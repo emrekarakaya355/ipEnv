@@ -10,6 +10,7 @@ class NetworkSwitch extends Device
     use HasFactory;
 
     protected $table = 'devices';
+    protected $fillable = ['type', 'brand'];
 
     protected static function boot()
     {
@@ -27,8 +28,6 @@ class NetworkSwitch extends Device
         return $this->belongsTo(NetworkSwitch::class,'parent_switch_id');
     }
 
-    public function childSwitches()
-    {
-        return $this->hasMany(NetworkSwitch::class,'parent_switch_id');
-    }
+
+
 }

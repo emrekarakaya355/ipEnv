@@ -16,13 +16,19 @@ return new class extends Migration
             $table->foreignId('location_id')->constrained('locations')->onDelete('cascade');
             $table->foreignId('device_type_id')->constrained('device_types')->onDelete('cascade');
             $table->string('type');
-            $table->string('name');
-            $table->string('serial_number')->unique();
-            $table->string('ip_address');
+            $table->string('name')->nullable();
+            $table->string('desc')->nullable();
+            $table->string('serial_number')->unique()->nullable();
+            $table->string('ip_address')->unique();;
             $table->string('status');
+            $table->string('block')->nullable();
+            $table->string('floor')->nullable();
+            $table->string('room_number')->nullable();
             $table->unsignedBigInteger('parent_switch_id')->nullable();
             $table->foreign('parent_switch_id')->references('id')->on('devices')->onDelete('cascade');
             $table->timestamps();
+
+            $table->softDeletes();
         });
     }
 

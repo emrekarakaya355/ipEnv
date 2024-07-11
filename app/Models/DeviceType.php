@@ -16,5 +16,13 @@ class DeviceType extends Model
     {
         return $this->hasMany(Device::class);
     }
+    public static function getBrandsByType($type)
+    {
+        return static::where('type', $type)->distinct('brand')->pluck('brand');
+    }
+    public static function getModelsByBrand($type, $brand)
+    {
+        return static::where('type', $type)->where('brand', $brand)->pluck('model');
+    }
 
 }

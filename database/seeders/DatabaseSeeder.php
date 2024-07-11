@@ -25,7 +25,10 @@ class DatabaseSeeder extends Seeder
         ]);
 
         Location::factory(10)->create();
-        DeviceType::factory(10)->create();
+        DeviceType::factory(8)->create();
         Device::factory(10)->create();
+        Device::factory(20)->create();
+        Device::factory(20)->create();
+
     }
 }

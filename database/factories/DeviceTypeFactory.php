@@ -16,10 +16,22 @@ class DeviceTypeFactory extends Factory
      */
     public function definition(): array
     {
+        $type = $this->faker->randomElement(['switch', 'access_point']);
+
+        if ($type === 'switch') {
+            $brands = ['Cisco', 'Seckin', 'TP-Link', 'Extreme', 'Netgear', 'Ruckus'];
+            $models = ['Sg590', 'SY12', 'AD123', 'AB512'];
+
+        } else {
+            $brands = ['Cisco', 'Aruba', 'HP', 'TP-Link', 'Extreme', 'Netgear', 'Ruckus'];
+            $models = ['1851', '315', '205', '512'];
+
+        }
+
         return [
-            'type' => $this->faker->randomElement(['switch', 'access point']),
-            'brand' => $this->faker-> randomElement(array:['cisco','aruba','cem']),
-            'model' => $this->faker->randomElement(array:['1851','315','205','512']),
+            'type' => $type,
+            'brand' => $this->faker->randomElement($brands),
+            'model' => $this->faker->randomElement($models),
         ];
     }
 }
