@@ -7,6 +7,7 @@ use App\Models\Device;
 use App\Models\DeviceType;
 use App\Models\Location;
 use App\Models\NetworkSwitch;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 
 class DeviceController extends Controller
@@ -18,44 +19,37 @@ class DeviceController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $search = $request->input('search');
-            $query = Device::query();
-            if ($search) {
-                $query->where('name', 'like', '%' . $search . '%')
-                ->orWhere('type', 'like', '%' . $search . '%')
-                ->orWhere('serial_number', 'like', '%' . $search . '%')
-                ->orWhere('ip_address', 'like', '%' . $search . '%')
-                    ->orWhereHas('location', function ($q) use ($search) {
-                        $q->where('faculty', 'like', '%' . $search . '%');
-                    });
-
-
-
-            }
-            $data = $query->paginate(10);
+            $data = $this->search($request,Device::class);
             return view('devices.partials.device_table', compact('data'))->render();
         }
-
 
         $devices = Device::paginate(10);
         return view('devices.index', compact('devices'));
     }
-    public function indexSwitches(){
 
+    public function indexSwitches(Request $request){
+        if ($request->ajax()) {
+            $data = $this->search($request,NetworkSwitch::class);
+            return view('devices.partials.device_table', compact('data'))->render();
+        }
         $devices = NetworkSwitch::paginate(10);
         return view('devices.index', compact('devices'));
 
     }
-    public function indexAp(){
-
+    public function indexAp(Request $request){
+        if ($request->ajax()) {
+            $data = $this->search($request,AccessPoint::class);
+            return view('devices.partials.device_table', compact('data'))->render();
+        }
         $devices = AccessPoint::paginate(10);
         return view('devices.index', compact('devices'));
 
     }
+
     public function create()
     {
         $locations = Location::all()->sortBy(['faculty','block','floor']);
-        $models = DeviceType::all()->sortBy(['brand','model']); // Burada Model modelini nasıl kullanıyorsanız ona göre ayarlayın
+        $models = DeviceType::all()->sortBy(['brand','model']);
 
         return view('devices.create', compact('locations', 'models'));
     }
@@ -147,14 +141,30 @@ class DeviceController extends Controller
     }
 
 
-    public function getSwitches()
+    public function getSwitches(): \Illuminate\Http\JsonResponse
     {
         $switches = Device::where('type', 'switch')->with('location')->get(['id','location_id', 'name', 'ip_address']);
         return response()->json(['switches' => $switches]);
     }
 
-
-
-
+    private function search(Request $request,$type): LengthAwarePaginator
+    {
+        $search = $request->input('search');
+        $query = $type::query();
+        if ($search) {
+            $query->where('name', 'like', '%' . $search . '%')
+                ->orWhere('type', 'like', '%' . $search . '%')
+                ->orWhere('serial_number', 'like', '%' . $search . '%')
+                ->orWhere('ip_address', 'like', '%' . $search . '%')
+                ->orWhere('desc', 'like', '%' . $search . '%')
+                ->orWhereHas('location', function ($q) use ($search) {
+                    $q->where('faculty', 'like', '%' . $search . '%');
+                })->orWhereHas('deviceType', function ($q) use ($search) {
+                    $q->where('model', 'like', '%' . $search . '%')
+                        ->orWhere('brand', 'like', '%' . $search . '%');
+                });
+        }
+        return $query->paginate(10);
+    }
 
 }
