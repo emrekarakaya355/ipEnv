@@ -13,10 +13,19 @@ return new class extends Migration
     {
         Schema::create('locations', function (Blueprint $table) {
             $table->id();
-            $table->string('faculty');
+            $table->string('faculty')->nullable(false);
             $table->timestamps();
         });
+
+        // Varsayılan veri ekleme
+        \Illuminate\Support\Facades\DB::table('locations')->insert([
+            'faculty' => 'Rektörlük',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
     }
+
+
 
     /**
      * Reverse the migrations.

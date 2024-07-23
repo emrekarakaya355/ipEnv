@@ -6,15 +6,17 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name', 'Laravel') }}</title>
 
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <!--link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet"-->
+
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 
 </head>
 <body class="bg-gray-200 font-sans leading-normal tracking-normal">
 <div class="flex flex-col md:flex-row">
     <!-- Sidebar -->
-    <x-sidebar2/>
+    <x-sidebar/>
     <!-- Main Content -->
-    <main class=" flex-1 ml-64">
+    <main class="flex-auto ml-64">
         {{$slot}}
     </main>
 </div>

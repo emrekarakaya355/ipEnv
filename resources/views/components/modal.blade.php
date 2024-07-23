@@ -30,7 +30,7 @@
                                         Lokasyon
                                     </th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        İsim
+                                        Isim
                                     </th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         IP Adresi
@@ -62,8 +62,8 @@
     function selectSwitch() {
         const selectedSwitch = document.querySelector('input[name="switchRadio"]:checked');
         if (selectedSwitch) {
-            document.getElementById('parent_switch_id').value = selectedSwitch.value;
-            document.getElementById('selected_switch_name').textContent = selectedSwitch.dataset.location;
+            document.getElementById('parent_device_id').value = selectedSwitch.value;
+            document.getElementById('parent_device_name').value = selectedSwitch.getAttribute('data-device_name');
             closeModal();
         } else {
             alert('Lütfen bir switch seçin');
@@ -96,16 +96,18 @@
         fetch('/api/switches')
             .then(response => response.json())
             .then(data => {
+                console.log(data);
                 const tableBody = document.getElementById('switchTableBody');
                 data.switches.forEach(switchItem => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td class="px-4 py-2">
-                            <input type="radio" name="switchRadio" value="${switchItem.id}">
+                            <input type="radio" name="switchRadio" value="${switchItem.id}" data-device_name="${switchItem.device_name}">
                         </td>
-                        <td class="px-4 py-2">${switchItem.location.faculty}</td>
-                        <td class="px-4 py-2">${switchItem.name}</td>
-                        <td class="px-4 py-2">${switchItem.ip_address}</td>
+                        <td class="px-4 py-2">${switchItem.latest_device_info.location.faculty}</td>
+                        <td class="px-4 py-2">${switchItem.device_name}</td>
+                        <td class="px-4 py-2">${switchItem.latest_device_info.ip_address}</td>
+
                     `;
                     tableBody.appendChild(row);
                 });

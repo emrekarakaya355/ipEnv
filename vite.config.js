@@ -12,9 +12,6 @@ export default defineConfig({
         }),
     ],
     server: {
-        host: '0.0.0.0',
-        hmr: {
-            host: '10.100.10.43'
-        },
+
     },
 });

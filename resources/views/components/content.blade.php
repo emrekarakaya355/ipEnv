@@ -1,4 +1,4 @@
-<div class="w-full p-8">
+<div class="flex-auto p-8">
     <h1 class="text-2xl font-semibold text-gray-900 mb-6">{{ $heading }}</h1>
     <div class="flex justify-between mb-4">
         <form id="searchForm" class="flex-grow mr-4">

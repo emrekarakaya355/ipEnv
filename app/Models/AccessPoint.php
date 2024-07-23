@@ -22,9 +22,14 @@ class AccessPoint extends Device
 
 
     }
-    public function parentSwitch()
+    public function deviceInfos(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->belongsTo(NetworkSwitch::class,'parent_switch_id');
+        return $this->hasMany(DeviceInfo::class, 'device_id');
+    }
+
+    public function latestDeviceInfo()
+    {
+        return $this->hasOne(DeviceInfo::class,'device_id')->latest();
     }
 }
 

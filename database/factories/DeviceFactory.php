@@ -2,10 +2,12 @@
 
 namespace Database\Factories;
 
+use App\DeviceStatus;
 use App\Models\DeviceType;
 use App\Models\Location;
 use App\Models\NetworkSwitch;
 use App\Models\Device;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class DeviceFactory extends Factory
@@ -24,25 +26,22 @@ class DeviceFactory extends Factory
      */
     public function definition(): array
     {
-        $locationId = Location::inRandomOrder()->first()->id ?? null;
 
         $deviceType = DeviceType::inRandomOrder()->first();
-
-
-        $parentSwitchId = NetworkSwitch::inRandomOrder()->first()?->id;
-        $useParentSwitch = $this->faker->boolean(90);
         return [
             'type' => $deviceType->type,
-            'location_id' => $locationId,
             'device_type_id' => $deviceType->id,
             'serial_number' => $this->faker->numberBetween(1000, 99999),
-            'name' => $this->faker->word,
-            'ip_address' => $this->faker->ipv4,
-            'status' => $this->faker->boolean,
-            'room_number' => fake()->numberBetween(0, 500),
-            'block' => fake()->randomElement(array:['A','B','C','D','Z','E','F']),
-            'floor' => fake()->randomDigit(),
-            'parent_switch_id' => $useParentSwitch && $parentSwitchId ? $parentSwitchId : null,
+            'registry_number' => $this->faker->numberBetween(1000, 99999),
+            'status' => $this->faker->randomElement(DeviceStatus::toArray()),
+            'device_name' => $this->faker->word,
+            'parent_device_id' => function () {
+                return NetworkSwitch::exists() ? NetworkSwitch::all()->random()->id : null;
+            },
+            'created_by'=> function () {
+                return User::all()->random()->id;
+            }
         ];
+
     }
 }

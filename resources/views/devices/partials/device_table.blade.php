@@ -1,7 +1,7 @@
 <table class="min-w-full bg-white">
     <thead>
     <tr class="bg-gray-100 text-gray-700">
-        @foreach (['Location', 'Type', 'Brand', 'Model', 'serial_number', 'name', 'IP_Address', 'Status'] as $header)
+        @foreach (['Fakülte', 'Cihaz Tipi', 'Marka', 'Model', 'Seri Numarası', 'Cihaz İsmi', 'IP Adresi', 'Durum'] as $header)
             <th class="py-3 px-4 text-left">
                 <a href="{{ request()->fullUrlWithQuery(['sort' => strtolower($header)]) }}">
                 {{ $header }}
@@ -11,22 +11,15 @@
     </tr>
     </thead>
     <tbody class="text-gray-700" id="deviceTableBody" >
-        @foreach ($data as $row)
+        @foreach ($devices as $row)
             <tr class="border-b border-gray-200 cursor-pointer" onclick="window.location.href='/devices/{{ $row->id }} '">
-                @foreach (['Location', 'Type', 'Brand', 'Model', 'serial_number', 'name', 'IP_Address', 'Status'] as $header)
+                @foreach (['Location', 'Type', 'Brand', 'Model', 'serial_number', 'Cihaz İsmi', 'IP_Address', 'Status'] as $header)
                     @switch($header)
                         @case('Location')
-                            <td class="py-3 px-4">{{ $row->faculty }}</td>
+                            <td class="py-3 px-4">{{ $row->latestDeviceInfo->location->faculty }}</td>
                             @break
-
-                        @case('Status')
-                            <td class="py-3 px-4">
-                                @if ($row->status == 0)
-                                    Aktif
-                                @else
-                                    Pasif
-                                @endif
-                            </td>
+                        @case('Cihaz İsmi')
+                            <td class="py-3 px-4">{{ $row->device_name }}</td>
                             @break
                         @default
                             <td class="py-3 px-4">{{ $row[strtolower($header)] }}</td>
@@ -44,5 +37,11 @@
 </table>
 
 <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-blue-gray-200 sm:px-6" id="pagination-links">
-    {{ $data->links() }}
+    {{ $devices->links() }}
 </div>
+
+
+@if ($devices->isEmpty())
+    <p class="text-center py-4">No records found.</p>
+@endif
+

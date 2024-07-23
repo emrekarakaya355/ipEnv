@@ -13,21 +13,19 @@ return new class extends Migration
     {
         Schema::create('devices', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('location_id')->constrained('locations')->onDelete('cascade');
-            $table->foreignId('device_type_id')->constrained('device_types')->onDelete('cascade');
+            $table->foreignId('device_type_id')->constrained('device_types');
             $table->string('type');
-            $table->string('name')->nullable();
-            $table->string('desc')->nullable();
-            $table->string('serial_number')->unique()->nullable();
-            $table->string('ip_address')->unique();;
-            $table->string('status');
-            $table->string('block')->nullable();
-            $table->string('floor')->nullable();
-            $table->string('room_number')->nullable();
-            $table->unsignedBigInteger('parent_switch_id')->nullable();
-            $table->foreign('parent_switch_id')->references('id')->on('devices')->onDelete('cascade');
+            $table->string('device_name')->nullable();
+            $table->string('serial_number')->unique();
+            $table->string('registry_number')->unique();
+            $table->enum('status', ['Çalışıyor', 'Depo', 'Garanti', 'Hurda'])->default('Çalışıyor');
+            $table->unsignedBigInteger('parent_device_id')->nullable();
+            $table->foreign('parent_device_id')->references('id')->on('devices');
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->foreign('created_by')->references('id')->on('users');
+            $table->unsignedBigInteger('deleted_by')->nullable();
+            $table->foreign('deleted_by')->references('id')->on('users');
             $table->timestamps();
-
             $table->softDeletes();
         });
     }

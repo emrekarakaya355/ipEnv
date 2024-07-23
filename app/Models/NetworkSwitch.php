@@ -23,11 +23,17 @@ class NetworkSwitch extends Device
             $model->type = 'switch';
         });
     }
-    public function parentSwitch()
+
+    // NetworkSwitch Model
+    public function deviceInfos(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->belongsTo(NetworkSwitch::class,'parent_switch_id');
+        return $this->hasMany(DeviceInfo::class, 'device_id');
     }
 
+    public function latestDeviceInfo()
+    {
+        return $this->hasOne(DeviceInfo::class,'device_id')->latest();
+    }
 
 
 }

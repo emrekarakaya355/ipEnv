@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Device;
+use App\Models\DeviceInfo;
 use App\Models\DeviceType;
 use App\Models\Location;
 use App\Models\User;
@@ -24,11 +25,14 @@ class DatabaseSeeder extends Seeder
             'email' => 'test@example.com',
         ]);
 
+        User::factory(5)->create();
         Location::factory(10)->create();
-        DeviceType::factory(8)->create();
+        DeviceType::factory(15)->create();
+        Device::factory(1)->create();
+        Device::factory(3)->create();
+        Device::factory(5)->create();
         Device::factory(10)->create();
-        Device::factory(20)->create();
-        Device::factory(20)->create();
+        DeviceInfo::factory(150)->create();
 
     }
 }

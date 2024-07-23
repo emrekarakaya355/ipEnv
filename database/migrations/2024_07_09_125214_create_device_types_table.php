@@ -20,7 +20,6 @@ return new class extends Migration
             $table->string('brand');
             $table->string('model');
             $table->timestamps();
-
             $table->softDeletes();
             $table->unique(['brand', 'model']);
         });

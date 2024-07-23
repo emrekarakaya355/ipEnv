@@ -25,4 +25,10 @@ class DeviceType extends Model
         return static::where('type', $type)->where('brand', $brand)->pluck('model');
     }
 
+    public function scopeSorted($query)
+    {
+        return $query->orderBy('type')
+            ->orderBy('brand')
+            ->orderBy('model');
+    }
 }

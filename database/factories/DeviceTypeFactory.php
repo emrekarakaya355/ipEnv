@@ -31,7 +31,7 @@ class DeviceTypeFactory extends Factory
         return [
             'type' => $type,
             'brand' => $this->faker->randomElement($brands),
-            'model' => $this->faker->randomElement($models),
+            'model' => $this->faker->randomElement($models).' '.$this->faker->randomElement(['1','2','3','4']),
         ];
     }
 }
