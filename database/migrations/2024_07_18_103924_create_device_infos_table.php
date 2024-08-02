@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+
+
     /**
      * Run the migrations.
      */
@@ -15,13 +17,19 @@ return new class extends Migration
             $table->id();
             $table->foreignId('device_id')->constrained('devices')->onDelete('cascade');
             $table->foreignId('location_id')->constrained('locations')->default(1);
-            $table->string('ip_address')->unique()->nullable();
+            $table->string('ip_address')->nullable();
             $table->string('description')->nullable();
 
             $table->string('update_reason')->nullable();
             $table->string('block')->nullable();
             $table->string('floor')->nullable();
             $table->string('room_number')->nullable();
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->foreign('created_by')->references('id')->on('users');
+            $table->unsignedBigInteger('updated_by')->nullable();
+            $table->foreign('updated_by')->references('id')->on('users');
+            $table->unsignedBigInteger('deleted_by')->nullable();
+            $table->foreign('deleted_by')->references('id')->on('users');
             $table->timestamps();
             $table->softDeletes();
         });

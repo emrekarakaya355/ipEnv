@@ -4,9 +4,7 @@
     <div class="w-full p-8">
         <h1 class="text-2xl font-semibold text-gray-900 mb-6">Cihaz Bilgileri</h1>
 
-       @include("devices.partials.device_info")
-
-
+        @include("devices.partials.device_info")
         @include("devices.partials.device_movements")
     </div>
 </x-layout>

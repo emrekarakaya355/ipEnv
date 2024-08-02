@@ -19,10 +19,9 @@
             </div>
             <div class="my-2 bg-gray-600 h-[1px]"></div>
         </div>
-
         <div
             class="p-2.5 mt-3 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-blue-600 text-white"
-        >
+            >
             <i class="bi bi-house-door-fill"></i>
             <a href="/devices" class="text-[15px] ml-4 text-gray-200 font-bold">Ana Sayfa</a>
         </div>
@@ -49,11 +48,11 @@
 
             </h1>
             <h1 class="cursor-pointer p-2 hover:bg-blue-600 rounded-md mt-1">
-                <a href="/switches" class="cursor-pointer p-2 hover:bg-blue-600 rounded-md mt-1">Switchler</a>
+                <a href="{{ route('devices.index.type', ['type' => 'switches']) }}"  class="cursor-pointer p-2 hover:bg-blue-600 rounded-md mt-1">Switchler</a>
 
             </h1>
             <h1 class="cursor-pointer p-2 hover:bg-blue-600 rounded-md mt-1">
-                <a href="/ap" class="cursor-pointer p-2 hover:bg-blue-600 rounded-md mt-1">Access Pointler</a>
+                <a href="{{ route('devices.index.type', ['type' => 'ap']) }}"  class="cursor-pointer p-2 hover:bg-blue-600 rounded-md mt-1">Access Pointler</a>
 
             </h1>
 
@@ -75,12 +74,34 @@
             <a href="/device_types" class="text-[15px] ml-4 text-gray-200 font-bold">Cihaz Tipleri</a>
         </div>
         <div class="my-4 bg-gray-600 h-[1px]"></div>
+        <div class="flex flex-col mt-auto space-y-2">
+            <div
+                class="p-2.5 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-blue-600 text-white"
+            >
+                <i class="bi bi-house-door-fill"></i>
+                <a href="/users" class="text-[15px] ml-4 text-gray-200 font-bold">Kullanıcılar</a>
+            </div>
 
-        <div class="p-2.5 mt-auto flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-blue-600 text-white">
-            <i class="bi bi-box-arrow-in-right"></i>
-            <span class="text-[15px] ml-4 text-gray-200 font-bold">Logout</span>
+            <div
+                class="p-2.5 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-blue-600 text-white"
+            >
+                <i class="bi bi-house-door-fill"></i>
+                <a href="{{ route('dashboard') }}" class="text-[15px] ml-4 text-gray-200 font-bold">Dashboard</a>
+            </div>
+
+            <div class="p-2.5 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-blue-600 text-white">
+                <i class="bi bi-box-arrow-in-right"></i>
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <a href="{{ route('logout') }}"
+                       onclick="event.preventDefault(); this.closest('form').submit();"
+                       class="text-[15px] ml-4 text-gray-200 font-bold"
+                    >
+                        Logout
+                    </a>
+                </form>
+            </div>
         </div>
-
     </div>
 
     <script type="text/javascript">

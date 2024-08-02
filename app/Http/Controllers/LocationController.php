@@ -22,13 +22,15 @@ class LocationController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'faculty' => 'required|string|max:255',
+            'building' => 'required|string|max:255',
+            'unit' => 'required|string|max:255',
         ]);
 
 
         try {
             Location::create([
-                'faculty' => ucfirst($request->faculty),
+                'building' => ucfirst($request->building),
+                'unit' => ucfirst($request->unit),
             ]);
             return response()->json(['success' => 'Location created successfully.']);
         }
@@ -84,6 +86,11 @@ class LocationController extends Controller
         $location->delete();
 
         return response()->json(['success' => 'Location deleted successfully.']);
+    }
+
+    public function getUnitsByBuilding($building){
+        $unit = Location::getUnitsByBuilding($building);
+        return response()->json(['unit' => $unit], 200);
     }
 
 }

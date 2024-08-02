@@ -13,13 +13,15 @@ return new class extends Migration
     {
         Schema::create('locations', function (Blueprint $table) {
             $table->id();
-            $table->string('faculty')->nullable(false);
+            $table->string('building')->nullable(false);
+            $table->string('unit')->nullable(false);
             $table->timestamps();
         });
 
         // Varsayılan veri ekleme
         \Illuminate\Support\Facades\DB::table('locations')->insert([
-            'faculty' => 'Rektörlük',
+            'building' => 'Rektörlük',
+            'unit' => 'network',
             'created_at' => now(),
             'updated_at' => now(),
         ]);

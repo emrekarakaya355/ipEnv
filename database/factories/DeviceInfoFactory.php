@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Models\Device;
 use App\Models\Location;
 use App\Models\NetworkSwitch;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -32,6 +33,9 @@ class DeviceInfoFactory extends Factory
             'block' => fake()->randomElement(array:['A','B','C','D','Z','E','F']),
             'update_reason' =>fake()->word,
             'floor' => fake()->randomDigit(),
+            'created_by'=> function () {
+                return User::all()->random()->id;
+            },
         ];
     }
 }

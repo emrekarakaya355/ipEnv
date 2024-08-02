@@ -11,6 +11,18 @@ class DeviceInfo extends Model
 {
     use HasFactory, SoftDeletes;
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+
+            // Aynı device_id'ye sahip mevcut kayıtları bul ve sil
+            self::where('device_id', $model->device_id)->delete();
+
+            $model->updated_at = null; // veya belirli bir değeri güncellemek istemiyorsanız unset edebilirsiniz.
+        });
+    }
     protected $fillable = [
         'device_id',
         'location_id',
@@ -47,6 +59,11 @@ class DeviceInfo extends Model
         ];
 
         return self::create(array_merge(['device_id' => $deviceId], $defaultDeviceInfo));
+    }
+
+    public function scopeSorted($query)
+    {
+        return $query->orderBy('created_at', 'desc');
     }
 
 }

@@ -10,7 +10,6 @@ class NetworkSwitch extends Device
     use HasFactory;
 
     protected $table = 'devices';
-    protected $fillable = ['type', 'brand'];
 
     protected static function boot()
     {

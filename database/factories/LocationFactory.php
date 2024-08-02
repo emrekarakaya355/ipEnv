@@ -18,7 +18,8 @@ class LocationFactory extends Factory
     public function definition(): array
     {
         return [
-            'faculty' => fake()->randomElement(array:['Rektörlük','Fen','Diş','Cami','İlahiyat','Myo','rektör']).''.fake()->randomElement(array:['-','/','*','+','1','2','3'])
+            'building' => fake()->randomElement(array:['Rektörlük','Fen','Diş','Cami','İlahiyat','Myo','rektör']).'',
+            'unit' => fake()->randomElement(array:['öğrenci işleri','dekan','personel','güvenlik','depo'])
         ];
     }
 }

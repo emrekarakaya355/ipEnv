@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\DeviceStatus;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreDeviceRequest extends FormRequest
@@ -18,19 +19,21 @@ class StoreDeviceRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array|string>
      */
     public function rules(): array
     {
+
         return array_merge([
             'type' => 'required|string|max:255',
-            'brand_id' => 'required|string|max:255',
-            'model_id' => 'required|string|max:255',
+            'brand' => 'required|string|max:255',
+            'model' => 'required|string|max:255',
             'device_name' => 'nullable|string|max:255',
             'serial_number' => 'required|string|max:255',
-            'registry_number' => 'required|string|max:255',
-            //'status' => ['required', 'string', 'in:' . implode(',', DeviceStatus::toArray())],
+            'registry_number' => 'nullable|string|max:255',
+            'status' => ['nullable', 'string', 'in:' . implode(',', DeviceStatus::toArray())],
             'parent_device_id' =>'nullable|exists:devices,id',
+
 
         ], $this->deviceInfoRules());
     }

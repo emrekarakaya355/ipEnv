@@ -40,7 +40,8 @@ class DeviceFactory extends Factory
             },
             'created_by'=> function () {
                 return User::all()->random()->id;
-            }
+            },
+
         ];
 
     }

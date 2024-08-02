@@ -13,7 +13,8 @@
                 <div class="bg-gray-100 p-4 rounded-lg shadow-md mb-4">
                     <div class="grid grid-cols-3 gap-4 items-center">
                         <div>
-                            <p><strong>Fakülte:</strong> {{ $deviceInfo->location->faculty }}</p>
+                            <p><strong>Bina:</strong> {{ $deviceInfo->location->building }}</p>
+                            <p><strong>Birim:</strong> {{ $deviceInfo->location->unit }}</p>
                             <p><strong>Blok:</strong> {{ $deviceInfo->block }}</p>
                             <p><strong>Kat:</strong> {{ $deviceInfo->floor }}</p>
                             <p><strong>Oda No:</strong> {{ $deviceInfo->room_number }}</p>

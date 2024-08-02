@@ -9,51 +9,43 @@ use App\Models\DeviceInfo;
 use App\Models\DeviceType;
 use App\Models\Location;
 use App\Models\NetworkSwitch;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use App\Services\DeviceService;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 
 class DeviceController extends Controller
 {
 
+    protected $deviceService;
+
+    public function __construct(DeviceService $deviceService){
+        $this->deviceService = $deviceService;
+    }
+
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index(Request $request, $type = null)
     {
-        if ($request->ajax()) {
-            $devices = $this->search($request,Device::class);
 
+        $modelClass = $this->getModelClass($type);
+
+        if ($request->ajax()) {
+            $devices = $this->deviceService->search($request, $modelClass);
             return view('devices.partials.device_table', compact('devices'))->render();
         }
 
-        $devices = Device::with('latestDeviceInfo')->sorted()->paginate(10);
+        $devices = $modelClass::with('latestDeviceInfo')->sorted()->paginate(10);
         return view('devices.index', compact('devices'));
     }
 
-    public function indexSwitches(Request $request){
-        if ($request->ajax()) {
-            $data = $this->search($request,NetworkSwitch::class);
-            return view('devices.partials.device_table', compact('data'))->render();
-        }
-        $devices = NetworkSwitch::with(['latestDeviceInfo'])->paginate(10);
-        return view('devices.index', compact('devices'));
-
-    }
-    public function indexAp(Request $request){
-        if ($request->ajax()) {
-            $data = $this->search($request,AccessPoint::class);
-            return view('devices.partials.device_table', compact('data'))->render();
-        }
-        $devices = AccessPoint::with('latestDeviceInfo')->sorted()->paginate(10);
-        return view('devices.index', compact('devices'));
-
-    }
 
     public function create()
     {
         $locations = Location::all()->sortBy(['faculty']);
-
         $models = DeviceType::all()->sortBy(['brand','model']);
 
         return view('devices.create', compact('locations', 'models'));
@@ -63,7 +55,9 @@ class DeviceController extends Controller
 
         $device = Device::with(['latestDeviceInfo', 'parentDevice.latestDeviceInfo','connectedDevices.latestDeviceInfo','deviceInfos'])->findOrFail($id);
 
-        return view('devices.show', compact('device'));
+        $locations = Location::all()->sortBy(['building']);
+
+        return view('devices.show', compact('device','locations'));
     }
 
 
@@ -75,27 +69,26 @@ class DeviceController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Device  $device
-     * @return \Illuminate\Http\JsonResponse
+     * @param StoreDeviceRequest $request
+     * @param Device $device
+     * @return RedirectResponse
      */
-    public function update(Request $request, Device $device)
+    public function update(StoreDeviceRequest $request, Device $device)
     {
-        $field = $request->input('field');
-        $value = $request->input('value');
 
-        if (in_array($field, ['faculty', 'block', 'floor', 'roomNumber'])) {
-            $device->$field = $value;
-            $device->save();
+        // Doğrulama başarılı, veriler kullanılabilir
+        $deviceValidated = $request->validated();
 
-            return response()->json(['success' => true]);
+        $response= $this->deviceService->updateDeviceWithInfo($deviceValidated,$device);
+        if($response){
+            return redirect()->route('devices.show',$device)->with('success', 'Cihaz başarıyla oluşturuldu.');
         }
 
-        return response()->json(['success' => false], 400);
     }
 
-    public function archive(Device $device): \Illuminate\Http\JsonResponse
+    public function archive(Device $device): JsonResponse
     {
+
         DB::transaction(function () use ($device) {
             DeviceInfo::createDefault($device->id);
 
@@ -110,13 +103,11 @@ class DeviceController extends Controller
         ]);
     }
 
-    public function destroy(Device $device)
+    public function destroy(Device $device): JsonResponse
     {
         try {
-            // Cihazı sil ve ilişkili device_infos otomatik olarak silinsin
             $device->delete();
 
-            // JSON yanıtı döndür
             return response()->json([
                 'success' => true,
                 'message' => 'Cihaz başarıyla silindi.'
@@ -130,79 +121,32 @@ class DeviceController extends Controller
         }
     }
 
-    public function store(StoreDeviceRequest  $request)
+    public function store(StoreDeviceRequest  $request): RedirectResponse
 
     {
         // Doğrulama başarılı, veriler kullanılabilir
         $deviceValidated = $request->validated();
-        $deviceType = DeviceType::where('type', $deviceValidated['type'])->
-        where('model', $deviceValidated['model_id'])->
-        where('brand', $deviceValidated['brand_id'])->
-        first();
 
-        //Her cihaz için en azından bir info olmak zorunda
-        DB::transaction(function () use ($deviceValidated, $deviceType) {
-            // Yeni cihaz kaydını oluştur
-            $deviceData =[
-                'type' => $deviceType->type,
-                'device_type_id' => $deviceType->id,
-                'device_name' => $deviceValidated['device_name'],
-                'serial_number' => $deviceValidated['serial_number'],
-                'registry_number' => $deviceValidated['registry_number'],
-                'parent_device_id' => $deviceValidated['parent_device_id'],
-            ];
-
-            //ip adresi varsa default olarak çalışıyor yoksa depoda olarak ayarlıyoruz.
-            if ($deviceValidated['ip_address'] === null) {
-
-                $deviceData['status'] = "Depo";
-            }
-            $device = Device::create($deviceData);
-
-            // Device Info kaydını oluştur
-            DeviceInfo::create([
-                'device_id' => $device->id,
-                'ip_address' => $deviceValidated['ip_address'],
-                'location_id' => $deviceValidated['location_id'],
-                'block' => $deviceValidated['block'],
-                'floor' => $deviceValidated['floor'],
-                'room_number' => $deviceValidated['room_number'],
-                'description' => $deviceValidated['description'],
-            ]);
-        });
-
-        // Redirect to a success page or route
+        $this->deviceService->createDeviceWithInfo($deviceValidated);
         return redirect()->route('devices.index')->with('success', 'Cihaz başarıyla oluşturuldu.');
+
     }
 
 
-    public function getSwitches(): \Illuminate\Http\JsonResponse
+    public function getSwitches(): JsonResponse
     {
 
         $switches = Device::where('type', 'switch')->with('latestDeviceInfo.location')->get();
         return response()->json(['switches' => $switches]);
     }
 
-    private function search(Request $request,$type): LengthAwarePaginator
+
+    private function getModelClass($type)
     {
-        $search = $request->input('search');
-        $query = $type::query();
-        if ($search) {
-            $query->where('name', 'like', '%' . $search . '%')
-            ->orWhere('type', 'like', '%' . $search . '%')
-                ->orWhere('serial_number', 'like', '%' . $search . '%')
-
-                ->orWhereHas('latestDeviceInfo.location', function ($q) use ($search) {
-                    $q->where('faculty', 'like', '%' . $search . '%')
-                        ->orWhere('ip_address', 'like', '%' . $search . '%')
-                        ->orWhere('description', 'like', '%' . $search . '%');
-                })
-                ->orWhereHas('deviceType', function ($q) use ($search) {
-                    $q->where('model', 'like', '%' . $search . '%')
-                        ->orWhere('brand', 'like', '%' . $search . '%');
-                });
-        }
-        return $query->with('latestDeviceInfo')->sorted()->paginate(10);
+        return match ($type) {
+            'switches' => NetworkSwitch::class,
+            'ap' => AccessPoint::class,
+            default => Device::class,
+        };
     }
-
 }

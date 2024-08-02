@@ -9,6 +9,7 @@ use App\Models\Location;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -32,7 +33,12 @@ class DatabaseSeeder extends Seeder
         Device::factory(3)->create();
         Device::factory(5)->create();
         Device::factory(10)->create();
-        DeviceInfo::factory(150)->create();
+        DeviceInfo::factory(10)->create();
+        DeviceInfo::factory(10)->create();
+        DeviceInfo::factory(10)->create();
+        DeviceInfo::factory(10)->create();
+        DeviceInfo::factory(10)->create();
+        DeviceInfo::factory(10)->create();
 
     }
 }

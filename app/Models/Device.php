@@ -23,6 +23,23 @@ class Device extends Model
         'parent_device_id',
         'status',
     ];
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            $model->created_by = auth()->id();
+        });
+
+        static::updating(function ($model) {
+            $model->updated_by = auth()->id();
+        });
+
+        static::deleting(function ($model) {
+            $model->deleted_by = auth()->id();
+        });
+    }
+
     public function newFromBuilder($attributes = [], $connection = null): Device
     {
 
@@ -45,9 +62,11 @@ class Device extends Model
 
         return $types[$type] ?? self::class;
     }
-    public function deviceInfos()
+    public function deviceInfos(): HasMany
     {
-        return $this->hasMany(DeviceInfo::class);
+        return $this->hasMany(DeviceInfo::class)
+            ->withTrashed()
+            ->orderBy('created_at', 'desc');
     }
     public function latestDeviceInfo()
     {
@@ -75,9 +94,14 @@ class Device extends Model
         }
     }
 
-    protected function getFacultyAttribute()
+    protected function getBuildingAttribute()
     {
-        return $this->latestDeviceInfo ? $this->latestDeviceInfo->location->faculty : null;
+        return $this->latestDeviceInfo ? $this->latestDeviceInfo->location->building : null;
+
+    }
+    protected function getUnitAttribute()
+    {
+        return $this->latestDeviceInfo ? $this->latestDeviceInfo->location->unit : null;
 
     }
 
@@ -121,8 +145,6 @@ class Device extends Model
     {
         return $this->hasMany(Device::class, 'parent_device_id');
     }
-
-
 
     public function scopeSorted($query)
     {

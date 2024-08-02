@@ -96,7 +96,6 @@
         fetch('/api/switches')
             .then(response => response.json())
             .then(data => {
-                console.log(data);
                 const tableBody = document.getElementById('switchTableBody');
                 data.switches.forEach(switchItem => {
                     const row = document.createElement('tr');
@@ -104,7 +103,7 @@
                         <td class="px-4 py-2">
                             <input type="radio" name="switchRadio" value="${switchItem.id}" data-device_name="${switchItem.device_name}">
                         </td>
-                        <td class="px-4 py-2">${switchItem.latest_device_info.location.faculty}</td>
+                        <td class="px-4 py-2">${switchItem.latest_device_info.location.building}</td>
                         <td class="px-4 py-2">${switchItem.device_name}</td>
                         <td class="px-4 py-2">${switchItem.latest_device_info.ip_address}</td>
 

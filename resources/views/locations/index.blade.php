@@ -10,20 +10,23 @@
                 Yeni Lokasyon Ekle
             </button>
 
-            <div class="overflow-x-auto bg-white shadow-md rounded-xl">
+            <        <div class="overflow-x-auto bg-white shadow-md rounded-xl">
                 <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50  ">
+                    <thead class="bg-gray-50">
                     <tr>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fakülte</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bina</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Birim</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">İşlemler</th>
                     </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-gray-200 ">
+                    <tbody class="bg-white divide-y divide-gray-200">
                     @foreach($locations as $location)
-                        <tr class="border-b border-gray-200  flex justify-between">
-                            <td class="px-6 py-4 whitespace-nowrap">{{ $location->faculty }}</td>
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap">{{ $location->building }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">{{ $location->unit }}</td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <x-edit-button onclick="editLocation({{ $location->id }})" />
-                                <x-delete-button onclick="deleteLocation({{ $location->id }})"/>
+                                <x-edit-button class="text-blue-600 hover:text-blue-900" onclick="editLocation({{ $location->id }})">Düzenle</x-edit-button>
+                                <x-delete-button class="text-red-600 hover:text-red-900 ml-4" onclick="deleteLocation({{ $location->id }})">Sil</x-delete-button>
                             </td>
                         </tr>
                     @endforeach
