@@ -1,10 +1,17 @@
 <table class="min-w-full bg-white">
     <thead>
     <tr class="bg-gray-100 text-gray-700">
-        @foreach (['Bina','Birim', 'Cihaz Tipi', 'Marka', 'Model', 'Seri Numarası', 'Cihaz İsmi', 'IP Adresi', 'Durum'] as $header)
+        @foreach ($columns as $header => $column)
+            @php
+                $sortOrder = request()->get('sort') === $header && request()->get('order') === 'asc' ? 'desc' : 'asc';
+            @endphp
             <th class="py-3 px-4 text-left">
-                <a href="{{ request()->fullUrlWithQuery(['sort' => strtolower($header)]) }}">
-                {{ $header }}
+                <a href="{{ request()->fullUrlWithQuery(['sort' => $header, 'order' => $sortOrder]) }}">
+                    {{ $header }}
+                    @if (request()->get('sort') === $header)
+                        <span>{{ request()->get('order') === 'asc' ? '▲' : '▼' }}</span>
+                    @endif
+                </a>
             </th>
         @endforeach
         <th class="py-3 px-4 text-left">Düzenle</th>

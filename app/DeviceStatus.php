@@ -12,10 +12,10 @@ enum DeviceStatus: string
     public static function toArray(): array
     {
         return [
-            self::WORKING->value => 'Çalışıyor',
-            self::STORAGE->value => 'Depo',
-            self::WARRANTY->value => 'Garanti',
-            self::SCRAP->value => 'Hurda',
+            self::WORKING->name => self::WORKING->value,
+            self::STORAGE->name => self::STORAGE->value,
+            self::WARRANTY->name => self::WARRANTY->value,
+            self::SCRAP->name => self::SCRAP->value,
         ];
     }
 }

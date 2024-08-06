@@ -18,13 +18,6 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        // Varsayılan veri ekleme
-        \Illuminate\Support\Facades\DB::table('locations')->insert([
-            'building' => 'Rektörlük',
-            'unit' => 'network',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
     }
 
 

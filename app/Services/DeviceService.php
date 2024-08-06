@@ -45,11 +45,17 @@ class DeviceService
                 ], 500); // 200 OK
             }
 
-            if ($device->isDirty()){
 
-                $device->update();
-            }
             if ($deviceInfo->isDirty()) {
+                //eğer ip adresi değiştiyse
+
+                if($deviceInfo->isDirty('ip_address')){
+                    foreach($device->connectedDevices->all() as $childDevice){
+                        $childDevice->parent_device_id = null;
+                        $childDevice->save();
+                    }
+                }
+
                 //eğer değişiklik var ise en son kayıt için update reason güncelleniyor.
                 $deviceInfo = $deviceInfo->fresh();
                 $deviceInfo->update(['update_reason' => $deviceValidated['update_reason']]);
@@ -57,6 +63,9 @@ class DeviceService
                 //yeni info ekleniyor.
                  $this->createDeviceInfo($deviceValidated,$device);
 
+                if ($device->isDirty()){
+                    $device->save();
+                }
             }
             return response()->json([
                 'success' => true,
@@ -83,6 +92,7 @@ class DeviceService
                         ->orWhere('brand', 'like', '%' . $search . '%');
                 });
         }
+
         return $query->with('latestDeviceInfo')->sorted()->paginate(10);
     }
 
@@ -128,7 +138,6 @@ class DeviceService
 
     private function fillDevice($deviceValidated,$device){
         $deviceType = DeviceType::getDeviceType($deviceValidated['type'],$deviceValidated['model'], $deviceValidated['brand']);
-
         // Device verilerinde değişiklik kontrolü
         $deviceData = ([
             'type' => $deviceType->type,
@@ -136,18 +145,17 @@ class DeviceService
             'device_name' => $deviceValidated['device_name'],
             'serial_number' => $deviceValidated['serial_number'],
             'registry_number' => $deviceValidated['registry_number'],
-            //'parent_device_id' => $deviceValidated['parent_device_id'] === null ? "" : $deviceValidated['parent_device_id'],
+            'parent_device_id' => $deviceValidated['parent_device_id'],
             'status' => $deviceValidated['status'],
         ]);
-
         $device->fill($deviceData);
+
     }
 
     private function fillDeviceInfo($deviceValidated,$device){
 
         $locationId = Location::getLocationIdFromBuildingAndUnit($deviceValidated['building'], $deviceValidated['unit']);
         $deviceInfo = $device->latestDeviceInfo;
-
         // DeviceInfo verilerinde değişiklik kontrolü
         $deviceInfoData = [
             'device_id' => $device->id,
@@ -156,7 +164,10 @@ class DeviceService
             'block' => $deviceValidated['block'],
             'floor' => $deviceValidated['floor'],
             'room_number' => $deviceValidated['room_number'],
+            'status' => $deviceValidated['status'],
+            'parent_device_id' => $deviceValidated['parent_device_id'],
         ];
+
         $deviceInfo->fill($deviceInfoData);
 
         return $deviceInfo;

@@ -73,6 +73,19 @@ class Device extends Model
         return $this->hasOne(DeviceInfo::class)->latest();
     }
 
+// Device.php (Model)
+    public function latestDeviceLocation()
+    {
+        return $this->hasOneThrough(
+            Location::class,
+            DeviceInfo::class,
+            'device_id', // DeviceInfo'daki foreign key
+            'id',        // Location'daki local key
+            'id',        // Device'daki local key
+            'location_id' // DeviceInfo'daki foreign key
+        )->latest(); // En güncel DeviceInfo'yu alır
+    }
+
     public function deviceType(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(DeviceType::class);
@@ -146,9 +159,61 @@ class Device extends Model
         return $this->hasMany(Device::class, 'parent_device_id');
     }
 
-    public function scopeSorted($query)
+    // Device.php (Model)
+    public function scopeSorted($query, $sortColumn = 'created_at', $sortOrder = 'desc')
     {
-        return $query->orderBy('created_at', 'desc');
+
+        // Sıralama yapılacak sütunlar
+        $validColumns = [
+            'building' => 'locations.building',
+            'unit' => 'locations.unit',
+            'block' => 'device_infos.block',
+            'floor' => 'device_infos.floor',
+            'description' => 'device_infos.description',
+            'room_number' => 'device_infos.room_number',
+            'ip_address' => 'device_infos.ip_address',
+            'brand' => 'device_types.brand',
+            'model' => 'device_types.model',
+        ];
+
+        $column = $validColumns[$sortColumn] ?? 'created_at';
+        // İlişkilendirilmiş tablolarda sıralama yapmak için join işlemi
+        if (strpos($column, '.') !== false) {
+            list($table, $column) = explode('.', $column);
+
+            if ($table === 'locations') {
+
+                return $query->join('device_infos', 'device_infos.device_id', '=', 'devices.id')
+                    ->join('locations', 'locations.id', '=', 'device_infos.location_id')
+                    ->orderBy('locations.' . $column, $sortOrder);
+            } elseif ($table === 'device_infos') {
+                return $query->join('device_infos', 'device_infos.device_id', '=', 'devices.id')
+                    ->orderBy('device_infos.' . $column, $sortOrder);
+            } elseif ($table === 'device_types') {
+
+                return $query->join('device_types', 'device_types.id', '=', 'devices.device_type_id')
+                    ->orderBy('device_types.' . $column, $sortOrder);
+            }
+        }
+
+        // Diğer sütunlar için doğrudan sıralama
+        return $query->orderBy($column, $sortOrder);
+    }
+
+
+    public static function getColumnMapping()
+    {
+        return [
+            'Bina' => 'building',
+            'Birim' => 'unit',
+            'Cihaz Tipi' => 'type',
+            'Marka' => 'brand',
+            'Model' => 'model',
+            'Seri Numarası' => 'serial_number',
+            'Cihaz İsmi' => 'name',
+            'IP Adresi' => 'ip_address',
+            'Durum' => 'status',
+        ];
     }
 
 }

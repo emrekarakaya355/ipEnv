@@ -7,9 +7,6 @@ use \App\Http\Controllers\DeviceTypeController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
 
 // Dashboard route'u oturum açmış kullanıcılar için
 Route::get('/dashboard', function () {
@@ -27,8 +24,13 @@ Route::middleware('auth')->group(function () {
 
 // Cihaz ve diğer resource route'ları oturum açmış kullanıcılar için
 Route::middleware('auth')->group(function () {
+    Route::get('/', function () { return view('welcome'); });
+
+    Route::get('/devices/orphans', [DeviceController::class, 'orphans']);
+
     Route::resource('devices', DeviceController::class);
     Route::get('/devices/type/{type}', [DeviceController::class, 'index'])->name('devices.index.type');
+
     Route::post('/devices/{device}/archive', [DeviceController::class, 'archive'])->name('devices.archive');
 
     Route::get('/get-brands/{type}', [DeviceTypeController::class, 'getBrandsByType']);

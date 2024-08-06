@@ -51,20 +51,63 @@
 </div>
 
 <script>
-    function openModal() {
+    let currentPageContext = '';
+    const parentDeviceIdInput = document.getElementById('parent_device_id');
+    // Function to update parent_device_id and trigger the change event
+
+    function updateParentDeviceId(newId, save) {
+        parentDeviceIdInput.value = newId;
+        if(save === 'show'){
+            handleInputChange(); // Call this directly to enable the save button
+        }
+    }
+
+    function openModal(context) {
+        currentPageContext = context;
         document.getElementById('modal').classList.remove('hidden');
     }
 
-    function closeModal() {
+    function closeModal(selectedSwitch) {
+
+        if(currentPageContext === 'show' && selectedSwitch != null){
+            updateParentDeviceInfo(selectedSwitch);
+        }
         document.getElementById('modal').classList.add('hidden');
+
+    }
+
+    function unselectDevice() {
+        document.getElementById('parent_device_name').textContent = 'Seçili cihaz yok';
+        document.getElementById('parent_device_building').textContent = '';
+        document.getElementById('parent_device_ip_address').textContent = '';
+        document.getElementById('parent_device_description').textContent = '';
+        document.getElementById('parent_device_id').textContent = null;
+    }
+
+        // Bu fonksiyon modal kapatıldığında seçilen cihazın bilgisini günceller
+    function updateParentDeviceInfo(selectedSwitch) {
+        const parentDeviceName = document.getElementById('parent_device_name');
+        const parentDeviceBuilding = document.getElementById('parent_device_building');
+        const parentDeviceIpAddress = document.getElementById('parent_device_ip_address');
+        const parentDeviceDescription = document.getElementById('parent_device_description');
+        const parentDeviceId = document.getElementById('parent_device_id');
+
+        // Burada seçilen cihazın verilerini alıp div'lere atıyoruz
+        parentDeviceName.textContent = selectedSwitch.getAttribute('data-device_name');
+        parentDeviceBuilding.textContent = selectedSwitch.getAttribute('data-building');
+        parentDeviceIpAddress.textContent = selectedSwitch.getAttribute('data-ip_address');
+        parentDeviceDescription.textContent = selectedSwitch.getAttribute('data-description');
+        parentDeviceId.value = selectedSwitch.value;
     }
 
     function selectSwitch() {
         const selectedSwitch = document.querySelector('input[name="switchRadio"]:checked');
+
         if (selectedSwitch) {
-            document.getElementById('parent_device_id').value = selectedSwitch.value;
-            document.getElementById('parent_device_name').value = selectedSwitch.getAttribute('data-device_name');
-            closeModal();
+            updateParentDeviceId(selectedSwitch.value, currentPageContext);
+            //document.getElementById('parent_device_id').value = selectedSwitch.value;
+            //document.getElementById('parent_device_name').value = selectedSwitch.getAttribute('data-device_name');
+            closeModal(selectedSwitch);
         } else {
             alert('Lütfen bir switch seçin');
         }
@@ -101,7 +144,14 @@
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td class="px-4 py-2">
-                            <input type="radio" name="switchRadio" value="${switchItem.id}" data-device_name="${switchItem.device_name}">
+                            <input type="radio" name="switchRadio"
+                        value="${switchItem.id}"
+                        data-device_name="${switchItem.device_name}"
+                        data-building="${switchItem.latest_device_info.location.building}"
+                        data-ip_address="${switchItem.latest_device_info.ip_address}"
+                        data-description="${switchItem.latest_device_info.description}"
+
+                        >
                         </td>
                         <td class="px-4 py-2">${switchItem.latest_device_info.location.building}</td>
                         <td class="px-4 py-2">${switchItem.device_name}</td>

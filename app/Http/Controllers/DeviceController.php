@@ -21,7 +21,8 @@ class DeviceController extends Controller
 
     protected $deviceService;
 
-    public function __construct(DeviceService $deviceService){
+    public function __construct(DeviceService $deviceService)
+    {
         $this->deviceService = $deviceService;
     }
 
@@ -31,33 +32,38 @@ class DeviceController extends Controller
     public function index(Request $request, $type = null)
     {
 
+        $columns = Device::getColumnMapping();
+        $sortColumn = $columns[$request->get('sort', 'created_at')] ?? 'created_at';
+        $sortOrder = $request->get('order', 'desc');
         $modelClass = $this->getModelClass($type);
 
         if ($request->ajax()) {
             $devices = $this->deviceService->search($request, $modelClass);
-            return view('devices.partials.device_table', compact('devices'))->render();
+            return view('devices.partials.device_table', compact('devices','columns'))->render();
         }
+        $devices = $modelClass::with('latestDeviceInfo')->sorted($sortColumn, $sortOrder)->paginate(10);
 
-        $devices = $modelClass::with('latestDeviceInfo')->sorted()->paginate(10);
-        return view('devices.index', compact('devices'));
+        return view('devices.index', compact('devices','columns'));
     }
+
 
 
     public function create()
     {
         $locations = Location::all()->sortBy(['faculty']);
-        $models = DeviceType::all()->sortBy(['brand','model']);
+        $models = DeviceType::all()->sortBy(['brand', 'model']);
 
         return view('devices.create', compact('locations', 'models'));
     }
 
-    public function show($id){
+    public function show($id)
+    {
 
-        $device = Device::with(['latestDeviceInfo', 'parentDevice.latestDeviceInfo','connectedDevices.latestDeviceInfo','deviceInfos'])->findOrFail($id);
+        $device = Device::with(['latestDeviceInfo', 'parentDevice.latestDeviceInfo', 'connectedDevices.latestDeviceInfo', 'deviceInfos'])->findOrFail($id);
 
         $locations = Location::all()->sortBy(['building']);
 
-        return view('devices.show', compact('device','locations'));
+        return view('devices.show', compact('device', 'locations'));
     }
 
 
@@ -75,15 +81,13 @@ class DeviceController extends Controller
      */
     public function update(StoreDeviceRequest $request, Device $device)
     {
-
         // Doğrulama başarılı, veriler kullanılabilir
         $deviceValidated = $request->validated();
-
-        $response= $this->deviceService->updateDeviceWithInfo($deviceValidated,$device);
-        if($response){
-            return redirect()->route('devices.show',$device)->with('success', 'Cihaz başarıyla oluşturuldu.');
+        $response = $this->deviceService->updateDeviceWithInfo($deviceValidated, $device);
+        if ($response) {
+            return redirect()->route('devices.show', $device)->with('success', 'Cihaz başarıyla update edildi.');
         }
-
+        return redirect()->route('devices.show', $device)->with('success', 'false');
     }
 
     public function archive(Device $device): JsonResponse
@@ -121,7 +125,7 @@ class DeviceController extends Controller
         }
     }
 
-    public function store(StoreDeviceRequest  $request): RedirectResponse
+    public function store(StoreDeviceRequest $request): RedirectResponse
 
     {
         // Doğrulama başarılı, veriler kullanılabilir
@@ -136,7 +140,11 @@ class DeviceController extends Controller
     public function getSwitches(): JsonResponse
     {
 
-        $switches = Device::where('type', 'switch')->with('latestDeviceInfo.location')->get();
+        $switches = Device::where('type', 'switch')
+            ->whereHas('latestDeviceInfo', function ($query) {
+                $query->whereNotNull('ip_address');
+            })
+            ->with('latestDeviceInfo.location')->get();
         return response()->json(['switches' => $switches]);
     }
 
@@ -148,5 +156,20 @@ class DeviceController extends Controller
             'ap' => AccessPoint::class,
             default => Device::class,
         };
+    }
+
+    private function getOrphans()
+    {
+        // parent_device_id'sı NULL olan tüm cihazları al
+        return Device::whereNull('parent_device_id')->orderBy('updated_at','desc')->paginate(10);
+    }
+
+    public function orphans()
+    {
+        $devices = $this->getOrphans();
+        $columns = Device::getColumnMapping();
+
+        return view('devices.index', compact('devices','columns'));
+
     }
 }

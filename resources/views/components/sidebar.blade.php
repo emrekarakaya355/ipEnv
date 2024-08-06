@@ -55,6 +55,9 @@
                 <a href="{{ route('devices.index.type', ['type' => 'ap']) }}"  class="cursor-pointer p-2 hover:bg-blue-600 rounded-md mt-1">Access Pointler</a>
 
             </h1>
+            <h1 class="cursor-pointer p-2 hover:bg-blue-600 rounded-md mt-1">
+                <a href="/devices/orphans"  class="cursor-pointer p-2 hover:bg-blue-600 rounded-md mt-1">Öksüz cihazlar</a>
+            </h1>
 
         </div>
         <div class="my-4 bg-gray-600 h-[1px]"></div>
@@ -106,14 +109,14 @@
 
     <script type="text/javascript">
         function dropdown(event) {
-            document.querySelector("#submenu").classList.toggle("hidden");
+            //document.querySelector("#submenu").classList.toggle("hidden");
             document.querySelector("#arrow").classList.toggle("rotate-0");
 
         }
         dropdown();
 
         function openSidebar() {
-            document.querySelector(".sidebar").classList.toggle("hidden");
+            //document.querySelector(".sidebar").classList.toggle("hidden");
         }
     </script>
 </body>

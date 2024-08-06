@@ -135,7 +135,6 @@
                     })
                     .catch(error => {
                         console.error('Error saving location:', error);
-                        alert(23432);
                         closeLocationModal();
                         location.reload();
                         // Handle errors here

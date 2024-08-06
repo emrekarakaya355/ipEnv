@@ -88,7 +88,8 @@ class LocationController extends Controller
         return response()->json(['success' => 'Location deleted successfully.']);
     }
 
-    public function getUnitsByBuilding($building){
+    public function getUnitsByBuilding($building): \Illuminate\Http\JsonResponse
+    {
         $unit = Location::getUnitsByBuilding($building);
         return response()->json(['unit' => $unit], 200);
     }
