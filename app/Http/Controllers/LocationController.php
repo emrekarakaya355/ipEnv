@@ -12,6 +12,7 @@ class LocationController extends Controller
      */
     public function index()
     {
+
         $locations = Location::sorted()->paginate(10);
         return view('locations.index', compact('locations'));
     }
@@ -21,11 +22,11 @@ class LocationController extends Controller
      */
     public function store(Request $request)
     {
+
         $request->validate([
             'building' => 'required|string|max:255',
             'unit' => 'required|string|max:255',
         ]);
-
 
         try {
             Location::create([
@@ -59,10 +60,11 @@ class LocationController extends Controller
      * Update the specified resource in storage.
      */
     public function update(Request $request, $id)
-    {
 
+    {
         $request->validate([
             'faculty' => 'required|string|max:255',
+            'unit' => 'required|string|max:255',
         ]);
 
 
@@ -70,6 +72,7 @@ class LocationController extends Controller
         $location = Location::findOrFail($id);
         $location->update([
             'faculty' => ucfirst($request->faculty),
+            'unit' => ucfirst($request->unit),
         ]);
 
         return response()->json(['success' => 'Location updated successfully.']);
@@ -82,6 +85,7 @@ class LocationController extends Controller
      */
     public function destroy($id)
     {
+
         $location = Location::findOrFail($id);
         $location->delete();
 

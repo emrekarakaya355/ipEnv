@@ -53,6 +53,7 @@
                             <label for="brand" class="block text-sm font-medium text-gray-700">Marka</label>
                             <select name="brand"
                                     id="brand"
+                                    required
                                     data-brand-select
                                     onchange="handleBrandChange(this.value, this.closest('.form-container'))"
                                     class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
@@ -69,6 +70,7 @@
                             <label for="model" class="block text-sm font-medium text-gray-700">Model</label>
                             <select name="model"
                                     id="model"
+                                    required
                                     data-model-select
                                     class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
                                 <option value="">-- Model Seçin --</option>
@@ -145,6 +147,7 @@
                             <label for="building" class="block text-sm font-medium text-gray-700">Bina</label>
                             <select name="building"
                                     id="building"
+                                    required
                                     onchange="handleBuildingChange(this.value,this.closest('.form-container'))"
                                     class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
                                 <option value="">-- Bina Seçin --</option>
@@ -165,6 +168,7 @@
                             <label for="unit" class="block text-sm font-medium text-gray-700">Birim</label>
                             <select name="unit"
                                     id="unit"
+                                    required
                                     data-unit-select
                                     class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
                                 <option value="">-- Birim Seçin --</option>

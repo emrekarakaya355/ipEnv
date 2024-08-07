@@ -10,7 +10,7 @@
                 Yeni Lokasyon Ekle
             </button>
 
-            <        <div class="overflow-x-auto bg-white shadow-md rounded-xl">
+            <div class="overflow-x-auto bg-white shadow-md rounded-xl">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                     <tr>
@@ -63,6 +63,10 @@
                                     <label for="faculty" class="block text-sm font-medium text-gray-700">Fakülte Adı</label>
                                     <input type="text" id="faculty" name="faculty" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                                 </div>
+                                <div>
+                                    <label for="unit" class="block text-sm font-medium text-gray-700">Birim Adı</label>
+                                    <input type="text" id="unit" name="unit" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                </div>
                             </form>
                         </div>
                     </div>
@@ -113,7 +117,6 @@
                 // CSRF token is already included in the formData
                 const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
                 formData.append('_token', csrfToken);
-
                 fetch(url, {
                     method: method,
                     body: formData,
@@ -124,8 +127,10 @@
                 })
                     .then(response => {
                         if (!response.ok) {
+                            alert(method);
                             throw new Error('Network response was not ok');
                         }
+
                         return response.json();
                     })
                     .then(data => {
