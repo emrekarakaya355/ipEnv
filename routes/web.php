@@ -20,10 +20,14 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-
+Route::get('/error', function () {
+    $message = 'Beklenmedik bir hata oluştu. Lütfen daha sonra tekrar deneyin.';
+    return view('errors.error', compact('message'));
+})->name('error.page');
 
 // Cihaz ve diğer resource route'ları oturum açmış kullanıcılar için
 Route::middleware('auth')->group(function () {
+
     Route::get('/', function () { return view('welcome'); });
 
     Route::get('/devices/orphans', [DeviceController::class, 'orphans']);
@@ -42,7 +46,20 @@ Route::middleware('auth')->group(function () {
 
     Route::apiResource('device_types', DeviceTypeController::class);
 
-    Route::resource("/users", UserController::class);
+
+    //Route::get('/user-roles', [UserController::class, 'showUserRoles'])->name('user.roles');
+
+    Route::resource('permissions', App\Http\Controllers\PermissionController::class);
+    Route::get('permissions/{permissionId}/delete', [App\Http\Controllers\PermissionController::class, 'destroy']);
+
+    Route::resource('roles', App\Http\Controllers\RoleController::class);
+    Route::get('roles/{roleId}/delete', [App\Http\Controllers\RoleController::class, 'destroy']);
+    Route::get('roles/{roleId}/give-permissions', [App\Http\Controllers\RoleController::class, 'addPermissionToRole']);
+    Route::put('roles/{roleId}/give-permissions', [App\Http\Controllers\RoleController::class, 'givePermissionToRole']);
+
+    Route::resource('users', App\Http\Controllers\UserController::class);
+    Route::get('users/{userId}/delete', [App\Http\Controllers\UserController::class, 'destroy']);
+
 });
 
 require __DIR__.'/auth.php';

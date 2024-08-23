@@ -25,8 +25,10 @@
                             <p><strong>Değişim Sebebi:</strong> {{ $deviceInfo->update_reason }}</p>
                         </div>
                         <div class="text-right col-span-1">
+                            <p><strong>Oluşturan Kişi:</strong> {{ $deviceInfo->createdBy->name ?? '' }}</p>
                             <p><strong>Oluşturulma Tarihi:</strong> {{ $deviceInfo->created_at }}</p>
                             <p><strong>Değişim Tarihi:</strong> {{ $deviceInfo->updated_at }}</p>
+                            <p><strong>Değiştiren Kişi:</strong> {{ $deviceInfo->updatedBy->name ?? '' }}</p>
                         </div>
                     </div>
                 </div>

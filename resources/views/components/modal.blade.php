@@ -1,4 +1,4 @@
-<div id="modal" class="fixed z-10 inset-0 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+<div id="modal" class="fixed z-10 inset-0 overflow-y-auto  hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
     <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
 
         <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
@@ -20,21 +20,25 @@
                             </div>
                         </div>
                         <div class="overflow-x-auto mt-4">
+                            <div class="mb-2 flex justify-end ">
+                                <div style="width: 80px;">
+                                    <label for="port" class="block text-sm font-medium text-gray-700">Port</label>
+                                    <input type="number"
+                                           required
+                                           id="port"
+                                           class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                                           oninput="validatePortValue(this)"
+                                    >
+                                </div>
+                            </div>
                             <table id="switchTable" class="min-w-full bg-white divide-y divide-gray-200">
                                 <thead>
                                 <tr>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-
-                                    </th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Lokasyon
-                                    </th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Isim
-                                    </th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        IP Adresi
-                                    </th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bina</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Isim</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">IP Adresi</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Port Sayısı</th>
                                 </tr>
                                 </thead>
                                 <tbody id="switchTableBody">
@@ -42,6 +46,7 @@
                                 </tbody>
                             </table>
                         </div>
+
                     </div>
                 </div>
             </div>
@@ -53,6 +58,7 @@
 <script>
     let currentPageContext = '';
     const parentDeviceIdInput = document.getElementById('parent_device_id');
+    const parentDevicePortInput = document.getElementById('parent_device_port');
     // Function to update parent_device_id and trigger the change event
 
     function updateParentDeviceId(newId, save) {
@@ -61,9 +67,28 @@
             handleInputChange(); // Call this directly to enable the save button
         }
     }
+    function updateParentDevicePort(port, save) {
+        parentDevicePortInput.value = port;
+        if(save === 'show'){
+            handleInputChange(); // Call this directly to enable the save button
+        }
+    }
 
     function openModal(context) {
+
         currentPageContext = context;
+
+        // parent_device_id'nin değerini al
+        const parentDeviceId = document.getElementById('parent_device_id').value;
+        document.getElementById('port').value= document.getElementById('parent_device_port').value;
+
+        // parentDeviceId'ye göre ilgili switchRadio'yu bul
+        const switchToSelect = document.querySelector(`input[name="switchRadio"][value="${parentDeviceId}"]`);
+
+        // Eğer ilgili switchRadio bulunursa, işaretle
+        if (switchToSelect) {
+            switchToSelect.checked = true;
+        }
         document.getElementById('modal').classList.remove('hidden');
     }
 
@@ -81,7 +106,9 @@
         document.getElementById('parent_device_building').textContent = '';
         document.getElementById('parent_device_ip_address').textContent = '';
         document.getElementById('parent_device_description').textContent = '';
-        document.getElementById('parent_device_id').textContent = null;
+        document.getElementById('parent_device_port_area').textContent = null;
+        document.getElementById('parent_device_id').value = null;
+        document.getElementById('parent_device_port').value = null;
     }
 
         // Bu fonksiyon modal kapatıldığında seçilen cihazın bilgisini günceller
@@ -91,13 +118,17 @@
         const parentDeviceIpAddress = document.getElementById('parent_device_ip_address');
         const parentDeviceDescription = document.getElementById('parent_device_description');
         const parentDeviceId = document.getElementById('parent_device_id');
+        const parentDevicePort = document.getElementById('parent_device_port');
+        const parentDevicePortArea = document.getElementById('parent_device_port_area');
 
         // Burada seçilen cihazın verilerini alıp div'lere atıyoruz
         parentDeviceName.textContent = selectedSwitch.getAttribute('data-device_name');
         parentDeviceBuilding.textContent = selectedSwitch.getAttribute('data-building');
         parentDeviceIpAddress.textContent = selectedSwitch.getAttribute('data-ip_address');
         parentDeviceDescription.textContent = selectedSwitch.getAttribute('data-description');
+        parentDevicePortArea.textContent = document.getElementById("port").value;
         parentDeviceId.value = selectedSwitch.value;
+        parentDevicePort.value = document.getElementById('port').value;
     }
 
     function selectSwitch() {
@@ -105,6 +136,9 @@
 
         if (selectedSwitch) {
             updateParentDeviceId(selectedSwitch.value, currentPageContext);
+            updateParentDevicePort(document.getElementById('port').value,currentPageContext)
+            document.getElementById('port').setAttribute('required', 'required');
+
             //document.getElementById('parent_device_id').value = selectedSwitch.value;
             //document.getElementById('parent_device_name').value = selectedSwitch.getAttribute('data-device_name');
             closeModal(selectedSwitch);
@@ -132,7 +166,18 @@
             row.style.display = match ? '' : 'none';
         }
     }
+    function updatePortMax(radioButton) {
+        const maxPortValue = radioButton.getAttribute('data-max_port');
+        document.getElementById('port').setAttribute('max', maxPortValue);
+    }
 
+    function validatePortValue(input) {
+        const maxPortValue = input.getAttribute('max');
+        if (parseInt(input.value) > parseInt(maxPortValue)) {
+            input.value = maxPortValue;
+            alert(`Port değeri ${maxPortValue} değerinden büyük olamaz.`);
+        }
+    }
     document.getElementById('searchSwitch').addEventListener('input', filterSwitches);
 
     document.addEventListener('DOMContentLoaded', function () {
@@ -150,12 +195,15 @@
                         data-building="${switchItem.latest_device_info.location.building}"
                         data-ip_address="${switchItem.latest_device_info.ip_address}"
                         data-description="${switchItem.latest_device_info.description}"
-
+                        data-port_number="${switchItem.device_type.port_number}"
+                        data-max_port="${switchItem.device_type.port_number}"
+                       onclick="updatePortMax(this)"
                         >
                         </td>
-                        <td class="px-4 py-2">${switchItem.latest_device_info.location.building}</td>
-                        <td class="px-4 py-2">${switchItem.device_name}</td>
-                        <td class="px-4 py-2">${switchItem.latest_device_info.ip_address}</td>
+                        <td class="px-4 py-2 " style="max-width: 40px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${switchItem.latest_device_info.location.building}</td>
+                        <td class="px-4 py-2 " style="max-width: 120px;overflow: hidden; white-space: nowrap;text-overflow: ellipsis;">${switchItem.device_name}</td>
+                        <td class="px-4 py-2" style="max-width: 160px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${switchItem.latest_device_info.ip_address}</td>
+                        <td class="px-4 py-2" style="max-width: 40px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${switchItem.device_type.port_number}</td>
 
                     `;
                     tableBody.appendChild(row);

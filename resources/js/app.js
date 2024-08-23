@@ -4,8 +4,8 @@ import Alpine from 'alpinejs';
 import 'toastr/build/toastr.min.css';
 import toastr from 'toastr';
 
-import './handlingBrand.js';
-import './location.js';
+import './custom.js';
+import './device-location-modals.js';
 
 import.meta.glob([
     '../images/**'

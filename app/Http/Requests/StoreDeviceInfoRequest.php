@@ -21,10 +21,7 @@ class StoreDeviceInfoRequest extends FormRequest
      */
     public function rules(): array
     {
-
         return [
-
-            'ip_address' => 'nullable|ipv4',
             'description' => 'nullable|string|max:255',
             'building' => 'required|string:max:255',
             'unit' => 'required|string:max:255',
@@ -32,8 +29,8 @@ class StoreDeviceInfoRequest extends FormRequest
             'block' => 'nullable|string',
             'floor' => 'nullable|string',
             'room_number' => 'nullable|string',
-
+            'ip_address' => 'nullable|ipv4',
         ];
-
     }
+
 }

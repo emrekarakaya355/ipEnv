@@ -9,7 +9,7 @@
             <table class="min-w-full bg-white">
                 <thead>
                 <tr class="bg-gray-100 text-gray-700">
-                    @foreach (['İsim', 'Email', 'Hesap Açılma Tarihi'] as $header)
+                    @foreach (['İsim', 'Email', 'Hesap Açılma Tarihi', 'Roller'] as $header)
                         <th class="py-3 px-4 text-left">
                             {{ $header }}
                         </th>
@@ -23,6 +23,10 @@
                         @foreach (['name', 'email', 'created_at'] as $field)
                             <td class="py-3 px-4">{{ $user->$field }}</td>
                         @endforeach
+
+                        <td class="py-3 px-4">
+                            {{ $user->roles->pluck('name')->join(', ') }}
+                        </td>
 
                         <td class="py-3 px-4 text-center">
                             <svg class="w-5 h-5 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">

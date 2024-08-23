@@ -19,9 +19,9 @@ return new class extends Migration
             $table->enum('type', ['switch', 'access_point']);
             $table->string('brand');
             $table->string('model');
+            $table->unsignedInteger('port_number')->nullable();
             $table->timestamps();
-            $table->softDeletes();
-            $table->unique(['brand', 'model']);
+            $table->unique(['type','brand', 'model', 'port_number']);
         });
     }
 

@@ -1,28 +1,37 @@
 <x-layout>
-    @if ($errors->any())
-        <div class="alert alert-danger">
-            <ul>
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
     <x-slot name="heading">Cihaz Ekle</x-slot>
 
     <div class="w-full p-8">
-        <h1 class="text-2xl font-semibold text-gray-900 mb-6">Cihaz Ekle</h1>
+        <h1 class="text-2xl font-semibold text-gray-900 mb-6">
+            Cihaz Ekle
+        </h1>
+        {{-- Hata veya başarılı işlem mesajları --}}
+        @if(session('error'))
+            <div class="bg-red-500 text-white p-4 rounded-md mb-4">
+                {{ session('error') }}
 
+            </div>
+        @endif
+
+        @if(session('success'))
+            <div class="bg-green-500 text-white p-4 rounded-md mb-4">
+                {{ session('success') }}
+            </div>
+        @endif
         {{-- Form başlangıcı --}}
-        <form method="POST" action="{{ route('devices.store') }}" class="bg-white shadow-lg rounded-2xl p-8 form-container">
+        <form id="deviceCreateForm" method="POST" action="{{ route('devices.store') }}" class="bg-white shadow-lg rounded-2xl p-8 form-container">
             @csrf
+            <div class="messages"></div>
+
             <div class="flex gap-x-48">
 
                 <div class="bg-white shadow-md rounded-xl p-6 mb-6 flex-auto">
 
                     <div class="space-y-8">
                         <div>
-                            <h1 class="text-2xl font-semibold text-gray-900 mb-6">Cihaz Temel Özellikleri</h1>
+                            <h1 class="text-2xl font-semibold text-gray-900 mb-6">
+                                Cihaz Temel Özellikleri
+                            </h1>
                         </div>
                         {{-- Type seçimi --}}
                         <div class="mb-4">
@@ -163,7 +172,7 @@
                             @enderror
                         </div>
 
-                        {{-- Model seçimi --}}
+                        {{-- Birim seçimi --}}
                         <div class="mb-4" id="unitSelectDiv" style="display: block;">
                             <label for="unit" class="block text-sm font-medium text-gray-700">Birim</label>
                             <select name="unit"
@@ -214,6 +223,7 @@
                             <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
                             @enderror
                         </div>
+
                         <div class="mb-4">
                             <label for="parent_device_id" class="block text-sm font-medium text-gray-700">Parent
                                 Switch</label>
@@ -234,13 +244,15 @@
                             <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
                             @enderror
                         </div>
+                        <input type="hidden" name="parent_device_port" id="parent_device_port">
+
                     </div>
 
                 </div>
             </div>
             {{-- Submit butonu --}}
             <div class="flex justify-end mt-4">
-                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-md">Kaydet</button>
+                <button id="submit" type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-md">Kaydet</button>
             </div>
 
         </form>
@@ -252,5 +264,39 @@
 
     {{-- Modal --}}
     <x-modal/>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('deviceCreateForm');
+            form.addEventListener('submit', function (event) {
+                event.preventDefault();
+                let formData = new FormData(form);
+                fetch(form.action, {
+                    method: form.method,
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Başarılı mesajını göster
+                            document.querySelector('.messages').innerHTML = '<div class="bg-green-500 text-white p-4 rounded-md mb-4">' + data.message + '</div>';
+                            setTimeout(() => {
+                                window.location.href = data.redirect_url;
+                            }, 1000); // 2 saniye sonra yönlendirme
+                            form.reset();
+                        } else {
+                            // Hata mesajını göster
+                            document.querySelector('.messages').innerHTML = '<div class="bg-red-500 text-white p-4 rounded-md mb-4">' + data.message + '</div>';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Hata:', error);
+                        document.querySelector('.messages').innerHTML = '<div class="bg-red-500 text-white p-4 rounded-md mb-4">Bir hata oluştu.</div>';
+                    });
+            });
+        });
+    </script>
 
 </x-layout>

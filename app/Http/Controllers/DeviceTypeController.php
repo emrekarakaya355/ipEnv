@@ -2,17 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\ConflictException;
+use App\Http\Responses\ErrorResponse;
+use App\Http\Responses\SuccessResponse;
+use App\Http\Responses\ValidatorResponse;
 use App\Models\DeviceType;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class DeviceTypeController extends Controller
 {
-
-
-
     public function index()
     {
-        $device_types = DeviceType::sorted()->paginate(10); // Sayfalama örneği, 10 öğe başına sayfa
+        $device_types = DeviceType::sorted()->paginate(10);
         return view('device_types.index', compact('device_types'));
     }
 
@@ -23,17 +25,30 @@ class DeviceTypeController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        //$request validate ediliyor
+        $validator = Validator::make($request->all(), [
             'type' => 'required|in:switch,access_point',
             'brand' => 'required|string',
-            'model' => 'required|string'
+            'model' => 'required|string',
+            'port_number' => 'nullable|integer'
         ]);
+        // Validasyon hatalarını kontrol et
+        if ($validator->fails()) {
+            return new ValidatorResponse($validator);
+        }
 
-        DeviceType::create($request->all());
-        return response()->json(['success' => 'Location updated successfully.']);
+        try {
+            $existingModel = DeviceType::where($validator->validated())->first();
+            if ($existingModel) {
+                throw new ConflictException("Cihaz Tipi Bilgisi Zaten Var!");
+            }
+            //DeviceType::updateOrCreate( $validator->validated(), $validator->validated() );
+            DeviceType::create($validator->validated());
+        } catch (\Exception $exception) {
+            return new ErrorResponse($exception);
+        }
+        return new SuccessResponse();
 
-       /* return redirect()->route('device_types.index')
-            ->with('success', 'Device type created successfully.');*/
     }
 
     public function show($id)
@@ -51,28 +66,40 @@ class DeviceTypeController extends Controller
 
     public function update(Request $request, $id)
     {
-        $request->validate([
-            'type' => 'required|in:switch,access_point',
+        //request doğrulama yapılıyor.
+        $validator = Validator::make($request->all(), [
             'brand' => 'required|string',
-            'model' => 'required|string'
+            'model' => 'required|string',
+            'port_number' => 'nullable|integer'
         ]);
 
-        $deviceType = DeviceType::findOrFail($id);
-        $deviceType->update($request->all());
+        // Validasyon hatalarını kontrol et
+        if ($validator->fails()) return new ValidatorResponse($validator);
 
-        return response()->json(['success' => 'Location updated successfully.']);
-        /*return redirect()->route('device_types.index')
-            ->with('success', 'Device type updated successfully.');*/
+        try{
+            $deviceType = DeviceType::findOrFail($id);
+
+            $deviceType->fill($validator->validated());
+
+            if($deviceType->isDirty()){
+                $deviceType->update($validator->validated());
+                return new SuccessResponse('Cihaz tipi başarı ile düzeltildi.',$deviceType);
+            }
+            return new ErrorResponse(null,'Herhangi Bir Değişiklik yapılmadı.');
+        } catch (\Exception $exception) {
+              return new ErrorResponse($exception);
+            }
     }
-
     public function destroy($id)
     {
-        $deviceType = DeviceType::findOrFail($id);
-        $deviceType->delete();
+        try {
+            $deviceType = DeviceType::findOrFail($id);
+            $deviceType->delete();
+            return new SuccessResponse('Cihaz Tipi Başarı ile silindi.');
+        }  catch (\Exception $e) {
+            return new ErrorResponse($e);
 
-        return response()->json(['success' => 'Location deleted successfully.']);
-        /*return redirect()->route('device_types.index')
-            ->with('success', 'Device type deleted successfully.');*/
+        }
     }
     public function getBrandsByType($type)
     {
@@ -87,7 +114,6 @@ class DeviceTypeController extends Controller
          */
 
     }
-
     public function getModelsByBrand(Request $request)
     {
         $type = $request->query('type');

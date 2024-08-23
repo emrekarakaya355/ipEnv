@@ -6,20 +6,18 @@ use App\Http\Requests\StoreDeviceRequest;
 use App\Models\AccessPoint;
 use App\Models\Device;
 use App\Models\DeviceInfo;
-use App\Models\DeviceType;
 use App\Models\Location;
 use App\Models\NetworkSwitch;
 use App\Services\DeviceService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 
 class DeviceController extends Controller
 {
 
-    protected $deviceService;
+    protected DeviceService $deviceService;
 
     public function __construct(DeviceService $deviceService)
     {
@@ -51,18 +49,26 @@ class DeviceController extends Controller
     public function create()
     {
         $locations = Location::all()->sortBy(['faculty']);
-        $models = DeviceType::all()->sortBy(['brand', 'model']);
-
-        return view('devices.create', compact('locations', 'models'));
+        return view('devices.create', compact('locations'));
     }
 
-    public function show($id)
+    public function store(StoreDeviceRequest $request)
     {
 
-        $device = Device::with(['latestDeviceInfo', 'parentDevice.latestDeviceInfo', 'connectedDevices.latestDeviceInfo', 'deviceInfos'])->findOrFail($id);
+        // Doğrulama başarılı, veriler kullanılabilir
+        //StoreDeviceRequest sınıfındaki kurallara göre doğrulama yapıyor.
+        $deviceValidated = $request->validated();
 
+        //Her device oluşturunca 1 adet info oluşturulması için servisi çağırıyoruz.
+        return $this->deviceService->createDeviceWithInfo($deviceValidated);
+
+
+
+    }
+    public function show($id)
+    {
+        $device = Device::with(['latestDeviceInfo', 'parentDevice.latestDeviceInfo', 'connectedDevices.latestDeviceInfo','connectedDevices.deviceType', 'deviceInfos'])->findOrFail($id);
         $locations = Location::all()->sortBy(['building']);
-
         return view('devices.show', compact('device', 'locations'));
     }
 
@@ -77,17 +83,14 @@ class DeviceController extends Controller
      *
      * @param StoreDeviceRequest $request
      * @param Device $device
-     * @return RedirectResponse
+     * @return JsonResponse
      */
     public function update(StoreDeviceRequest $request, Device $device)
     {
-        // Doğrulama başarılı, veriler kullanılabilir
-        $deviceValidated = $request->validated();
-        $response = $this->deviceService->updateDeviceWithInfo($deviceValidated, $device);
-        if ($response) {
-            return redirect()->route('devices.show', $device)->with('success', 'Cihaz başarıyla update edildi.');
-        }
-        return redirect()->route('devices.show', $device)->with('success', 'false');
+            // Doğrulama başarılı, veriler kullanılabilir
+            $deviceValidated = $request->validated();
+
+            return $this->deviceService->updateDeviceWithInfo($deviceValidated, $device);
     }
 
     public function archive(Device $device): JsonResponse
@@ -111,7 +114,6 @@ class DeviceController extends Controller
     {
         try {
             $device->delete();
-
             return response()->json([
                 'success' => true,
                 'message' => 'Cihaz başarıyla silindi.'
@@ -125,16 +127,6 @@ class DeviceController extends Controller
         }
     }
 
-    public function store(StoreDeviceRequest $request): RedirectResponse
-
-    {
-        // Doğrulama başarılı, veriler kullanılabilir
-        $deviceValidated = $request->validated();
-
-        $this->deviceService->createDeviceWithInfo($deviceValidated);
-        return redirect()->route('devices.index')->with('success', 'Cihaz başarıyla oluşturuldu.');
-
-    }
 
 
     public function getSwitches(): JsonResponse
@@ -144,7 +136,7 @@ class DeviceController extends Controller
             ->whereHas('latestDeviceInfo', function ($query) {
                 $query->whereNotNull('ip_address');
             })
-            ->with('latestDeviceInfo.location')->get();
+            ->with('latestDeviceInfo.location','deviceType')->get();
         return response()->json(['switches' => $switches]);
     }
 

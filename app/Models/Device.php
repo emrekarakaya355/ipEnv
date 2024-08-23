@@ -2,16 +2,22 @@
 
 namespace App\Models;
 
-use App\DeviceStatus;
+use App\Enums\DeviceStatus;
+use App\Http\Responses\ErrorResponse;
+use App\Http\Responses\SuccessResponse;
+use Exception;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class Device extends Model
+class Device extends Model implements Auditable
 
 {
     use HasFactory, SoftDeletes;
+    use \OwenIt\Auditing\Auditable;
 
     protected $table = 'devices';
     protected $fillable = [
@@ -22,6 +28,7 @@ class Device extends Model
         'registry_number',
         'parent_device_id',
         'status',
+        'parent_device_port',
     ];
     protected static function boot()
     {
@@ -37,8 +44,48 @@ class Device extends Model
 
         static::deleting(function ($model) {
             $model->deleted_by = auth()->id();
+            $model->isDeleted = true;
+            $model->save();
+        });
+
+        static::deleted(function ($model) {
+            if($model->latestDeviceInfo){
+                $model->latestDeviceInfo->delete();
+            }
+        });
+
+        static::restoring(function ($model) {
+            $model->deleted_by = null;
+            $model->isDeleted = false;
+            $model->updated_by = auth()->id();
+
+        });
+
+
+        static::saving(function ($model) {
+            if ($model->parent_device_id) {
+                if (!$model->parent_device_port) {
+                    throw new \Exception('Port numarasını girmek zorundasınız.');
+                }
+                $parentDevice = self::find($model->parent_device_id);
+
+                if($parentDevice === null) return;
+
+                if ( $parentDevice->deviceType->type == 'access_point') {
+                    throw new \Exception('Access Point parent olarak seçilemez');
+                }
+                if ($model->parent_device_port > $parentDevice->deviceType->port_number) {
+                    throw new \Exception('Seçtiğiniz cihaz '.$parentDevice->deviceType->port_number.' adet porta sahiptir. Lütfen bu sayıdan küçük bir değer giriniz.');
+                }
+                foreach ($parentDevice->connectedDevices as $connectedDevice) {
+                   if ($connectedDevice->parent_device_port == $model->parent_device_port && $connectedDevice->id != $model->id ) {
+                       throw new \Exception('Bu port '.$connectedDevice->latest_deviced_info->ip_address.' ip adresine sahip cihaz tarafından kullanılıyor');
+                   }
+                }
+            }
         });
     }
+
 
     public function newFromBuilder($attributes = [], $connection = null): Device
     {
@@ -73,7 +120,23 @@ class Device extends Model
         return $this->hasOne(DeviceInfo::class)->latest();
     }
 
-// Device.php (Model)
+    // Device oluşturan kullanıcı
+    public function createdBy()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    // Device güncelleyen kullanıcı
+    public function updatedBy()
+    {
+        return $this->belongsTo(User::class, 'updated_by');
+    }
+
+    // DeviceInfo silen kullanıcı
+    public function deletedBy()
+    {
+        return $this->belongsTo(User::class, 'deleted_by');
+    }
     public function latestDeviceLocation()
     {
         return $this->hasOneThrough(
@@ -148,7 +211,10 @@ class Device extends Model
     {
         return $this->deviceType->model;
     }
-
+    protected function getPortNumberAttribute()
+    {
+        return $this->deviceType->port_number;
+    }
     public function parentDevice()
     {
         return $this->belongsTo(Device::class, 'parent_device_id');
@@ -159,7 +225,6 @@ class Device extends Model
         return $this->hasMany(Device::class, 'parent_device_id');
     }
 
-    // Device.php (Model)
     public function scopeSorted($query, $sortColumn = 'created_at', $sortOrder = 'desc')
     {
 
@@ -198,6 +263,31 @@ class Device extends Model
 
         // Diğer sütunlar için doğrudan sıralama
         return $query->orderBy($column, $sortOrder);
+    }
+
+    /**
+     * @throws Exception
+     */
+    public static function create(array $attributes)
+    {
+
+    //Try catch device servicede düşüyor
+            // Silinmiş bir kaydı kontrol et
+        $existingModel = static::withTrashed()
+            ->where('type', $attributes['type'])
+            ->where('device_type_id', $attributes['device_type_id'])
+            ->where('serial_number', $attributes['serial_number'])
+            ->where('registry_number',$attributes['registry_number'])->first();
+
+        if ($existingModel ) {
+            if( $existingModel->trashed()){
+                // Kayıt silinmişse, restore et ve güncelle
+                   $existingModel->restore();
+                   $existingModel->update($attributes);
+                   return $existingModel;
+            }
+        }
+        return static::query()->create($attributes);
     }
 
 

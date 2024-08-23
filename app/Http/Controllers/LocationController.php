@@ -2,8 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\ConflictException;
+use App\Exceptions\CustomInternalException;
+use App\Exceptions\ForeignKeyConstrainException;
+use App\Exceptions\NotFoundException;
+use App\Http\Responses\ErrorResponse;
+use App\Http\Responses\SuccessResponse;
+use App\Http\Responses\ValidatorResponse;
 use App\Models\Location;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use Exception;
 
 class LocationController extends Controller
 {
@@ -19,25 +30,30 @@ class LocationController extends Controller
 
     /**
      * Store a newly created resource in storage.
+     * @throws ConflictException
      */
     public function store(Request $request)
     {
-
-        $request->validate([
+        //validate ediliyor
+        $validator = Validator::make($request->all(), [
             'building' => 'required|string|max:255',
             'unit' => 'required|string|max:255',
         ]);
-
+        // Validasyon hatalarını kontrol et
+        if ($validator->fails()) {
+            return new ValidatorResponse($validator);
+        }
+        // Önce kaydın mevcut olup olmadığını kontrol et
+        $existingModel = Location::where($validator->validated())->first();
+        if ($existingModel) {
+            throw new ConflictException("Yer Bilgisi Zaten Var");
+        }
         try {
-            Location::create([
-                'building' => ucfirst($request->building),
-                'unit' => ucfirst($request->unit),
-            ]);
-            return response()->json(['success' => 'Location created successfully.']);
+            Location::create($validator->validated());
+        } catch (Exception $e) {
+           return new ErrorResponse($e);
         }
-        catch (\Exception $e) {
-            return response()->json(['error' => 'Failed to create location. ' . $e->getMessage()], 400);
-        }
+        return new SuccessResponse("Yer Bilgisi Başarı İle Kaydedildi.");
     }
 
     /**
@@ -50,48 +66,69 @@ class LocationController extends Controller
         return response()->json($location);
     }
 
+    /*
     public function edit(Location $location)
     {
 
         return view('locations.edit', ['location' => $location]);
     }
-
+    */
     /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, $id)
-
     {
-        $request->validate([
-            'faculty' => 'required|string|max:255',
+        //gelen veriler validate ediliyor.
+        $validator = Validator::make($request->all(), [
+            'building' => 'required|string|max:255',
             'unit' => 'required|string|max:255',
         ]);
 
+        // Validasyon hatalarını kontrol et
+        if ($validator->fails()) {
+            return new ValidatorResponse($validator);
+        }
+        try{
+            $location = Location::findOrFail($id);
 
-
-        $location = Location::findOrFail($id);
-        $location->update([
-            'faculty' => ucfirst($request->faculty),
-            'unit' => ucfirst($request->unit),
-        ]);
-
-        return response()->json(['success' => 'Location updated successfully.']);
-        /*return redirect()->route('locations.index')->with('success', 'Location updated successfully.');*/
+            $location->fill($validator->validated());
+            //eğer değişiklik var ise update yapılıyor.!
+            if($location->isDirty()){
+                $location->update([
+                    'building' => ucfirst($request->building),
+                    'unit' => ucfirst($request->unit),
+                ]);
+                return new SuccessResponse('Yer Bilgisi Başarı İle Kaydedildi.');
+            }
+            return new ErrorResponse(null,'Herhangi Bir Değişiklik yapılmadı.');
+        }
+        catch (Exception $e) {
+            return new ErrorResponse($e);
+        }
     }
-
 
     /**
      * Remove the specified resource from storage.
+     * @throws NotFoundException
+     * @throws ForeignKeyConstrainException
+     * @throws CustomInternalException
      */
     public function destroy($id)
     {
+        try {
+            $location = Location::findOrFail($id);
+            $location->delete();
+            return new SuccessResponse('Cihaz Başarı İle Silindi!');
+        } catch (ModelNotFoundException $e) {
+            throw new NotFoundException($e);
+        } catch (QueryException $e) {
+            if ($e->getCode() == '23000') {
+                throw new ForeignKeyConstrainException('Bir Cihaz Tarafından Kullanıldığı için Silinemez!!!');
+            }
+            throw new CustomInternalException();
 
-        $location = Location::findOrFail($id);
-        $location->delete();
-
-        return response()->json(['success' => 'Location deleted successfully.']);
+        }
     }
-
     public function getUnitsByBuilding($building): \Illuminate\Http\JsonResponse
     {
         $unit = Location::getUnitsByBuilding($building);

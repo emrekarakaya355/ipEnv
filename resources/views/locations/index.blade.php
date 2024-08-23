@@ -60,8 +60,8 @@
                                 @csrf
                                 <input type="hidden" name="_method" id="method" value="{{ csrf_token() }}">
                                 <div>
-                                    <label for="faculty" class="block text-sm font-medium text-gray-700">Fakülte Adı</label>
-                                    <input type="text" id="faculty" name="faculty" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                    <label for="building" class="block text-sm font-medium text-gray-700">Fakülte Adı</label>
+                                    <input type="text" id="building" name="building" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                                 </div>
                                 <div>
                                     <label for="unit" class="block text-sm font-medium text-gray-700">Birim Adı</label>
@@ -94,7 +94,8 @@
                 fetch(`/locations/${locationId}`)
                     .then(response => response.json())
                     .then(data => {
-                        document.getElementById('faculty').value = data.faculty;
+                        document.getElementById('building').value = data.building;
+                        document.getElementById('unit').value = data.unit;
                         document.getElementById('locationModal').classList.remove('hidden');
                         document.getElementById('method').value = "PUT";
                         document.getElementById('locationForm').action = `/locations/${locationId}`;
@@ -127,28 +128,33 @@
                 })
                     .then(response => {
                         if (!response.ok) {
-                            alert(method);
-                            throw new Error('Network response was not ok');
-                        }
+                            alert(2);
 
+                            return response.json().then(errorData => {
+                                throw new Error(errorData.message || 'Girdiğiniz verileri kontrol ediniz.');
+                            });
+                        }
                         return response.json();
                     })
                     .then(data => {
+
                         console.log('Location saved successfully:', data);
                         closeLocationModal();
-                        location.reload(); // Reload the page after saving
+                        toastr.success(data.message || 'Yer Bilgisi Başarı ile kaydedildi.');
+                        setTimeout(() =>
+                            location.reload(),1500);
                     })
                     .catch(error => {
-                        console.error('Error saving location:', error);
-                        closeLocationModal();
-                        location.reload();
-                        // Handle errors here
+                        // Log error to console
+                        console.error('Error saving location: ', error);
+                        // Show error message to user
+                        toastr.error(error.message || 'Beklenmedik bir hata oluştu.');
                     });
             }
 
 
           function deleteLocation(locationId) {
-              if (confirm('Are you sure you want to delete this location?')) {
+              if (confirm('Bu Yer Bilgisini Silmek İstediğinizden Eminmisiniz?')) {
                   fetch(`/locations/${locationId}`, {
                       method: 'DELETE',
                       headers: {
@@ -157,19 +163,25 @@
                   })
                       .then(response => {
                           if (!response.ok) {
-                              throw new Error('Network response was not ok');
+                              return response.json().then(errorData => {
+                                  throw new Error(errorData.message || 'Network response was not ok');
+                              });
                           }
-                          location.reload(); // Reload the page after deletion
+                          return response.json();
+                      })
+                      .then(data => {
+                          toastr.success(data.message || 'Yer Bilgisi Başarı ile Silindi.');
+                          setTimeout(() => location.reload(), 500);
                       })
                       .catch(error => {
-                          console.error('Error deleting location:', error);
+                          toastr.error(error.message || 'Beklenmedik bir hata oluştu.');
                       });
               }
 
           }
 
 
-            function closeLocationModal() {
+          function closeLocationModal() {
                 document.getElementById('locationModal').classList.add('hidden');
             }
         </script>

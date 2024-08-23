@@ -5,7 +5,7 @@
         <h2 class="text-lg font-semibold mb-4">Cihaz Tipleri</h2>
 
         <!-- Add New Device Type Button -->
-        <button class="mb-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="openCreateModal()">
+        <button id="openModal" class="mb-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="openCreateModal()">
             Yeni Cihaz Tipi Ekle
         </button>
 
@@ -16,6 +16,7 @@
                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cihaz Tipi</th>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Marka</th>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Model</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Port Sayısı</th>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
                 </tr>
                 </thead>
@@ -25,6 +26,7 @@
                         <td class="px-6 py-4 whitespace-nowrap">{{ $device_type->type }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">{{ $device_type->brand }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">{{ $device_type->model }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ $device_type->port_number }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <x-edit-button onclick="editDeviceType({{ $device_type->id }})"/>
                             <x-delete-button onclick="deleteDeviceType({{ $device_type->id }})"/>
@@ -62,18 +64,28 @@
                             <input type="hidden" name="_method" id="method" value="{{ csrf_token() }}">
                             <div>
                                 <label for="type" class="block text-sm font-medium text-gray-700">Type</label>
-                                <select id="type" name="type" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                                    <option value="switch">Switch</option>
-                                    <option value="access_point">Access Point</option>
-                                </select>
+                                <div class="mt-1 flex space-x-8">
+                                    <div class="flex items-center">
+                                        <input id="switch" name="type" type="radio" value="switch" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300" onclick="togglePortNumber(true)">
+                                        <label for="switch" class="ml-3 block text-sm font-medium text-gray-700">Switch</label>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <input id="access_point" name="type" type="radio" value="access_point" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300" onclick="togglePortNumber(false)">
+                                        <label for="access_point" class="ml-3 block text-sm font-medium text-gray-700">Access Point</label>
+                                    </div>
+                                </div>
                             </div>
                             <div class="mt-4">
                                 <label for="brand" class="block text-sm font-medium text-gray-700">Brand</label>
-                                <input type="text" id="brand" name="brand" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                <input required type="text" id="brand" name="brand" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                             </div>
                             <div class="mt-4">
                                 <label for="model" class="block text-sm font-medium text-gray-700">Model</label>
-                                <input type="text" id="model" name="model" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                <input  required type="text" id="model" name="model" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                            </div>
+                            <div class="mt-4" id="portNumberContainer" style="display: none;">
+                                <label for="port_number" class="block text-sm font-medium text-gray-700">Port Sayısı</label>
+                                <input  type="number" id="port_number" name="port_number" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                             </div>
                         </form>
                     </div>
@@ -85,95 +97,149 @@
             </div>
         </div>
     </div>
+<script>
+    let editingDeviceTypeId = null;
+    function openCreateModal() {
+        document.getElementById('deviceTypeForm').reset();
+        document.querySelectorAll('input[name="type"]').forEach(radio => {
+            radio.disabled = false;
+        });
+        document.getElementById('deviceTypeModal').classList.remove('hidden');
+        document.getElementById('method').value = "POST";
+        document.getElementById('deviceTypeForm').action = "{{ route('device_types.store') }}";
+        document.getElementById('saveDeviceTypeButton').innerText = 'Save';
+    }
 
-    <script>
-        let editingDeviceTypeId = null; // Global variable to store the ID of the device type being edited
-
-        function openCreateModal() {
-            document.getElementById('deviceTypeForm').reset(); // Reset form fields
-            document.getElementById('deviceTypeModal').classList.remove('hidden');
-            document.getElementById('method').value = "POST";
-            document.getElementById('deviceTypeForm').action = "{{ route('device_types.store') }}";
-            document.getElementById('saveDeviceTypeButton').innerText = 'Save';
-            editingDeviceTypeId = null; // Reset editing ID
-        }
-
-        function editDeviceType(deviceTypeId) {
-            fetch(`/device_types/${deviceTypeId}`)
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('type').value = data.type;
-                    document.getElementById('brand').value = data.brand;
-                    document.getElementById('model').value = data.model;
-                    document.getElementById('deviceTypeModal').classList.remove('hidden');
-                    document.getElementById('method').value = "PUT";
-                    document.getElementById('deviceTypeForm').action = `/device_types/${deviceTypeId}`;
-                    document.getElementById('saveDeviceTypeButton').innerText = 'Update';
-                    editingDeviceTypeId = deviceTypeId;
-                })
-                .catch(error => {
-                    console.error('Error fetching device type details:', error);
+    function editDeviceType(deviceTypeId) {
+        fetch(`/device_types/${deviceTypeId}`)
+            .then(response => response.json())
+            .then(data => {
+                const typeInput = document.querySelector(`input[name="type"][value="${data.type}"]`);
+                if (typeInput) {
+                    typeInput.checked = true;
+                    togglePortNumber(data.type === 'switch'); // Trigger the function based on the selected type
+                }
+                document.querySelectorAll('input[name="type"]').forEach(radio => {
+                    radio.disabled = true;
                 });
+                document.getElementById('method').value = "PUT";
+                document.getElementById('brand').value = data.brand;
+                document.getElementById('model').value = data.model;
+                document.getElementById('port_number').value = data.port_number;
+                document.getElementById('deviceTypeModal').classList.remove('hidden');
+                document.getElementById('deviceTypeForm').action = `/device_types/${deviceTypeId}`;
+                document.getElementById('saveDeviceTypeButton').innerText = 'Update';
+                editingDeviceTypeId = deviceTypeId;
+
+            })
+            .catch(error => {
+                console.error('Cihaz Tipi Bilgilerini alırken hata oluştu lüften sonra tekrar deneyiniz.:', error);
+            });
+    }
+
+    function saveDeviceType() {
+        const form = document.getElementById('deviceTypeForm');
+
+
+        // Check if the form is valid
+        if (!form.checkValidity()) {
+            toastr.error('Lütfen tüm alanları doldurunuz.');
+            return; // Stop the form submission if validation fails
         }
 
-        function saveDeviceType() {
-            const form = document.getElementById('deviceTypeForm');
-            const formData = new FormData(form);
+        // Check if a radio button is selected
+        const typeRadios = form.querySelectorAll('input[name="type"]');
+        let typeSelected = false;
+        typeRadios.forEach(radio => {
+            if (radio.checked) {
+                typeSelected = true;
+            }
+        });
 
-            let url = form.action;
-            let method = editingDeviceTypeId ? 'POST' : form.querySelector('input[name="_method"]').value;
+        if (!typeSelected) {
+            toastr.error('Lütfen bir cihaz tipi seçin.');
+            return; // Stop the form submission if no radio button is selected
+        }
+        let method = editingDeviceTypeId ? 'POST' : form.querySelector('input[name="_method"]').value;
+        const formData = new FormData(form);
+        let url = form.action;
+        // CSRF token is already included in the formData
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        formData.append('_token', csrfToken);
+        fetch(url, {
+            method: method,
+            body: formData,
+            headers: {
+                'X-CSRF-TOKEN': csrfToken,
+                'Accept': 'application/json'
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(errorData => {
+                        throw new Error(errorData.message || 'Network response was not ok');
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Device type saved successfully:', data);
+                closeDeviceTypeModal();
+                toastr.success(data.message || 'Device Tipi Başarı ile kaydedildi.');
+                setTimeout(() =>
+                    location.reload(), 1500);
+            })
+            .catch(error => {
+                // Log error to console
 
-            // CSRF token is already included in the formData
-            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-            formData.append('_token', csrfToken);
+                console.error('Error saving device type:', error);
+                // Show error message to user
+                toastr.error(error.message || 'Beklenmedik bir hata oluştu.');
+            });
+    }
 
-            fetch(url, {
-                method: method,
-                body: formData,
+    function deleteDeviceType(deviceTypeId) {
+        if (confirm('Bu Cihazı Silmek İstediğinizden Emin misiniz?')) {
+            fetch(`/device_types/${deviceTypeId}`, {
+                method: 'DELETE',
                 headers: {
-                    'X-CSRF-TOKEN': csrfToken,
-                    'Accept': 'application/json'
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
                 }
             })
                 .then(response => {
                     if (!response.ok) {
-                        throw new Error('Network response was not ok');
+                        return response.json().then(errorData => {
+                            throw new Error(errorData.message || 'Network response was not ok');
+                        });
                     }
                     return response.json();
                 })
                 .then(data => {
-                    console.log('Device type saved successfully:', data);
-                    closeDeviceTypeModal();
-                    location.reload(); // Reload the page after saving
+                    toastr.success(data.message || 'Cihaz Tipi Başarı ile Silindi.');
+                    setTimeout(() => location.reload(), 1000);
                 })
                 .catch(error => {
-                    console.error('Error saving device type:', error);
-                    // Handle errors here
+                    toastr.error(error.message || 'Beklenmedik bir hata oluştu.');
                 });
         }
+    }
 
-        function deleteDeviceType(deviceTypeId) {
-            if (confirm('Are you sure you want to delete this device type?')) {
-                fetch(`/device_types/${deviceTypeId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    }
-                })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Network response was not ok');
-                        }
-                        location.reload(); // Reload the page after deletion
-                    })
-                    .catch(error => {
-                        console.error('Error deleting device type:', error);
-                    });
-            }
-        }
+    function closeDeviceTypeModal() {
+        document.getElementById('deviceTypeModal').classList.add('hidden');
+    }
 
-        function closeDeviceTypeModal() {
-            document.getElementById('deviceTypeModal').classList.add('hidden');
+    function togglePortNumber(isSwitch) {
+        const portNumberContainer = document.getElementById('portNumberContainer');
+        portNumberContainer.style.display = isSwitch ? 'block' : 'none';
+        const portNumberInput = document.getElementById('port_number');
+
+        if (isSwitch) {
+            portNumberContainer.style.display = 'block';
+            portNumberInput.setAttribute('required', 'required');
+        } else {
+            portNumberContainer.style.display = 'none';
+            portNumberInput.removeAttribute('required');
         }
-    </script>
+    }
+</script>
 </x-layout>

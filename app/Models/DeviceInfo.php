@@ -4,12 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class DeviceInfo extends Model
+class DeviceInfo extends Model implements Auditable
 {
     use HasFactory, SoftDeletes;
+    use \OwenIt\Auditing\Auditable;
 
     protected static function boot()
     {
@@ -20,9 +21,35 @@ class DeviceInfo extends Model
             // Aynı device_id'ye sahip mevcut kayıtları bul ve sil
             self::where('device_id', $model->device_id)->delete();
 
-            $model->updated_at = null; // veya belirli bir değeri güncellemek istemiyorsanız unset edebilirsiniz.
+            $model->created_by = auth()->id();
+
+        });
+
+        static::updating(function ($model) {
+            $model->updated_by = auth()->id();
+        });
+
+        static::deleting(function ($model) {
+            $model->deleted_by = auth()->id();
+            $model->isDeleted = true;
+            $model->save();
+        });
+
+        static::saving(function ($model) {
+            // Aynı IP adresine sahip silinmemiş (soft deleted olmayan) bir kayıt olup olmadığını kontrol et
+            $existingDevice = static::where('ip_address', $model->ip_address)
+                ->whereNull('deleted_at')
+                ->exists();
+
+            // Eğer böyle bir kayıt varsa, kaydetme işlemini engelle
+            if ($existingDevice) {
+                return false; // Kaydetme işlemi iptal edilir
+            }
+            return true;
         });
     }
+
+
     protected $fillable = [
         'device_id',
         'location_id',
@@ -45,6 +72,23 @@ class DeviceInfo extends Model
         return $this->belongsTo(Location::class);
     }
 
+    // DeviceInfo'yu oluşturan kullanıcı
+    public function createdBy()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    // DeviceInfo'yu güncelleyen kullanıcı
+    public function updatedBy()
+    {
+        return $this->belongsTo(User::class, 'updated_by');
+    }
+
+    // DeviceInfo'yu silen kullanıcı
+    public function deletedBy()
+    {
+        return $this->belongsTo(User::class, 'deleted_by');
+    }
 
     // Varsayılan değerlerle oluşturma metodu
     public static function createDefault($deviceId)

@@ -1,12 +1,3 @@
-@if ($errors->any())
-    <div class="alert alert-danger">
-        <ul>
-            @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
-@endif
 <div class="bg-white shadow-md rounded-xl p-6 mb-6">
     <h2 class="text-lg font-semibold text-gray-900 mb-4">Cihaz Bilgileri</h2>
     <form id="device-info-form" action="{{ route('devices.update', $device) }}" method="POST" class="form-container">
@@ -19,26 +10,25 @@
                     disabled
                     name="type"
                     data-dis
+                    id="type"
                     class="bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 mt-2 w-full">
                     <option
                         value="{{ $device->type }}"> {{ $device->type }}
                     </option>
                 </select>
             </div>
-            <div>
-                <label class="text-sm font-medium text-gray-500">Cihaz Adı</label>
-                <p contenteditable="false"
-                   id="device-name"
-                   class="text-lg text-gray-900"
-                   data-name="device_name"
-                   data-value="{{ $device->device_name }}">{{ $device->device_name }}</p>
-            </div>
+            <x-input-text label="Cihaz Adı"
+                          id="device-name"
+                          dataName="device_name"
+                          value="{{ $device->device_name }}"/>
+
             <div>
                 <label class="text-sm font-medium text-gray-500">Marka</label>
                 <select
                     disabled
                     name="brand"
                     data-dis
+                    id="brand"
                     class="bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 mt-2 w-full">
                     <option
                         value="{{ $device->brand }}"> {{ $device->brand }}
@@ -51,53 +41,56 @@
                     disabled
                     name="model"
                     data-dis
+                    id="model"
                     class="bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 mt-2 w-full">
                     <option
-                        value="{{ $device->model }}"> {{ $device->model }}
+                        value=" {{$device->model}}{{$device->deviceType->port_number ? '('.$device->deviceType->port_number.')' : ''}}">  {{$device->model}}{{$device->deviceType->port_number ? ' ('.$device->deviceType->port_number.')' : ''}}
                     </option>
                 </select>
             </div>
-            <div>
-                <label class="text-sm font-medium text-gray-500">Seri Numarası</label>
-                <p contenteditable="false" id="device-serial-number" class="text-lg text-gray-900"
-                   data-name="serial_number" data-value="{{ $device->serial_number }}">{{ $device->serial_number }}</p>
-            </div>
-            <div>
-                <label class="text-sm font-medium text-gray-500">Sicil Numarası</label>
-                <p contenteditable="false" id="device-registry-number" class="text-lg text-gray-900"
-                   data-name="registry_number"
-                   data-value="{{ $device->registry_number }}">{{ $device->registry_number }}</p>
-            </div>
+
+            <x-input-text label="Seri Numarası"
+                          id="device-serial-number"
+                          dataName="serial_number"
+                          value="{{ $device->serial_number }}"/>
+
+            <x-input-text label="Sicil Numarası"
+                          id="device-registry-number"
+                          dataName="registry_number"
+                          value="{{ $device->registry_number }}"/>
+
             <div>
                 <label class="text-sm font-medium text-gray-500">Durum</label>
                 <select
                     disabled
-                    id = "status"
+                    id="status"
                     name="status"
                     class="bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 mt-2 w-full">
-                    @foreach (App\DeviceStatus::toArray() as $key => $value)
+                    @foreach (\App\Enums\DeviceStatus::toArray() as $key => $value)
                         <option value="{{ $value }}" {{ $device->status->value === $value ? 'selected' : '' }}>
                             {{ $value}}
                         </option>
                     @endforeach
                 </select>
             </div>
-            <div>
-                <label class="text-sm font-medium text-gray-500">IP Adresi</label>
-                <p contenteditable="false" id="device-ip-address" class="text-lg text-gray-900" data-name="ip_address"
-                   data-value="{{ $device->ip_address }}">{{ $device->ip_address }}</p>
-            </div>
-            <div>
-                <label class="text-sm font-medium text-gray-500">Açıklama</label>
-                <p contenteditable="false" id="device-description" class="text-lg text-gray-900" data-name="description"
-                   data-value="{{ $device->description }}">{{ $device->description }}</p>
-            </div>
+            @can('view-ip-address')
+            <x-input-text label="IP Adresi"
+                          id="device-ip-address"
+                          dataName="ip_address"
+                          value="{{ $device->ip_address }}"/>
+            @endcan
+
+            <x-input-text label="Açıklama"
+                          id="device-description"
+                          dataName="description"
+                          value="{{ $device->description }}"/>
 
             <div>
                 <label class="text-sm font-medium text-gray-500">Bina</label>
                 <select
                     disabled
                     name="building"
+                    id="building"
                     onchange="handleBuildingChange(this.value,this.closest('.form-container'), '{{$device->unit}}')"
                     class="bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 mt-2 w-full">
                     @foreach ($locations as $location)
@@ -122,27 +115,22 @@
                 </select>
             </div>
 
+            <x-input-text label="Blok"
+                          id="device-block"
+                          dataName="block"
+                          value="{{ $device->block }}"/>
 
-            <div>
-                <label class="text-sm font-medium text-gray-500">Blok</label>
-                <p contenteditable="false" id="device-block" class="text-lg text-gray-900" data-name="block"
-                   data-value="{{ $device->block }}">{{ $device->block }}</p>
-            </div>
-            <div>
-                <label class="text-sm font-medium text-gray-500">Kat</label>
-                <p contenteditable="false" id="device-floor" class="text-lg text-gray-900" data-name="floor"
-                   data-value="{{ $device->floor }}">{{ $device->floor }}</p>
-            </div>
-            <div>
-                <label class="text-sm font-medium text-gray-500">Oda No</label>
-                <p contenteditable="false"
-                   id="device-room-number"
-                   class="text-lg text-gray-900"
-                   data-name="room_number"
-                   data-value="{{ $device->room_number }}">
-                    {{ $device->room_number }}
-                </p>
-            </div>
+            <x-input-text label="floor"
+                          id="device-floor"
+                          dataName="floor"
+                          value="{{ $device->floor }}"/>
+
+            <x-input-text label="Oda No"
+                          id="device-room-number"
+                          dataName="room_number"
+                          value="{{ $device->room_number }}"/>
+
+
         </div>
         <div class="mt-4">
             <button type="button" id="edit-btn" class="bg-blue-500 text-white px-4 py-2 rounded mr-2">Update</button>
@@ -150,12 +138,18 @@
             </button>
             <button type="button" id="cancel-btn" class="bg-gray-500 text-white px-4 py-2 rounded mr-2 hidden">Cancel
             </button>
+            @can('delete-devices')
+
             <button type="button" id="delete-btn" class="bg-red-500 text-white px-4 py-2 rounded">Delete</button>
+            @endcan
         </div>
-        <input type="hidden" name="parent_device_id" id="parent_device_id" value="{{ $device->parentDevice->id ?? '' }}">
+        <input type="hidden" name="parent_device_id" id="parent_device_id"
+               value="{{ $device->parentDevice->id ?? '' }}">
+        <input type="hidden" name="parent_device_port" id="parent_device_port"
+               value="{{ $device->parent_device_port ?? '' }}">
     </form>
 </div>
-
+@can('VIEW_CONNECTED_DEVICES')
 {{-- Altta Solda Bağlı Olan Cihazlar ve Sağda Çocuk Cihazlar --}}
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8  ">
     <!-- Parent Switch Alanı -->
@@ -171,43 +165,59 @@
                     {{ $device->parentDevice->device_name ?? 'Seçili cihaz yok' }}
                 </div>
                 <div class="text-gray-600 mt-2">
-                    <div id="parent_device_building"><span class="font-medium">Konum:</span> {{ $device->parentDevice->building ?? '' }}</div>
-                    <div id="parent_device_ip_address"><span class="font-medium">IP Adresi:</span> {{ $device->parentDevice->ip_address ?? '' }}</div>
-                    <div id="parent_device_description"><span class="font-medium">Açıklama:</span> {{ $device->parentDevice->description ?? '' }}</div>
+                    <div id="parent_device_building"><span
+                            class="font-medium">Konum:</span> {{ $device->parentDevice->building ?? '' }}</div>
+                    <div id="parent_device_ip_address"><span
+                            class="font-medium">IP Adresi:</span> {{ $device->parentDevice->ip_address ?? '' }}</div>
+                    <div id="parent_device_description"><span
+                            class="font-medium">Açıklama:</span> {{ $device->parentDevice->description ?? '' }}</div>
+                    <div id="parent_device_port_area"><span
+                            class="font-medium">Port:</span> {{ $device->parent_device_port ?? '' }}</div>
                 </div>
             </div>
             <x-edit-button type="button" id="parent-edit-btn"
-                    onclick="openModal('show')"
-                    class="hidden ml-2 px-2 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                           onclick="openModal('show')"
+                           class="hidden ml-2 px-2 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
                 Düzenle
             </x-edit-button>
-            <x-delete-button type="button" id="parent-delete-btn"
-                             onclick="unselectDevice()"
-                             class="hidden ml-2 px-2 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 items-center">
-                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                </svg>
-                Sil
-            </x-delete-button>
+                <x-delete-button type="button" id="parent-delete-btn"
+                                 onclick="unselectDevice()"
+                                 class="hidden ml-2 px-2 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 items-center">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                         xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                    Sil
+                </x-delete-button>
+
         </a>
+
     </div>
 
     <div class="col-span-1 bg-white shadow-md rounded-xl p-6">
         <h2 class="text-lg font-semibold text-gray-900 mb-4">Bağlı Olan Cihazlar</h2>
-        @if($device->connectedDevices && $device->connectedDevices->isEmpty())
-            <p class="text-gray-600">Bağlı cihaz bulunmamaktadır.</p>
-        @else
-            <ul class="list-disc pl-5">
+        @if($device->connectedDevices && $device->connectedDevices->isNotEmpty())
+            <div class="space-y-4">
                 @foreach($device->connectedDevices as $connectedDevice)
-                    <li><a href="/devices/{{$connectedDevice->id}}"> {{ ucfirst($connectedDevice->name ) }}
-                            --- {{ $connectedDevice->brand }}/{{ $connectedDevice->model }}
-                            ---------- {{ $connectedDevice->ip_address}}  </a></li>
+                    <x-device-compact-info
+                        id="{{$connectedDevice->id}}"
+                        type="{{$connectedDevice->type}}"
+                        name="{{$connectedDevice->device_name}}"
+                        brand="{{$connectedDevice->brand}}"
+                        model="{{$connectedDevice->model}}"
+                        ipAddress="{{$connectedDevice->ip_address}}"
+                        port="{{$connectedDevice->parent_device_port}}"
+                        portNumber="{{$device->deviceType->port_number}}"
+                    />
                 @endforeach
-            </ul>
+            </div>
+        @else
+            <p class="text-gray-600">Bağlı cihaz bulunmamaktadır.</p>
         @endif
     </div>
 </div>
-
+@endcan
 {{-- Modal --}}
 <x-modal/>
 
@@ -228,6 +238,7 @@
         const selectElements = document.querySelectorAll('#device-info-form select');
 
         const serialNumber = document.getElementById('device-serial-number');
+        const registerNumber = document.getElementById('device-registry-number');
         let dataDisSelects = document.querySelectorAll('select[data-dis]');
 
         const originalValues = {};
@@ -241,11 +252,14 @@
                 element.addEventListener('input', handleInputChange);
             });
             serialNumber.setAttribute('contenteditable', 'false');
+            registerNumber.setAttribute('contenteditable', 'false');
 
             selectElements.forEach(element => {
                 element.removeAttribute('disabled');
                 const id = element.id;
+
                 originalValues[id] = element.value;
+
                 element.addEventListener('change', handleInputChange);
             });
 
@@ -278,10 +292,11 @@
             });
             saveButton.classList.add('hidden');
             cancelButton.classList.add('hidden');
+            parentEditButton.classList.add('hidden');
+            parentDeleteButton.classList.add('hidden');
             editButton.classList.remove('hidden');
             saveButton.disabled = true;
         });
-
 
 
         function isIpAddressChanged() {
@@ -290,11 +305,10 @@
         }
 
 
-        saveButton.addEventListener('click', function (event) {
-            // Kullanıcı onay vermezse form gönderimini iptal et
-            if (isIpAddressChanged() && !confirm('IP adresini güncellemek istediğinizden emin misiniz? Bağlı Cihazlar öksüz kalacak.')) {
-                event.preventDefault();
-            }
+        saveButton.addEventListener('click', async function (event) {
+            event.preventDefault(); // Formun varsayılan gönderimini engelle
+
+
             infoElements.forEach(element => {
                 const name = element.getAttribute('data-name');
                 const value = element.textContent;
@@ -314,21 +328,68 @@
                 input.value = value;
                 document.getElementById('device-info-form').appendChild(input);
             });
+
+            // Kullanıcı onay vermezse form gönderimini iptal et
+            if (isIpAddressChanged()) {
+                event.preventDefault();
+                toastr.info(
+                    "<br /><br /><button type='button' id='confirmationButtonYes' class='btn clear'>Evet</button>&nbsp;&nbsp;<button type='button' id='confirmationButtonNo' class='btn clear'>Hayır</button>",
+                    'IP adresini güncellemek istediğinizden emin misiniz? Bağlı Cihazlar öksüz kalacak?',
+                    {
+                        closeButton: false,
+                        allowHtml: true,
+                        onShown: function (toast) {
+                            $("#confirmationButtonYes").click(function () {
+                                // Kullanıcı "Evet"e tıkladı, formu gönder
+                                document.getElementById('device-info-form').submit();
+                            });
+
+                            $("#confirmationButtonNo").click(function () {
+                                // Kullanıcı "Hayır"e tıkladı, Toastr mesajı kapatılsın
+                                toastr.clear(toast, {force: true});
+                            });
+                        },
+                        timeOut: 0, // Toastr mesajı kaybolmasın
+                        extendedTimeOut: 0 // Fare üzerinde olduğunda da kaybolmasın
+                    }
+                );
+
+            }
             // Kullanıcıdan değişiklik yapma sebebini alın
             const changeReason = prompt('Değişiklik yapma sebebini girin:');
 
-            if (changeReason) {
-                // Kullanıcı açıklama sağladıysa, bunu formda gizli bir alan olarak ekleyin
-                const reasonInput = document.createElement('input');
-                reasonInput.type = 'hidden';
-                reasonInput.name = 'update_reason';
-                reasonInput.value = changeReason;
-                document.getElementById('device-info-form').appendChild(reasonInput);
+            if (!changeReason) {
+                toastr.error('Değişiklik yapma sebebini girmeniz gerekiyor.');
+                return;
+            }
 
-                // Formu gönder
-                document.getElementById('device-info-form').submit();
-            } else {
-                alert('Değişiklik yapma sebebini girmeniz gerekiyor.');
+            if (changeReason) {
+                const formData = new FormData(document.getElementById('device-info-form'));
+                formData.append('update_reason', changeReason);
+
+                try {
+                    const response = await fetch(document.getElementById('device-info-form').action, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok) {
+                        toastr.success(result.message || 'Başarıyla güncellendi.');
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1000);
+                    } else {
+                        toastr.error(result.message || 'Güncelleme sırasında bir hata oluştu.');
+                    }
+                } catch (error) {
+                    toastr.error(error || 'hata oluştu');
+                }
+
             }
         });
 

@@ -2,14 +2,37 @@
 
 namespace App\Models;
 
+use App\Exceptions\ConflictException;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class Location extends Model
+class Location extends Model implements Auditable
 {
     use HasFactory;
+    use \OwenIt\Auditing\Auditable;
 
     protected $fillable = ['building', 'unit'];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            $model->created_by = auth()->id();
+        });
+
+        static::updating(function ($model) {
+            $model->updated_by = auth()->id();
+        });
+
+        static::deleted(function ($model) {
+            $model->deleted_by = auth()->id();
+            $model->save();
+        });
+    }
+
 
     /**
      * DeviceInfo ile ilişkisi

@@ -2,11 +2,10 @@
 
 namespace Database\Factories;
 
-use App\DeviceStatus;
-use App\Models\DeviceType;
-use App\Models\Location;
-use App\Models\NetworkSwitch;
+use App\Enums\DeviceStatus;
 use App\Models\Device;
+use App\Models\DeviceType;
+use App\Models\NetworkSwitch;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 

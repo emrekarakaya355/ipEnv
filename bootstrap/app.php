@@ -1,5 +1,7 @@
 <?php
 
+use App\Exceptions\CustomException;
+use App\Http\Responses\ErrorResponse;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -12,8 +14,29 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
 
-
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        //
+
+        $exceptions->renderable(function (Throwable $exception, $request) {
+
+            // Laravel'in varsayılan istisna işleyicilerini koru
+            if ($exception instanceof \Illuminate\Auth\AuthenticationException) {
+                return redirect()->guest(route('login'));
+            }
+
+            if ($exception instanceof \Illuminate\Auth\Access\AuthorizationException) {
+                return response()->view('errors.403', [], 403);
+            }
+
+            if ($exception instanceof \App\Exceptions\ModelNotFoundException || $exception instanceof \Symfony\Component\HttpKernel\Exception\NotFoundHttpException) {
+                return response()->view('errors.404', [], 404);
+            }
+            if ($exception instanceof CustomException) {
+                return (new ErrorResponse($exception));
+            }
+
+            // Diğer tüm durumlarda genel bir hata sayfası döndür
+            return response()->view('errors.error', ['exception' => $exception]);
+        });
+
     })->create();

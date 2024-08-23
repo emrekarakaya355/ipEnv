@@ -21,12 +21,14 @@ return new class extends Migration
             $table->enum('status', ['Çalışıyor', 'Depo', 'Garanti', 'Hurda'])->default('Çalışıyor');
             $table->unsignedBigInteger('parent_device_id')->nullable();
             $table->foreign('parent_device_id')->references('id')->on('devices');
-            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedInteger('parent_device_port')->nullable();
+            $table->unsignedBigInteger('created_by');
             $table->foreign('created_by')->references('id')->on('users');
             $table->unsignedBigInteger('updated_by')->nullable();
             $table->foreign('updated_by')->references('id')->on('users');
             $table->unsignedBigInteger('deleted_by')->nullable();
             $table->foreign('deleted_by')->references('id')->on('users');
+            $table->string('isDeleted')->default('0');
             $table->timestamps();
             $table->softDeletes();
         });

@@ -15,8 +15,8 @@ return new class extends Migration
     {
         Schema::create('device_infos', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('device_id')->constrained('devices')->onDelete('cascade');
-            $table->foreignId('location_id')->constrained('locations')->default(1);
+            $table->foreignId('device_id')->constrained('devices');
+            $table->foreignId('location_id')->constrained('locations');
             $table->string('ip_address')->nullable();
             $table->string('description')->nullable();
 
@@ -30,6 +30,7 @@ return new class extends Migration
             $table->foreign('updated_by')->references('id')->on('users');
             $table->unsignedBigInteger('deleted_by')->nullable();
             $table->foreign('deleted_by')->references('id')->on('users');
+            $table->string('isDeleted')->default('0');
             $table->timestamps();
             $table->softDeletes();
         });
