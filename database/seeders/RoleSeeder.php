@@ -31,11 +31,35 @@ class RoleSeeder extends Seeder
         Permission::create(['name' => 'update user']);
         Permission::create(['name' => 'delete user']);
 
-        Permission::create(['name' => 'view product']);
-        Permission::create(['name' => 'create product']);
-        Permission::create(['name' => 'update product']);
-        Permission::create(['name' => 'delete product']);
+        Permission::create(['name' => 'view device']);
+        Permission::create(['name' => 'create device']);
+        Permission::create(['name' => 'update device']);
+        Permission::create(['name' => 'delete device']);
 
+        Permission::create(['name' => 'view deviceInfo']);
+        Permission::create(['name' => 'create deviceInfo']);
+        Permission::create(['name' => 'update deviceInfo']);
+        Permission::create(['name' => 'delete deviceInfo']);
+
+        Permission::create(['name' => 'view location']);
+        Permission::create(['name' => 'create location']);
+        Permission::create(['name' => 'update location']);
+        Permission::create(['name' => 'delete location']);
+
+        Permission::create(['name' => 'view deviceType']);
+        Permission::create(['name' => 'create deviceType']);
+        Permission::create(['name' => 'update deviceType']);
+        Permission::create(['name' => 'delete deviceType']);
+
+        Permission::create(['name' => 'view-building']);
+        Permission::create(['name' => 'view-unit']);
+        Permission::create(['name' => 'view-type']);
+        Permission::create(['name' => 'view-brand']);
+        Permission::create(['name' => 'view-model']);
+        Permission::create(['name' => 'view-serial_number']);
+        Permission::create(['name' => 'view-device_name']);
+        Permission::create(['name' => 'view-ip_address']);
+        Permission::create(['name' => 'view-status']);
 
         // Create Roles
         $superAdminRole = Role::create(['name' => 'super-admin']); //as super-admin
@@ -52,11 +76,12 @@ class RoleSeeder extends Seeder
         $adminRole->givePermissionTo(['create role', 'view role', 'update role']);
         $adminRole->givePermissionTo(['create permission', 'view permission']);
         $adminRole->givePermissionTo(['create user', 'view user', 'update user']);
-        $adminRole->givePermissionTo(['create product', 'view product', 'update product']);
-
+        $adminRole->givePermissionTo(['create device', 'view device', 'update device']);
+        $adminRole->givePermissionTo(['create location', 'view location', 'update location']);
+        $adminRole->givePermissionTo(['create deviceType', 'view deviceType', 'update deviceType']);
+        $adminRole->givePermissionTo(['create deviceInfo', 'view deviceInfo', 'update deviceInfo']);
 
         // Let's Create User and assign Role to it.
-
         $superAdminUser = User::firstOrCreate([
             'email' => 'superadmin@gmail.com',
         ], [
@@ -66,8 +91,6 @@ class RoleSeeder extends Seeder
         ]);
 
         $superAdminUser->assignRole($superAdminRole);
-
-
         $adminUser = User::firstOrCreate([
             'email' => 'admin@gmail.com'
         ], [

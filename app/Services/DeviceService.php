@@ -97,15 +97,19 @@ class DeviceService
 
     private function createDeviceInfo( $deviceValidated, $device) : void
     {
-        $locationId = Location::getLocationIdFromBuildingAndUnit($deviceValidated['building'], $deviceValidated['unit']);
+        $locationId = Location::getLocationIdFromBuildingAndUnit(
+            $deviceValidated['building'] ?? null,
+            $deviceValidated['unit'] ?? null
+        ) ?? null;
+
         DeviceInfo::create([
              'device_id' => $device->id,
-             'ip_address' => $deviceValidated['ip_address'],
+             'ip_address' => $deviceValidated['ip_address'] ?? null,
              'location_id' =>$locationId,
-             'block' => $deviceValidated['block'],
-             'floor' => $deviceValidated['floor'],
-             'room_number' => $deviceValidated['room_number'],
-             'description' => $deviceValidated['description'],
+             'block' => $deviceValidated['block'] ?? null,
+             'floor' => $deviceValidated['floor'] ?? null,
+             'room_number' => $deviceValidated['room_number'] ?? null,
+             'description' => $deviceValidated['description'] ?? null,
          ]);
     }
     /**
@@ -123,12 +127,12 @@ class DeviceService
         $attributes = [
             'type' => $deviceType->type,
             'device_type_id' => $deviceType->id,
-            'device_name' => $deviceValidated['device_name'],
+            'device_name' => $deviceValidated['device_name']?? null,
             'serial_number' => $deviceValidated['serial_number'],
             'registry_number' => $deviceValidated['registry_number'],
-            'parent_device_id' => $deviceValidated['parent_device_id'],
-            'parent_device_port' => $deviceValidated['parent_device_port'],
-            'status' => $deviceValidated['ip_address'] === null ? "Depo" : "Çalışıyor",
+            'parent_device_id' => $deviceValidated['parent_device_id'] ?? null,
+            'parent_device_port' => $deviceValidated['parent_device_port'] ?? null,
+            'status' => isset($deviceValidated['ip_address']) ? "Çalışıyor" : "Depo",
         ];
         return Device::create($attributes);
     }

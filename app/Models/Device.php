@@ -300,10 +300,11 @@ class Device extends Model implements Auditable
             'Marka' => 'brand',
             'Model' => 'model',
             'Seri Numarası' => 'serial_number',
-            'Cihaz İsmi' => 'name',
+            'Cihaz İsmi' => 'device_name',
             'IP Adresi' => 'ip_address',
             'Durum' => 'status',
         ];
     }
+
 
 }

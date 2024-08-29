@@ -13,10 +13,10 @@ class ValidatorResponse implements Responsable
 
 
 
-    public function __construct(Validator $validator)
+    public function __construct(Validator $validator,?string $message = '')
     {
-
         $this->validator = $validator;
+        $this->message = $message;
 
     }
 
@@ -25,20 +25,21 @@ class ValidatorResponse implements Responsable
 
         // Get all error messages and flatten them into a single array
         $messages = collect($this->validator->errors()->all())->flatten()->all();
-
         // Join all messages into a single string, separated by a line break or any other delimiter
         $errorMessage = implode(' ', $messages);
-        if($request->ajax()){
+        if ($request->expectsJson()) {
+
             $response = [
                 'success' => false,
                 'message' => $errorMessage
             ];
-            return response()->json($response,422);
+            return response()->json($response, 422);
+        } else {
+
+            // Eğer routeName belirtilmişse redirect et, belirtilmemişse bir önceki sayfaya yönlendir
+            return back()
+                ->withInput()
+                ->with(['error' => $this->message ?: $errorMessage]);
         }
-    else {
-        // Eğer routeName belirtilmişse redirect et, belirtilmemişse bir önceki sayfaya yönlendir
-        return redirect()->route('fallback.route.name')->with([
-            'success' => $this->$errorMessage,
-        ]);
     }
 }

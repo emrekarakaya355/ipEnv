@@ -1,4 +1,5 @@
 <x-layout>
+    @can('create device')
     <x-slot name="heading">Cihaz Ekle</x-slot>
 
     <div class="w-full p-8">
@@ -121,9 +122,8 @@
                             @enderror
                         </div>
                     </div>
-
+                @can('create deviceInfo')
                 </div>
-
                 <div class="bg-white shadow-md rounded-xl p-6 mb-6 flex-auto ">
                     <div class="space-y-4">
                         <div>
@@ -247,6 +247,7 @@
                         <input type="hidden" name="parent_device_port" id="parent_device_port">
 
                     </div>
+                    @endcan
 
                 </div>
             </div>
@@ -257,11 +258,7 @@
 
         </form>
         {{-- Form sonu --}}
-
-
-        {{-- Form sonu --}}
     </div>
-
     {{-- Modal --}}
     <x-modal/>
     <script>
@@ -298,5 +295,5 @@
             });
         });
     </script>
-
+    @endcan
 </x-layout>

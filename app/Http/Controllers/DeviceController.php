@@ -10,7 +10,6 @@ use App\Models\Location;
 use App\Models\NetworkSwitch;
 use App\Services\DeviceService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -22,6 +21,11 @@ class DeviceController extends Controller
     public function __construct(DeviceService $deviceService)
     {
         $this->deviceService = $deviceService;
+
+        $this->middleware('permission:view device', ['only' => ['index']]);
+        $this->middleware('permission:create device', ['only' => ['create','store']]);
+        $this->middleware('permission:update device', ['only' => ['update','edit']]);
+        $this->middleware('permission:delete device', ['only' => ['destroy']]);
     }
 
     /**
@@ -54,7 +58,6 @@ class DeviceController extends Controller
 
     public function store(StoreDeviceRequest $request)
     {
-
         // Doğrulama başarılı, veriler kullanılabilir
         //StoreDeviceRequest sınıfındaki kurallara göre doğrulama yapıyor.
         $deviceValidated = $request->validated();

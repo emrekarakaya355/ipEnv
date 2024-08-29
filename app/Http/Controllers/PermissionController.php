@@ -2,14 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Responses\ErrorResponse;
 use App\Http\Responses\SuccessResponse;
+use App\Http\Responses\ValidatorResponse;
 use Illuminate\Http\Request;
-use Spatie\Permission\Exceptions\PermissionAlreadyExists;
+use Illuminate\Support\Facades\Validator;
 use Spatie\Permission\Models\Permission;
 
 class PermissionController extends Controller
 {
-    /*
+
     public function __construct()
     {
         $this->middleware('permission:view permission', ['only' => ['index']]);
@@ -17,7 +19,7 @@ class PermissionController extends Controller
         $this->middleware('permission:update permission', ['only' => ['update','edit']]);
         $this->middleware('permission:delete permission', ['only' => ['destroy']]);
     }
-*/
+
     public function index()
     {
         $permissions = Permission::paginate(10);
@@ -31,26 +33,27 @@ class PermissionController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validator =Validator::make( $request->all(),[
             'name' => [
                 'required',
                 'string',
                 'unique:permissions,name'
             ]
         ]);
+
+        if($validator->fails()){
+            return new ValidatorResponse($validator);
+        }
         try{
             $permission = Permission::create([
                 'name' => $request->name
             ]);
-            $routname = route('\permissions');
 
-            return new SuccessResponse("Yetki Başarı İle Oluşturuldu.",['data' => $permission->id],$routname);
-        } catch (PermissionAlreadyExists $exception) {
-
+            return new SuccessResponse("Yetki Başarı İle Oluşturuldu.",['data' => $permission->id],'permissions.index');
+        } catch (\Exception $exception) {
+            return new ErrorResponse($exception);
         }
-        return redirect('permissions')->with('status','Permission Created Successfully');
     }
-
     public function edit(Permission $permission)
     {
         return view('role-permission.permission.edit', ['permission' => $permission]);
@@ -58,25 +61,37 @@ class PermissionController extends Controller
 
     public function update(Request $request, Permission $permission)
     {
-        $request->validate([
+        $validator =Validator::make( $request->all(),[
             'name' => [
                 'required',
                 'string',
-                'unique:permissions,name,'.$permission->id
+                'unique:permissions,name'
             ]
         ]);
+        if($validator->fails()){
+            return new ValidatorResponse($validator,"Bu isimde bir yetki hali hazırda var!");
 
-        $permission->update([
-            'name' => $request->name
-        ]);
+        }
 
-        return redirect('permissions')->with('status','Permission Updated Successfully');
+        try {
+            $permission->update([
+                'name' => $request->name
+            ]);
+            return new SuccessResponse("Yetki Başarı İle düzeltildi.",['data' => $permission->id],'permissions.index');
+
+        } catch (\Exception $exception) {
+            return new ErrorResponse($exception);
+        }
     }
 
     public function destroy($permissionId)
     {
-        $permission = Permission::find($permissionId);
-        $permission->delete();
-        return redirect('permissions')->with('status','Permission Deleted Successfully');
+        try {
+            $permission = Permission::find($permissionId);
+            $permission->delete();
+            return new SuccessResponse("Yetki Başarı İle Silindi.",null,'permissions.index');
+        } catch (\Exception $exception) {
+            return new ErrorResponse($exception);
+        }
     }
 }

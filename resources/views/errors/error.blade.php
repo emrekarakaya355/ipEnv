@@ -13,7 +13,7 @@
             @endif
 
             <div class="mt-6">
-                <a href="{{ url()->previous() }}" class="text-blue-500 hover:underline">{{ url()->previous() }} Geri Dön</a>
+                <a href="{{ url()->previous() }}" class="text-blue-500 hover:underline">{{ url()}} Geri Dön</a>
             </div>
         </div>
     </div>

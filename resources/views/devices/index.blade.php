@@ -18,11 +18,9 @@
                     <input type="text" placeholder="Ara..." class="border border-gray-300 rounded-md px-4 py-1 w-full" name="search" id="searchInput">
                 </form>
                 <div class="ml-4">
-                    <a href="/devices/create">
-                        <x-primary-button>Ekle</x-primary-button>
-                    </a>
-                    <button class="bg-blue-500 text-white px-4 py-2 rounded-md">Kopyala</button>
-                    <button class="bg-red-500 text-white px-4 py-2 rounded-md">Sil</button>
+                    @can('create device')
+                    <x-primary-button onclick="window.location.href='{{route('devices.create')}}'">Ekle</x-primary-button>
+                    @endcan
                 </div>
             </div>
             <div class="overflow-x-auto bg-white shadow-md rounded-xl">

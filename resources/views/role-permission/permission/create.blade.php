@@ -32,7 +32,7 @@
                                 </div>
                                 <div class="mb-3">
                                     <x-primary-button type="submit" class="btn btn-primary"> Save </x-primary-button>
-                                    <x-danger-button onclick="window.location.href='{{ route('permissions.index') }}'">Geri Dön </x-danger-button>
+                                    <x-danger-button type="button" onclick="window.location.href='{{ route('permissions.index') }}'">Geri Dön </x-danger-button>
                                 </div>
                             </div>
                         </form>

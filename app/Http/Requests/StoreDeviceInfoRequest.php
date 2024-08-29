@@ -23,8 +23,8 @@ class StoreDeviceInfoRequest extends FormRequest
     {
         return [
             'description' => 'nullable|string|max:255',
-            'building' => 'required|string:max:255',
-            'unit' => 'required|string:max:255',
+            'building' => 'nullable|string:max:255',
+            'unit' => 'nullable|string:max:255',
             'update_reason' => 'nullable|string|max:255',
             'block' => 'nullable|string',
             'floor' => 'nullable|string',

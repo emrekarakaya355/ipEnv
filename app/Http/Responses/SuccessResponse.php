@@ -37,6 +37,7 @@ class SuccessResponse implements Responsable
     {
         // Eğer AJAX isteği ise JSON döndür
         if ($request->expectsJson()) {
+
             return response()->json(
                 [
                     'success' => true,
@@ -46,8 +47,14 @@ class SuccessResponse implements Responsable
                 ], $this->statusCode, $this->headers
             );
         } else {
+            if($this->routeName){
+               return redirect()->route($this->routeName)->with([
+                   'success' => $this->message,
+                   'data' => $this->data,
+               ]);
+            }
             // Eğer routeName belirtilmişse redirect et, belirtilmemişse bir önceki sayfaya yönlendir
-            return redirect()->route($this->routeName ?? 'fallback.route.name')->with([
+            return back()->with([
                 'success' => $this->message,
                 'data' => $this->data,
             ]);

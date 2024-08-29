@@ -3,15 +3,17 @@
     <div class="flex-auto p-8">
         <h1 class="text-2xl font-semibold text-gray-900 mb-6">Yetkiler</h1>
         <!-- Başarı ve hata mesajlarını göstermek için -->
-        @if (session('success'))
-            <div>
-                <p>{{ session('success') }}</p>
+        {{-- Hata veya başarılı işlem mesajları --}}
+        @if(session('error'))
+            <div class="bg-red-500 text-white p-4 rounded-md mb-4">
+                {{ session('error') }}
+
             </div>
         @endif
 
-        @if (session('error'))
-            <div>
-                <p>{{ session('error') }}</p>
+        @if(session('success'))
+            <div class="bg-green-500 text-white p-4 rounded-md mb-4">
+                {{ session('success') }}
             </div>
         @endif
                 <div class="card mt-3">
@@ -55,7 +57,4 @@
                     </div>
                 </div>
             </div>
-
-
-
 </x-layout>

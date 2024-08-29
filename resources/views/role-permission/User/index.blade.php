@@ -1,18 +1,25 @@
 <x-layout>
-    <div class="container mt-2">
-        <div class="row">
-            <div class="col-md-12">
-                @if (session('status'))
-                    <div class="alert alert-success">{{ session('status') }}</div>
-                @endif
+    <x-slot name="heading"> Kullanıcılar </x-slot>
+    <div class="flex-auto p-8">
+        <h1 class="text-2xl font-semibold text-gray-900 mb-6">Kullanıcılar</h1>
+        <!-- Başarı ve hata mesajlarını göstermek için -->
+        {{-- Hata veya başarılı işlem mesajları --}}
+        @if(session('error'))
+            <div class="bg-red-500 text-white p-4 rounded-md mb-4">
+                {{ session('error') }}
 
+            </div>
+        @endif
+        @if(session('success'))
+            <div class="bg-green-500 text-white p-4 rounded-md mb-4">
+                {{ session('success') }}
+            </div>
+        @endif
                 <div class="card mt-3">
                     <div class="card-header">
-                        <h4>Users
                             @can('create user')
                                 <x-primary-button onclick="window.location.href='{{ route('users.create') }}'">Kullanıcı Ekle</x-primary-button>
                             @endcan
-                        </h4>
                     </div>
                     <div class="overflow-x-auto bg-white shadow-md rounded-xl">
                         <table class="min-w-full divide-y divide-gray-200">
@@ -39,11 +46,8 @@
                                         @endif
                                     </td>
                                     <td class="px-6 py-2 whitespace-nowrap">
-                                        @can('update user')
                                             <x-edit-button onclick="window.location.href='{{ url('users/'.$user->id.'/edit') }}'"></x-edit-button>
-                                        @endcan
-
-                                                <x-delete-button onclick="window.location.href='{{ url('users/'.$user->id.'/delete') }}'"></x-delete-button>
+                                            <x-delete-button onclick="window.location.href='{{ url('users/'.$user->id.'/delete') }}'"></x-delete-button>
                                     </td>
                                 </tr>
                             @endforeach
@@ -52,6 +56,4 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
 </x-layout>

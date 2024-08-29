@@ -2,14 +2,18 @@
 
 namespace  App\Http\Controllers;
 
+use App\Http\Responses\ErrorResponse;
+use App\Http\Responses\SuccessResponse;
+use App\Http\Responses\ValidatorResponse;
 use App\Models\User;
 use Illuminate\Http\Request;
-use  Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Validator;
+use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-    /*
+
     public function __construct()
     {
         $this->middleware('permission:view user', ['only' => ['index']]);
@@ -17,7 +21,6 @@ class UserController extends Controller
         $this->middleware('permission:update user', ['only' => ['update','edit']]);
         $this->middleware('permission:delete user', ['only' => ['destroy']]);
     }
-*/
     public function index()
     {
         $users = User::get();
@@ -29,27 +32,30 @@ class UserController extends Controller
         $roles = Role::pluck('name','name')->all();
         return view('role-permission.user.create', ['roles' => $roles]);
     }
-
     public function store(Request $request)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email',
             'password' => 'required|string|min:8|max:20',
             'roles' => 'required'
         ]);
-
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
-
-        $user->syncRoles($request->roles);
-
-        return redirect('/users')->with('status','User created successfully with roles');
+        if($validator->fails()){
+            return new ValidatorResponse($validator);
+        }
+        try {
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+            ]);
+            $user->syncRoles($request->roles);
+            return new SuccessResponse();
+        }catch (\Exception $e)
+        {
+            return new ErrorResponse($e);
+        }
     }
-
     public function edit(User $user)
     {
         $roles = Role::pluck('name','name')->all();
@@ -60,37 +66,34 @@ class UserController extends Controller
             'userRoles' => $userRoles
         ]);
     }
-
     public function update(Request $request, User $user)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
-            'password' => 'nullable|string|min:8|max:20',
             'roles' => 'required'
         ]);
 
-        $data = [
-            'name' => $request->name,
-            'email' => $request->email,
-        ];
-
+        /*
         if(!empty($request->password)){
             $data += [
                 'password' => Hash::make($request->password),
             ];
         }
-
-        $user->update($data);
-        $user->syncRoles($request->roles);
-
-        return redirect('/users')->with('status','User Updated Successfully with roles');
+        */
+        try {
+            $user->syncRoles($request->roles);
+            return new SuccessResponse();
+        }catch (\Exception $exception){
+            return new ErrorResponse($exception);
+        }
     }
-
     public function destroy($userId)
     {
-        $user = User::findOrFail($userId);
-        $user->delete();
-
-        return redirect('/users')->with('status','User Delete Successfully');
+        try {
+            $user = User::findOrFail($userId);
+            $user->delete();
+            return new SuccessResponse('Kullanıcı Başarı İle Silindi.');
+        }catch (\Exception $exception){
+            return new ErrorResponse($exception);
+        }
     }
 }

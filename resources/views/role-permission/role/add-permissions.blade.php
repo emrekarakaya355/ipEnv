@@ -1,22 +1,32 @@
 <x-layout>
+    <x-slot name="heading">Yetkileri Düzenle</x-slot>
 
-    <div class="container mt-5">
-        <div class="row">
-            <div class="col-md-12">
+    <div class="w-full p-8">
+        <h1 class="text-2xl font-semibold text-gray-900 mb-6">
+            Yetkileri Düzenle
+        </h1>
+        <h4 class="text-2xl font-semibold"> Role : {{ $role->name }}
+        </h4>
+        {{-- Hata veya başarılı işlem mesajları --}}
+        @if(session('error'))
+            <div class="bg-red-500 text-white p-4 rounded-md mb-4">
+                {{ session('error') }}
 
-                @if (session('status'))
-                    <div class="alert alert-success">{{ session('status') }}</div>
-                @endif
+            </div>
+        @endif
 
-                <div class="card">
-                    <div class="card-header">
-                        <h4>Role : {{ $role->name }}
-                            <a href="{{ url('roles') }}" class="btn btn-danger float-end">Back</a>
-                        </h4>
-                    </div>
+        @if(session('success'))
+            <div class="bg-green-500 text-white p-4 rounded-md mb-4">
+                {{ session('success') }}
+            </div>
+        @endif
+
+
+        <div class="card">
+
                     <div class="card-body">
 
-                        <form action="{{ url('roles/'.$role->id.'/give-permissions') }}" method="POST">
+                        <form action="{{ url('roles/'.$role->id.'/give-permissions') }}" method="POST" class="bg-white shadow-lg rounded-2xl p-8 form-container">
                             @csrf
                             @method('PUT')
 
@@ -24,8 +34,7 @@
                                 @error('permission')
                                 <span class="text-danger">{{ $message }}</span>
                                 @enderror
-
-                                <label for="">Permissions</label>
+                                <label for="">Yetkiler</label>
 
                                 <div class="row">
                                     @foreach ($permissions as $permission)
@@ -45,13 +54,12 @@
 
                             </div>
                             <div class="mb-3">
-                                <button type="submit" class="btn btn-primary">Update</button>
+                                <x-primary-button type="submit" class="btn btn-primary">Update</x-primary-button>
+                                <x-danger-button type="button" onclick="window.location.href='{{ route('roles.index') }}'">Geri Dön </x-danger-button>
+
                             </div>
                         </form>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-
 </x-layout>
