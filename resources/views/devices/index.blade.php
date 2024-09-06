@@ -1,4 +1,5 @@
 <x-layout>
+        @can('view device')
         <div class="flex-auto p-8">
             <h1 class="text-2xl font-semibold text-gray-900 mb-6">Ağ Cihazları</h1>
             <!-- Başarı ve hata mesajlarını göstermek için -->
@@ -29,4 +30,5 @@
             </div>
                 @include('devices.partials.device_search')
         </div>
+    @endcan
 </x-layout>

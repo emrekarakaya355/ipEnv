@@ -12,6 +12,13 @@ use Illuminate\Support\Facades\Validator;
 
 class DeviceTypeController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:view deviceType', ['only' => ['index']]);
+        $this->middleware('permission:create deviceType', ['only' => ['create','store']]);
+        $this->middleware('permission:update deviceType', ['only' => ['update','edit']]);
+        $this->middleware('permission:delete deviceType', ['only' => ['destroy']]);
+    }
     public function index()
     {
         $device_types = DeviceType::sorted()->paginate(10);

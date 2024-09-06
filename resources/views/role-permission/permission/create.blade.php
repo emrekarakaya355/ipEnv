@@ -1,4 +1,5 @@
 <x-layout>
+    @can('view permission')
     <x-slot name="heading">Yetki Ekle</x-slot>
 
     <div class="w-full p-8">
@@ -39,4 +40,5 @@
                     </div>
                 </div>
             </div>
+    @endcan
 </x-layout>

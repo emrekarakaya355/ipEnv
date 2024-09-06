@@ -15,7 +15,6 @@ use Illuminate\Support\Facades\DB;
 
 class DeviceController extends Controller
 {
-
     protected DeviceService $deviceService;
 
     public function __construct(DeviceService $deviceService)
@@ -23,6 +22,7 @@ class DeviceController extends Controller
         $this->deviceService = $deviceService;
 
         $this->middleware('permission:view device', ['only' => ['index']]);
+        $this->middleware('permission:view deviceInfo', ['only' => ['orphans']]);
         $this->middleware('permission:create device', ['only' => ['create','store']]);
         $this->middleware('permission:update device', ['only' => ['update','edit']]);
         $this->middleware('permission:delete device', ['only' => ['destroy']]);

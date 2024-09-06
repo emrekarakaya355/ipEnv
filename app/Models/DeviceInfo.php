@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Auth;
 use OwenIt\Auditing\Contracts\Auditable;
 
 class DeviceInfo extends Model implements Auditable
@@ -93,13 +94,15 @@ class DeviceInfo extends Model implements Auditable
     // Varsayılan değerlerle oluşturma metodu
     public static function createDefault($deviceId)
     {
+        $locationId = Auth::location() ?? null;
+
         $defaultDeviceInfo = [
             'ip_address' => 'N/A',
-            'location_id' => 1,
+            'location_id' => $locationId,
             'block' => null,
             'floor' => null,
             'room_number' => null,
-            'description' => 'Cihaz depoya çekildi.'
+            'description' => 'Default Kayıt'
         ];
 
         return self::create(array_merge(['device_id' => $deviceId], $defaultDeviceInfo));

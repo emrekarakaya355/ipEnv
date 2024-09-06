@@ -1,13 +1,16 @@
 <x-layout>
+    @can('view deviceType')
     <x-slot name="heading">Device Types</x-slot>
 
     <div class="flex-auto p-8">
         <h2 class="text-lg font-semibold mb-4">Cihaz Tipleri</h2>
 
+        @can('create deviceType')
         <!-- Add New Device Type Button -->
         <button id="openModal" class="mb-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="openCreateModal()">
             Yeni Cihaz Tipi Ekle
         </button>
+        @endcan
 
         <div class="overflow-x-auto bg-white shadow-md rounded-xl">
             <table class="min-w-full divide-y divide-gray-200">
@@ -28,8 +31,12 @@
                         <td class="px-6 py-4 whitespace-nowrap">{{ $device_type->model }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">{{ $device_type->port_number }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">
+                            @can('update deviceType')
                             <x-edit-button onclick="editDeviceType({{ $device_type->id }})"/>
+                            @endcan
+                            @can('delete deviceType')
                             <x-delete-button onclick="deleteDeviceType({{ $device_type->id }})"/>
+                                @endcan
                         </td>
                     </tr>
                 @endforeach
@@ -46,7 +53,7 @@
         @endif
 
     </div>
-
+    @canany(['create deviceType','update deviceType'])
     <!-- Add/Edit Device Type Modal -->
     <div id="deviceTypeModal" class="fixed z-10 inset-0 overflow-y-auto hidden" aria-labelledby="deviceTypeModalLabel" role="dialog" aria-modal="true">
         <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
@@ -97,6 +104,7 @@
             </div>
         </div>
     </div>
+        @endcanany
 <script>
     let editingDeviceTypeId = null;
     function openCreateModal() {
@@ -242,4 +250,5 @@
         }
     }
 </script>
+        @endcan
 </x-layout>

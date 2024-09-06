@@ -73,18 +73,17 @@
                     @endforeach
                 </select>
             </div>
-            @can('view-ip-address')
+            @can('view-ip_address')
             <x-input-text label="IP Adresi"
                           id="device-ip-address"
                           dataName="ip_address"
                           value="{{ $device->ip_address }}"/>
             @endcan
-
             <x-input-text label="Açıklama"
                           id="device-description"
                           dataName="description"
                           value="{{ $device->description }}"/>
-
+            @can('view-building')
             <div>
                 <label class="text-sm font-medium text-gray-500">Bina</label>
                 <select
@@ -101,6 +100,8 @@
                     @endforeach
                 </select>
             </div>
+            @endcan
+            @can('view-unit')
             <div>
                 <label class="text-sm font-medium text-gray-500">Birim</label>
                 <select
@@ -114,31 +115,38 @@
                     </option>
                 </select>
             </div>
-
+            @endcan
+            @can('view-block')
             <x-input-text label="Blok"
                           id="device-block"
                           dataName="block"
                           value="{{ $device->block }}"/>
+            @endcan
+            @can('view-floor')
 
             <x-input-text label="floor"
                           id="device-floor"
                           dataName="floor"
                           value="{{ $device->floor }}"/>
+            @endcan
+            @can('view-room')
 
             <x-input-text label="Oda No"
                           id="device-room-number"
                           dataName="room_number"
                           value="{{ $device->room_number }}"/>
 
-
+            @endcan
         </div>
         <div class="mt-4">
+            @can('update device')
             <button type="button" id="edit-btn" class="bg-blue-500 text-white px-4 py-2 rounded mr-2">Update</button>
             <button type="submit" id="save-btn" class="bg-green-500 text-white px-4 py-2 rounded mr-2 hidden">Save
             </button>
             <button type="button" id="cancel-btn" class="bg-gray-500 text-white px-4 py-2 rounded mr-2 hidden">Cancel
             </button>
-            @can('delete-devices')
+            @endcan
+            @can('delete device')
 
             <button type="button" id="delete-btn" class="bg-red-500 text-white px-4 py-2 rounded">Delete</button>
             @endcan
@@ -149,7 +157,7 @@
                value="{{ $device->parent_device_port ?? '' }}">
     </form>
 </div>
-@can('VIEW_CONNECTED_DEVICES')
+@can('view-device_family')
 {{-- Altta Solda Bağlı Olan Cihazlar ve Sağda Çocuk Cihazlar --}}
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8  ">
     <!-- Parent Switch Alanı -->
@@ -301,6 +309,12 @@
 
         function isIpAddressChanged() {
             const ipAddressElement = document.getElementById('device-ip-address');
+
+            // Eğer IP address elementi bulunamazsa (görünmüyorsa), değişiklik olmadığını varsay.
+            if (ipAddressElement === null) {
+                return false;
+            }
+
             return ipAddressElement.textContent !== originalValues['device-ip-address'];
         }
 

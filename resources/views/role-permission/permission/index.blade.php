@@ -17,16 +17,18 @@
             </div>
         @endif
                 <div class="card mt-3">
+                    @can('create permission')
                     <div class="card-header mt-3">
                         <x-primary-button onclick="window.location.href='{{ route('permissions.create') }}'">Yetki Ekle</x-primary-button>
                     </div>
+                    @endcan
                     <div class="overflow-x-auto bg-white shadow-md rounded-xl">
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead>
                                 <tr>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ADI</th>
-                                    @can('update permission')
+                                    @canany(['update permission','delete permission'])
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ISLEMLER</th>
                                     @endcan
                                 </tr>
@@ -38,8 +40,12 @@
                                     <td class="px-6 py-2 whitespace-nowrap">{{ $permission->name }}</td>
                                     @can('update permission')
                                         <td class="px-6 py-2 whitespace-nowrap">
+                                            @can('update permission')
                                             <x-edit-button onclick="window.location.href='{{url('permissions/'.$permission->id.'/edit')}}'">Edit </x-edit-button>
+                                            @endcan
+                                            @can('delete permission')
                                             <x-delete-button onclick="window.location.href='{{url('permissions/'.$permission->id.'/delete')}}'">Geri Dön </x-delete-button>
+                                            @endcan
                                         </td>
                                     @endcan
                                 </tr>

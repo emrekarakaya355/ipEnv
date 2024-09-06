@@ -5,6 +5,8 @@
         <h1 class="text-2xl font-semibold text-gray-900 mb-6">Cihaz Bilgileri</h1>
 
         @include("devices.partials.device_info")
+        @can('view-device_movement')
         @include("devices.partials.device_movements")
+        @endcan
     </div>
 </x-layout>

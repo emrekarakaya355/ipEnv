@@ -1,15 +1,18 @@
 <x-layout >
+        @can('view location')
         <x-slot name="heading">Lokasyonlar</x-slot>
 
         <div class="flex-auto p-8" >
             <h2 class="text-lg font-semibold mb-4">Lokasyonlar</h2>
+
+            @can('create location')
 
             <!-- Add New Location Button -->
             <button class="mb-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="openCreateModal()">
 
                 Yeni Lokasyon Ekle
             </button>
-
+            @endcan
             <div class="overflow-x-auto bg-white shadow-md rounded-xl">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
@@ -25,8 +28,12 @@
                             <td class="px-6 py-4 whitespace-nowrap">{{ $location->building }}</td>
                             <td class="px-6 py-4 whitespace-nowrap">{{ $location->unit }}</td>
                             <td class="px-6 py-4 whitespace-nowrap">
+                                @can('update location')
                                 <x-edit-button class="text-blue-600 hover:text-blue-900" onclick="editLocation({{ $location->id }})">Düzenle</x-edit-button>
+                                @endcan
+                                @can('delete location')
                                 <x-delete-button class="text-red-600 hover:text-red-900 ml-4" onclick="deleteLocation({{ $location->id }})">Sil</x-delete-button>
+                                @endcan
                             </td>
                         </tr>
                     @endforeach
@@ -43,7 +50,7 @@
             @endif
 
         </div>
-
+        @canany(['create location','update location'])
         <!-- Add/Edit Location Modal -->
         <div id="locationModal" class="fixed z-10 inset-0 overflow-y-auto hidden" aria-labelledby="locationModalLabel" role="dialog" aria-modal="true">
             <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
@@ -77,7 +84,7 @@
                 </div>
             </div>
         </div>
-
+        @endcanany
         <script>
             let editingLocationId = null; // Global variable to store the ID of the location being edited
 
@@ -185,4 +192,6 @@
                 document.getElementById('locationModal').classList.add('hidden');
             }
         </script>
+    @endcan
+
 </x-layout>

@@ -23,8 +23,9 @@
             class="p-2.5 mt-3 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-blue-600 text-white"
             >
             <i class="bi bi-house-door-fill"></i>
-            <a href="/devices" class="text-[15px] ml-4 text-gray-200 font-bold">Ana Sayfa</a>
+            <a href="/" class="text-[15px] ml-4 text-gray-200 font-bold">Ana Sayfa</a>
         </div>
+        @can('view device')
 
         <div class="my-4 bg-gray-600 h-[1px]"></div>
         <div
@@ -55,12 +56,17 @@
                 <a href="{{ route('devices.index.type', ['type' => 'ap']) }}"  class="cursor-pointer p-2 hover:bg-blue-600 rounded-md mt-1">Access Pointler</a>
 
             </h1>
+            @can('view deviceInfo')
             <h1 class="cursor-pointer p-2 hover:bg-blue-600 rounded-md mt-1">
                 <a href="/devices/orphans"  class="cursor-pointer p-2 hover:bg-blue-600 rounded-md mt-1">Öksüz cihazlar</a>
             </h1>
+            @endcan
 
         </div>
+        @endcan
+        @can('view location')
         <div class="my-4 bg-gray-600 h-[1px]"></div>
+
 
         <div
             class="p-2.5 mt-3 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-blue-600 text-white"
@@ -68,6 +74,8 @@
             <i class="bi bi-house-door-fill"></i>
             <a href="/locations" class="text-[15px] ml-4 text-gray-200 font-bold">Yer Bilgisi</a>
         </div>
+        @endcan
+        @can('view deviceType')
         <div class="my-4 bg-gray-600 h-[1px]"></div>
 
         <div
@@ -76,46 +84,54 @@
             <i class="bi bi-house-door-fill"></i>
             <a href="/device_types" class="text-[15px] ml-4 text-gray-200 font-bold">Cihaz Tipleri</a>
         </div>
+        @endcan
         <div class="my-4 bg-gray-600 h-[1px]"></div>
         <div class="flex flex-col mt-auto space-y-2">
-            <div
-                class="p-2.5 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-blue-600 text-white"
-            >
-                <i class="bi bi-house-door-fill"></i>
-                    <a href="/users" class="text-[15px] ml-4 text-gray-200 font-bold">Kullanıcılar</a>
-            </div>
-            <div
-                class="p-2.5 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-blue-600 text-white"
-            >
-                <i class="bi bi-house-door-fill"></i>
-                <a href="/permissions" class="text-[15px] ml-4 text-gray-200 font-bold">Permissions</a>
-            </div>
-            <div
-                class="p-2.5 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-blue-600 text-white"
-            >
-                <i class="bi bi-house-door-fill"></i>
-                <a href="/roles" class="text-[15px] ml-4 text-gray-200 font-bold">Roles</a>
-            </div>
-            <div
-                class="p-2.5 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-blue-600 text-white"
-            >
-                <i class="bi bi-house-door-fill"></i>
-                <a href="{{ route('dashboard') }}" class="text-[15px] ml-4 text-gray-200 font-bold">Dashboard</a>
-            </div>
 
-            <div class="p-2.5 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-blue-600 text-white">
-                <i class="bi bi-box-arrow-in-right"></i>
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <a href="{{ route('logout') }}"
-                       onclick="event.preventDefault(); this.closest('form').submit();"
-                       class="text-[15px] ml-4 text-gray-200 font-bold"
-                    >
-                        Logout
-                    </a>
-                </form>
-            </div>
+        @can('view user')
+        <div
+            class="p-2.5 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-blue-600 text-white"
+        >
+            <i class="bi bi-house-door-fill"></i>
+                <a href="/users" class="text-[15px] ml-4 text-gray-200 font-bold">Kullanıcılar</a>
         </div>
+        @endcan
+        @can('view permission')
+        <div
+            class="p-2.5 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-blue-600 text-white"
+        >
+            <i class="bi bi-house-door-fill"></i>
+            <a href="/permissions" class="text-[15px] ml-4 text-gray-200 font-bold">Permissions</a>
+        </div>
+        @endcan
+            @can('view role')
+        <div
+            class="p-2.5 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-blue-600 text-white"
+        >
+            <i class="bi bi-house-door-fill"></i>
+            <a href="/roles" class="text-[15px] ml-4 text-gray-200 font-bold">Roles</a>
+        </div>
+            @endcan
+        <div
+            class="p-2.5 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-blue-600 text-white"
+        >
+            <i class="bi bi-house-door-fill"></i>
+            <a href="{{ route('dashboard') }}" class="text-[15px] ml-4 text-gray-200 font-bold">Dashboard</a>
+        </div>
+
+        <div class="p-2.5 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-blue-600 text-white">
+            <i class="bi bi-box-arrow-in-right"></i>
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <a href="{{ route('logout') }}"
+                   onclick="event.preventDefault(); this.closest('form').submit();"
+                   class="text-[15px] ml-4 text-gray-200 font-bold"
+                >
+                    Logout
+                </a>
+            </form>
+        </div>
+    </div>
     </div>
 
     <script type="text/javascript">

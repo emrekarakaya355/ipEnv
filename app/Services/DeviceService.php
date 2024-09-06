@@ -51,8 +51,6 @@ class DeviceService
                 return new ErrorResponse(null,'Herhangi bir değişiklik yapılmadı.');
             }
             if ($deviceInfo->isDirty()) {
-                //eğer ip adresi değiştiyse
-
                 if($deviceInfo->isDirty('ip_address')){
                     foreach($device->connectedDevices->all() as $childDevice){
                         $childDevice->parent_device_id = null;
@@ -71,29 +69,81 @@ class DeviceService
             return new SuccessResponse('Cihaz Başarı İle Update Edildi.',['data' => $device->id]);
         });
     }
-    public function search(Request $request,$type): LengthAwarePaginator
+    public function search(Request $request, $type): LengthAwarePaginator
     {
         $search = $request->input('search');
         $query = $type::query();
-        if ($search) {
-            $query->where('device_name', 'like', '%' . $search . '%')
-                ->orWhere('type', 'like', '%' . $search . '%')
-                ->orWhere('serial_number', 'like', '%' . $search . '%')
 
-                ->orWhereHas('latestDeviceInfo.location', function ($q) use ($search) {
-                    $q->where('building', 'like', '%' . $search . '%')
-                        ->orWhere('unit', 'like', '%' . $search . '%')
-                        ->orWhere('ip_address', 'like', '%' . $search . '%')
-                        ->orWhere('description', 'like', '%' . $search . '%');
-                })
-                ->orWhereHas('deviceType', function ($q) use ($search) {
-                    $q->where('model', 'like', '%' . $search . '%')
-                        ->orWhere('brand', 'like', '%' . $search . '%');
-                });
+        if ($search) {
+            $query->where(function ($query) use ($search) {
+                $firstConditionAdded = false;
+
+                if (canView('view-device_name')) {
+                    $query->where('device_name', 'like', '%' . $search . '%');
+                    $firstConditionAdded = true;
+                }
+                if (canView('view-type')) {
+                    $firstConditionAdded
+                        ? $query->orWhere('type', 'like', '%' . $search . '%')
+                        : $query->where('type', 'like', '%' . $search . '%');
+                    $firstConditionAdded = true;
+                }
+                if (canView('view-serial_number')) {
+                    $firstConditionAdded
+                        ? $query->orWhere('serial_number', 'like', '%' . $search . '%')
+                        : $query->where('serial_number', 'like', '%' . $search . '%');
+                    $firstConditionAdded = true;
+                }
+                if (canView('view-building') || canView('view-ip_address') || canView('view-description')|| canView('view-unit')) {
+                    $query->orWhereHas('latestDeviceInfo.location', function ($q) use ($search, &$firstConditionAdded) {
+                        $q->where(function ($q) use ($search, &$firstConditionAdded) {
+                            if (canView('view-building')) {
+                                $firstConditionAdded
+                                    ? $q->orWhere('building', 'like', '%' . $search . '%')
+                                    : $q->where('building', 'like', '%' . $search . '%');
+                                $firstConditionAdded = true;
+                            }
+
+                            if (canView('view-ip_address')) {
+                                $firstConditionAdded
+                                    ? $q->orWhere('ip_address', 'like', '%' . $search . '%')
+                                    : $q->where('ip_address', 'like', '%' . $search . '%');
+                                $firstConditionAdded = true;
+                            }
+
+                            if (canView('view-description')) {
+                                $firstConditionAdded
+                                    ? $q->orWhere('description', 'like', '%' . $search . '%')
+                                    : $q->where('description', 'like', '%' . $search . '%');
+                                $firstConditionAdded = true;
+                            }
+                            if (canView('view-unit')) {
+                                $firstConditionAdded
+                                    ? $q->orWhere('unit', 'like', '%' . $search . '%')
+                                    : $q->where('unit', 'like', '%' . $search . '%');
+                                $firstConditionAdded = true;
+                            }
+                        });
+                    });
+                }
+
+                if (canView('view-device_type')) {
+                    $query->orWhereHas('deviceType', function ($q) use ($search, &$firstConditionAdded) {
+                        $q->where(function($q) use ($search, &$firstConditionAdded) {
+                            $firstConditionAdded
+                                ? $q->orWhere('model', 'like', '%' . $search . '%')
+                                : $q->where('model', 'like', '%' . $search . '%');
+                            $q->orWhere('brand', 'like', '%' . $search . '%');
+                        });
+                        $firstConditionAdded = true;
+                    });
+                }
+            });
         }
 
         return $query->with('latestDeviceInfo')->sorted()->paginate(10);
     }
+
 
     private function createDeviceInfo( $deviceValidated, $device) : void
     {
@@ -111,6 +161,7 @@ class DeviceService
              'room_number' => $deviceValidated['room_number'] ?? null,
              'description' => $deviceValidated['description'] ?? null,
          ]);
+
     }
     /**
      * @throws
@@ -142,16 +193,19 @@ class DeviceService
 
         $deviceType = DeviceType::getDeviceType($deviceValidated['type'],$deviceValidated['model'], $deviceValidated['brand']);
 
+        if($deviceType === null){
+            throw new ModelNotFoundException('Cihaz Tipi Bulunamadı!');
+        }
         // Device verilerinde değişiklik kontrolü
         $deviceData = ([
             'type' => $deviceType->type,
             'device_type_id' => $deviceType->id,
-            'device_name' => $deviceValidated['device_name'],
+            'device_name' => $deviceValidated['device_name']?? null,
             'serial_number' => $deviceValidated['serial_number'],
             'registry_number' => $deviceValidated['registry_number'],
-            'parent_device_id' => $deviceValidated['parent_device_id'],
-            'parent_device_port' => $deviceValidated['parent_device_port'],
-            'status' => $deviceValidated['status'],
+            'parent_device_id' => $deviceValidated['parent_device_id']?? null,
+            'parent_device_port' => $deviceValidated['parent_device_port']?? null,
+            'status' => isset($deviceValidated['ip_address']) ? "Çalışıyor" : "Depo",
 
 
         ]);
@@ -162,21 +216,27 @@ class DeviceService
 
     private function fillDeviceInfo($deviceValidated,$device){
 
-        $locationId = Location::getLocationIdFromBuildingAndUnit($deviceValidated['building'], $deviceValidated['unit']);
+        $locationId = Location::getLocationIdFromBuildingAndUnit(
+            $deviceValidated['building'] ?? null,
+            $deviceValidated['unit'] ?? null
+        ) ?? null;
+
         $deviceInfo = $device->latestDeviceInfo;
+
         // DeviceInfo verilerinde değişiklik kontrolü
         $deviceInfoData = [
             'device_id' => $device->id,
-            'ip_address' => $deviceValidated['ip_address'],
-            'location_id' =>  $locationId,
-            'block' => $deviceValidated['block'],
-            'floor' => $deviceValidated['floor'],
-            'room_number' => $deviceValidated['room_number'],
-            'parent_device_id' => $deviceValidated['parent_device_id'],
+            'ip_address' => $deviceValidated['ip_address']?? null,
+            'location_id' =>  $locationId ?? null,
+            'block' => $deviceValidated['block']?? null,
+            'floor' => $deviceValidated['floor']?? null,
+            'room_number' => $deviceValidated['room_number']?? null,
+            'description' => $deviceValidated['description'] ?? null,
         ];
-
+        if($deviceInfo === null){
+            return null;
+        }
         $deviceInfo->fill($deviceInfoData);
-
         return $deviceInfo;
     }
 
