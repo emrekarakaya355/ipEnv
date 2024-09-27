@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Exceptions\ConflictException;
+use App\Http\Responses\ErrorResponse;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -18,15 +20,14 @@ class DeviceInfo extends Model implements Auditable
         parent::boot();
 
         static::creating(function ($model) {
-
             // Aynı device_id'ye sahip mevcut kayıtları bul ve sil
             self::where('device_id', $model->device_id)->delete();
-
             $model->created_by = auth()->id();
 
         });
 
         static::updating(function ($model) {
+
             $model->updated_by = auth()->id();
         });
 
@@ -35,22 +36,20 @@ class DeviceInfo extends Model implements Auditable
             $model->isDeleted = true;
             $model->save();
         });
-
         static::saving(function ($model) {
             // Aynı IP adresine sahip silinmemiş (soft deleted olmayan) bir kayıt olup olmadığını kontrol et
             $existingDevice = static::where('ip_address', $model->ip_address)
+                ->where('ip_address','!=',null)
                 ->whereNull('deleted_at')
+                ->where('device_id', '!=', $model->device_id) // device_id eşit değil
                 ->exists();
-
             // Eğer böyle bir kayıt varsa, kaydetme işlemini engelle
             if ($existingDevice) {
-                return false; // Kaydetme işlemi iptal edilir
+                throw new ConflictException('Girdiğiniz ip adresi başka cihaz tarafından kullanılıyor.');
             }
             return true;
         });
     }
-
-
     protected $fillable = [
         'device_id',
         'location_id',
@@ -94,17 +93,18 @@ class DeviceInfo extends Model implements Auditable
     // Varsayılan değerlerle oluşturma metodu
     public static function createDefault($deviceId)
     {
-        $locationId = Auth::location() ?? null;
-
+        $locationId = Location::getLocationIdFromBuildingAndUnit(
+            'Rektörlük',
+            'Depo'
+        ) ;
         $defaultDeviceInfo = [
-            'ip_address' => 'N/A',
+            'ip_address' => null,
             'location_id' => $locationId,
             'block' => null,
             'floor' => null,
             'room_number' => null,
             'description' => 'Default Kayıt'
         ];
-
         return self::create(array_merge(['device_id' => $deviceId], $defaultDeviceInfo));
     }
 

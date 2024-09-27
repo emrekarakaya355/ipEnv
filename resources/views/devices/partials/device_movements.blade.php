@@ -13,19 +13,19 @@
                 <div class="bg-gray-100 p-4 rounded-lg shadow-md mb-4">
                     <div class="grid grid-cols-3 gap-4 items-center">
                         <div>
-                            @can('view_building')
+                            @can('view-building')
                             <p><strong>Bina:</strong> {{ $deviceInfo->location->building }}</p>
                             @endcan
-                            @can('view_unit')
+                            @can('view-unit')
                             <p><strong>Birim:</strong> {{ $deviceInfo->location->unit }}</p>
                             @endcan
-                            @can('view_block')
+                            @can('view-block')
                             <p><strong>Blok:</strong> {{ $deviceInfo->block }}</p>
                             @endcan
-                            @can('view_floor')
+                            @can('view-floor')
                             <p><strong>Kat:</strong> {{ $deviceInfo->floor }}</p>
                             @endcan
-                            @can('view_room_number')
+                            @can('view-room_number')
                             <p><strong>Oda No:</strong> {{ $deviceInfo->room_number }}</p>
                             @endcan
                         </div>

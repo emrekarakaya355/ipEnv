@@ -26,7 +26,7 @@
 
                             <div class="mb-3">
                                 <label for="">Name</label>
-                                <input type="text" name="name" id="name" class="form-control ml-7 value="{{old('name')}}" />
+                                <input type="text" name="name" id="name" class="form-control ml-7" value="{{old('name')}}" />
                             </div>
 
                             <div class="mb-3">

@@ -2,10 +2,8 @@
 
 namespace App\Models;
 
-use App\Exceptions\ConflictException;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Contracts\Auditable;
 
 class Location extends Model implements Auditable
@@ -26,11 +24,6 @@ class Location extends Model implements Auditable
         static::updating(function ($model) {
             $model->updated_by = auth()->id();
         });
-
-        static::deleted(function ($model) {
-            $model->deleted_by = auth()->id();
-            $model->save();
-        });
     }
 
 
@@ -50,6 +43,11 @@ class Location extends Model implements Auditable
         return $query->orderBy('building', 'asc');
     }
 
+
+    public function createdBy()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
     /**
      * Belirli bir bina için benzersiz üniteleri döndürür
      *

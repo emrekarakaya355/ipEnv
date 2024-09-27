@@ -28,7 +28,6 @@ class DeviceService
                 if ($device instanceof Device) {
                     $this->createDeviceInfo($deviceValidated, $device);
                 }
-
             });
             $routname = route('devices.show', $device->id);
             return new SuccessResponse('Cihaz Başarı İle Oluşturuldu.',['data' => $device->id],$routname);
@@ -46,6 +45,7 @@ class DeviceService
             if (!$device->isDirty() and !$deviceInfo->isDirty()) {
                 if ($deviceValidated['description'] !== null){ // eğer sadece açıklama değişti ise update ediliyor yeni info eklenmiyor.
                     $deviceInfo->update(['description' => $deviceValidated['description']]);
+
                     return new SuccessResponse('Açıklama Update Edildi.',['data' => $deviceInfo->id]);
                 }
                 return new ErrorResponse(null,'Herhangi bir değişiklik yapılmadı.');
@@ -59,10 +59,11 @@ class DeviceService
                 }
                 //eğer değişiklik var ise en son kayıt için update reason güncelleniyor.
                 $deviceInfo = $deviceInfo->fresh();
-                $deviceInfo->update(['update_reason' => $deviceValidated['update_reason']]);
+                $deviceInfo?->update(['update_reason' => $deviceValidated['update_reason']]);
                 //yeni info ekleniyor.
                  $this->createDeviceInfo($deviceValidated,$device);
             }
+
             if ($device->isDirty()){
                 $device->save();
             }
@@ -145,22 +146,35 @@ class DeviceService
     }
 
 
-    private function createDeviceInfo( $deviceValidated, $device) : void
+    private function createDeviceInfo( $deviceValidated, $device)
     {
         $locationId = Location::getLocationIdFromBuildingAndUnit(
             $deviceValidated['building'] ?? null,
             $deviceValidated['unit'] ?? null
-        ) ?? null;
+        ) ;
 
-        DeviceInfo::create([
+        // Tüm değerlerin null olup olmadığını kontrol et
+        $isAllNull = is_null($deviceValidated['ip_address'] ?? null) &&
+            is_null($locationId) &&
+            is_null($deviceValidated['block'] ?? null) &&
+            is_null($deviceValidated['floor'] ?? null) &&
+            is_null($deviceValidated['room_number'] ?? null) &&
+            is_null($deviceValidated['description'] ?? null);
+
+        if($isAllNull) {
+
+        }
+         return DeviceInfo::create([
              'device_id' => $device->id,
              'ip_address' => $deviceValidated['ip_address'] ?? null,
-             'location_id' =>$locationId,
+             'location_id' =>$locationId ?? null,
              'block' => $deviceValidated['block'] ?? null,
              'floor' => $deviceValidated['floor'] ?? null,
              'room_number' => $deviceValidated['room_number'] ?? null,
              'description' => $deviceValidated['description'] ?? null,
          ]);
+
+
 
     }
     /**
@@ -183,7 +197,7 @@ class DeviceService
             'registry_number' => $deviceValidated['registry_number'],
             'parent_device_id' => $deviceValidated['parent_device_id'] ?? null,
             'parent_device_port' => $deviceValidated['parent_device_port'] ?? null,
-            'status' => isset($deviceValidated['ip_address']) ? "Çalışıyor" : "Depo",
+            'status' => $deviceValidated['status'] ?? "Depo",
         ];
         return Device::create($attributes);
     }
@@ -205,7 +219,7 @@ class DeviceService
             'registry_number' => $deviceValidated['registry_number'],
             'parent_device_id' => $deviceValidated['parent_device_id']?? null,
             'parent_device_port' => $deviceValidated['parent_device_port']?? null,
-            'status' => isset($deviceValidated['ip_address']) ? "Çalışıyor" : "Depo",
+            'status' => $deviceValidated['status'] ?? "Depo",
 
 
         ]);
@@ -222,7 +236,6 @@ class DeviceService
         ) ?? null;
 
         $deviceInfo = $device->latestDeviceInfo;
-
         // DeviceInfo verilerinde değişiklik kontrolü
         $deviceInfoData = [
             'device_id' => $device->id,
@@ -231,12 +244,13 @@ class DeviceService
             'block' => $deviceValidated['block']?? null,
             'floor' => $deviceValidated['floor']?? null,
             'room_number' => $deviceValidated['room_number']?? null,
-            'description' => $deviceValidated['description'] ?? null,
         ];
+
         if($deviceInfo === null){
-            return null;
+            $deviceInfo = new DeviceInfo();
         }
         $deviceInfo->fill($deviceInfoData);
+
         return $deviceInfo;
     }
 

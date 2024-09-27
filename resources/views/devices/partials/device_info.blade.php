@@ -129,7 +129,7 @@
                           dataName="floor"
                           value="{{ $device->floor }}"/>
             @endcan
-            @can('view-room')
+            @can('view-room_number')
 
             <x-input-text label="Oda No"
                           id="device-room-number"
@@ -147,7 +147,6 @@
             </button>
             @endcan
             @can('delete device')
-
             <button type="button" id="delete-btn" class="bg-red-500 text-white px-4 py-2 rounded">Delete</button>
             @endcan
         </div>
@@ -188,16 +187,16 @@
                            class="hidden ml-2 px-2 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
                 Düzenle
             </x-edit-button>
-                <x-delete-button type="button" id="parent-delete-btn"
-                                 onclick="unselectDevice()"
-                                 class="hidden ml-2 px-2 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 items-center">
-                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                         xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                    Sil
-                </x-delete-button>
+            <x-delete-button type="button" id="parent-delete-btn"
+                             onclick="unselectDevice()"
+                             class="hidden ml-2 px-2 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 items-center">
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                     xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+                Sil
+            </x-delete-button>
 
         </a>
 
@@ -386,7 +385,8 @@
                         method: 'POST',
                         body: formData,
                         headers: {
-                            'X-Requested-With': 'XMLHttpRequest'
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json'
                         }
                     });
 
@@ -413,7 +413,8 @@
                 fetch(`/devices/${deviceId}`, {
                     method: 'DELETE',
                     headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
                     }
                 })
                     .then(response => response.json())

@@ -54,8 +54,6 @@ class RoleSeeder extends Seeder
 
         Permission::create(['name' => 'view-device_movement']);
         Permission::create(['name' => 'view-device_family']);
-        Permission::create(['name' => 'view-building']);
-        Permission::create(['name' => 'view-unit']);
         Permission::create(['name' => 'view-type']);
         Permission::create(['name' => 'view-brand']);
         Permission::create(['name' => 'view-model']);
@@ -64,10 +62,18 @@ class RoleSeeder extends Seeder
         Permission::create(['name' => 'view-ip_address']);
         Permission::create(['name' => 'view-status']);
 
+        Permission::create(['name' => 'view-building']);
+        Permission::create(['name' => 'view-unit']);
+        Permission::create(['name' => 'view-block']);
+        Permission::create(['name' => 'view-floor']);
+        Permission::create(['name' => 'view-room_number']);
+        Permission::create(['name' => 'view-depo']);
+
+
         // Create Roles
         $superAdminRole = Role::create(['name' => 'super-admin']); //as super-admin
         $adminRole = Role::create(['name' => 'admin']);
-        $staffRole = Role::create(['name' => 'staff']);
+        $staffRole = Role::create(['name' => 'tasinir']);
         $userRole = Role::create(['name' => 'user']);
 
         // Lets give all permission to super-admin role.
@@ -106,10 +112,10 @@ class RoleSeeder extends Seeder
 
 
         $staffUser = User::firstOrCreate([
-            'email' => 'staff@gmail.com',
+            'email' => 'tasinir@gmail.com',
         ], [
-            'name' => 'Staff',
-            'email' => 'staff@gmail.com',
+            'name' => 'Tasinir',
+            'email' => 'tasinir@gmail.com',
             'password' => Hash::make('12345678'),
         ]);
 

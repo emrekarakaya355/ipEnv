@@ -43,8 +43,10 @@ class DeviceController extends Controller
             $devices = $this->deviceService->search($request, $modelClass);
             return view('devices.partials.device_table', compact('devices','columns'))->render();
         }
-        $devices = $modelClass::with('latestDeviceInfo')->sorted($sortColumn, $sortOrder)->paginate(10);
-
+        $devices = $modelClass::with('latestDeviceInfo')
+            ->withoutDepo() // Depoda olanları hariç tutma
+            ->sorted($sortColumn, $sortOrder)
+            ->paginate(10);
         return view('devices.index', compact('devices','columns'));
     }
 

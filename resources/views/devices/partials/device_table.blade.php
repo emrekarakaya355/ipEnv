@@ -31,10 +31,11 @@
     </tbody>
 </table>
 
-
-<div class="bg-white px-4 py-3 flex items-center justify-between border-t border-blue-gray-200 sm:px-6" id="pagination-links">
-    {{ $devices->links() }}
-</div>
+@if($devices->hasPages())
+    <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-blue-gray-200 sm:px-6" id="pagination-links">
+        {{ $devices->links() }}
+    </div>
+@endif
 
 
 @if ($devices->isEmpty())

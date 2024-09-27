@@ -3,12 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Exceptions\ConflictException;
+use App\Exports\DeviceTypeExport;
+use App\Exports\DeviceTypeTemplateExport;
 use App\Http\Responses\ErrorResponse;
 use App\Http\Responses\SuccessResponse;
 use App\Http\Responses\ValidatorResponse;
+use App\Imports\DeviceTypeImport;
 use App\Models\DeviceType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Maatwebsite\Excel\Facades\Excel;
 
 class DeviceTypeController extends Controller
 {
@@ -21,7 +25,22 @@ class DeviceTypeController extends Controller
     }
     public function index()
     {
-        $device_types = DeviceType::sorted()->paginate(10);
+        $device_types = DeviceType::query()
+            ->when(request('type'), function ($query) {
+                return $query->where('type', 'like', '%' . request('type') . '%');
+            })
+            ->when(request('brand'), function ($query) {
+                return $query->where('brand', 'like', '%' . request('brand') . '%');
+            })
+            ->when(request('model'), function ($query) {
+                return $query->where('model', 'like', '%' . request('model') . '%');
+            })
+            ->when(request('port_number'), function ($query) {
+                return $query->where('port_number', 'like', '%' . request('port_number') . '%');
+            })
+            ->orderBy(request('sort', 'type'), request('direction', 'asc')) // Sıralama ekleme
+            ->paginate(10);
+
         return view('device_types.index', compact('device_types'));
     }
 
@@ -128,5 +147,38 @@ class DeviceTypeController extends Controller
 
         $models = DeviceType::getModelsByBrand($type, $brand);
         return response()->json(['models' => $models]);
+    }
+
+    public function import(Request $request)
+    {
+        $file = $request->file('file');
+
+        try {
+            $import = new deviceTypeImport();
+            $import->import($file);
+            // Return the failures export if there are any
+            if (!empty($import->getFailures())) {
+                return $import->exportFailures(); // Ensure this is returned
+            }
+            return new SuccessResponse('Kayıtlar Başarı ile aktarıldı.');
+        } catch (\Exception $e) {
+            // Hata durumunda kullanıcıya bildirim yap
+            return new ErrorResponse($e);
+        }
+    }
+    public function export(Request $request)
+    {
+        // Filtre kriterlerini al
+        $filterCriteria = $request->only(['type', 'brand','model','port_number']);
+        // BaseExport sınıfını kullanarak export işlemi yap
+        return Excel::download(
+            new DeviceTypeExport(DeviceType::class, $filterCriteria,[]),
+            'device_types.xlsx'
+        );
+    }
+
+    public function downloadTemplate()
+    {
+        return Excel::download(new DeviceTypeTemplateExport(), 'device_type_import_template.xlsx');
     }
 }

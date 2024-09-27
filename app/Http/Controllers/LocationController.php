@@ -6,15 +6,21 @@ use App\Exceptions\ConflictException;
 use App\Exceptions\CustomInternalException;
 use App\Exceptions\ForeignKeyConstrainException;
 use App\Exceptions\NotFoundException;
+use App\Exports\BaseExport;
+use App\Exports\FailuresExport;
+use App\Exports\LocationExport;
+use App\Exports\LocationTemplateExport;
 use App\Http\Responses\ErrorResponse;
 use App\Http\Responses\SuccessResponse;
 use App\Http\Responses\ValidatorResponse;
+use App\Imports\LocationImport;
 use App\Models\Location;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Exception;
+use Maatwebsite\Excel\Facades\Excel;
 
 class LocationController extends Controller
 {
@@ -28,10 +34,18 @@ class LocationController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
+        $locations = Location::query()
+            ->when(request('building'), function ($query) {
+                return $query->where('building', 'like', '%' . request('building') . '%');
+            })
+            ->when(request('unit'), function ($query) {
+                return $query->where('unit', 'like', '%' . request('unit') . '%');
+            })
+            ->orderBy(request('sort', 'building'), request('direction', 'asc')) // Sıralama ekleme
+            ->paginate(10);
 
-        $locations = Location::sorted()->paginate(10);
         return view('locations.index', compact('locations'));
     }
 
@@ -133,7 +147,6 @@ class LocationController extends Controller
                 throw new ForeignKeyConstrainException('Bir Cihaz Tarafından Kullanıldığı için Silinemez!!!');
             }
             throw new CustomInternalException();
-
         }
     }
     public function getUnitsByBuilding($building): \Illuminate\Http\JsonResponse
@@ -141,5 +154,46 @@ class LocationController extends Controller
         $unit = Location::getUnitsByBuilding($building);
         return response()->json(['unit' => $unit], 200);
     }
+
+    public function import(Request $request)
+    {
+        // Validate the uploaded file
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx,xls,csv|max:2048', // Adjust max size as needed
+        ]);
+        $file = $request->file('file');
+
+        try {
+            $import = new LocationImport();
+            $import->import($file);
+
+
+            if (!empty($import->getFailures())) {
+                return $import->exportFailures(); // Ensure this is returned
+            }
+            return new SuccessResponse('Kayıtlar Başarı ile aktarıldı.');
+        } catch (\Exception $e) {
+            // Hata durumunda kullanıcıya bildirim yap
+            return new ErrorResponse($e);
+        }
+    }
+    public function export(Request $request)
+    {
+        // Filtre kriterlerini al
+        $filterCriteria = $request->only(['building', 'unit']);
+        // Excel başlıklarını belirle
+
+        // BaseExport sınıfını kullanarak export işlemi yap
+        return Excel::download(
+            new LocationExport(Location::class, $filterCriteria,[]),
+            'locations.xlsx'
+        );
+    }
+
+    public function downloadTemplate()
+    {
+        return Excel::download(new LocationTemplateExport(), 'location_import_template.xlsx');
+    }
+
 
 }

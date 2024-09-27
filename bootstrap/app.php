@@ -11,6 +11,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+
         $middleware->alias([
             'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
@@ -39,7 +40,7 @@ return Application::configure(basePath: dirname(__DIR__))
             //return parent::render($request, $exception);
 
             // Diğer tüm durumlarda genel bir hata sayfası döndür
-            //return response()->view('errors.error', ['exception' => $exception]);
+            return response()->view('errors.error', ['exception' => $exception]);
         });
 
     })->create();

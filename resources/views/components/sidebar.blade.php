@@ -1,150 +1,122 @@
-<body class="bg-blue-600">
-    <span
-        class="absolute text-white text-4xl top-5 left-4 cursor-pointer"
-        onclick="openSidebar()"
-    >
-      <i class="bi bi-filter-left px-2 bg-gray-900 rounded-md"></i>
-    </span>
-    <div
-        class="sidebar fixed top-0 bottom-0 lg:left-0 p-2 w-[250px] overflow-y-auto text-center bg-gray-900 flex flex-col"
-    >
-        <div class="text-gray-100 text-xl">
-            <div class="p-2.5 mt-1 flex items-center">
-                <x-application-logo class="w-8 h-8" />
-                <h1 class="font-bold text-gray-200 text-[15px] ml-3">BT Envanteri</h1>
-                <i
-                    class="bi bi-x cursor-pointer ml-28 lg:hidden"
-                    onclick="openSidebar()"
-                ></i>
-            </div>
-            <div class="my-2 bg-gray-600 h-[1px]"></div>
-        </div>
-        <div
-            class="p-2.5 mt-3 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-blue-600 text-white"
-            >
-            <i class="bi bi-house-door-fill"></i>
-            <a href="/" class="text-[15px] ml-4 text-gray-200 font-bold">Ana Sayfa</a>
-        </div>
-        @can('view device')
+<!-- Navegación lateral -->
+<aside class="bg-gray-800 text-white w-64 min-h-screen p-4">
+    <nav>
+        <ul class="space-y-2">
+            <li class="opcion-con-desplegable">
+                <div class="flex items-center justify-between p-2 hover:bg-gray-700">
+                    <div class="flex items-center">
+                        <i class="fas fa-calendar-alt mr-2"></i>
+                        <span>Agenda</span>
+                    </div>
+                    <i class="fas fa-chevron-down text-xs"></i>
+                </div>
+                <ul class="desplegable ml-4 hidden">
+                    <li>
+                        <a href="#" class="block p-2 hover:bg-gray-700 flex items-center">
+                            <i class="fas fa-chevron-right mr-2 text-xs"></i>
+                            Gestion de citas
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="block p-2 hover:bg-gray-700 flex items-center">
+                            <i class="fas fa-chevron-right mr-2 text-xs"></i>
+                            Polizas
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="opcion-con-desplegable">
+                <div class="flex items-center justify-between p-2 hover:bg-gray-700">
+                    <div class="flex items-center">
+                        <i class="fas fa-money-bill-wave mr-2"></i>
+                        <span>Contabilidad</span>
+                    </div>
+                    <i class="fas fa-chevron-down text-xs"></i>
+                </div>
+                <ul class="desplegable ml-4 hidden">
+                    <li>
+                        <a href="#" class="block p-2 hover:bg-gray-700 flex items-center">
+                            <i class="fas fa-chevron-right mr-2 text-xs"></i>
+                            Tratamientos
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="block p-2 hover:bg-gray-700 flex items-center">
+                            <i class="fas fa-chevron-right mr-2 text-xs"></i>
+                            Gastos
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="block p-2 hover:bg-gray-700 flex items-center">
+                            <i class="fas fa-chevron-right mr-2 text-xs"></i>
+                            Facturas
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="opcion-con-desplegable">
+                <div class="flex items-center justify-between p-2 hover:bg-gray-700">
+                    <div class="flex items-center">
+                        <i class="fas fa-chart-bar mr-2"></i>
+                        <span>Informes</span>
+                    </div>
+                    <i class="fas fa-chevron-down text-xs"></i>
+                </div>
+                <ul class="desplegable ml-4 hidden">
+                    <li>
+                        <a href="#" class="block p-2 hover:bg-gray-700 flex items-center">
+                            <i class="fas fa-chevron-right mr-2 text-xs"></i>
+                            Presupuestos
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="block p-2 hover:bg-gray-700 flex items-center">
+                            <i class="fas fa-chevron-right mr-2 text-xs"></i>
+                            Informe médico
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="opcion-con-desplegable">
+                <div class="flex items-center justify-between p-2 hover:bg-gray-700">
+                    <div class="flex items-center">
+                        <i class="fas fa-file-alt mr-2"></i>
+                        <span>Documentación</span>
+                    </div>
+                    <i class="fas fa-chevron-down text-xs"></i>
+                </div>
+                <ul class="desplegable ml-4 hidden">
+                    <li>
+                        <a href="#" class="block p-2 hover:bg-gray-700 flex items-center">
+                            <i class="fas fa-chevron-right mr-2 text-xs"></i>
+                            Firmas pendientes
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="block p-2 hover:bg-gray-700 flex items-center">
+                            <i class="fas fa-chevron-right mr-2 text-xs"></i>
+                            Documentos
+                        </a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
+</aside>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Obtener todas las opciones principales con desplegables
+        const opcionesConDesplegable = document.querySelectorAll(".opcion-con-desplegable");
 
-        <div class="my-4 bg-gray-600 h-[1px]"></div>
-        <div
-            class="p-2.5 mt-3 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-blue-600 text-white"
-            onclick="dropdown()"
-        >
-            <i class="bi bi-chat-left-text-fill"></i>
-            <div class="flex justify-between w-full items-center">
-                <span class="text-[15px] ml-4 text-gray-200 font-bold">Cihazlar</span>
-                <span class="text-sm rotate-180" id="arrow">
-            <i class="bi bi-chevron-down"></i>
-          </span>
-            </div>
-        </div>
-        <div
-            class="text-left text-sm mt-2 w-4/5 mx-auto text-gray-200 font-bold"
-            id="submenu"
-        >
-            <h1 class="cursor-pointer p-2 hover:bg-blue-600 rounded-md mt-1">
-                <a href="/devices" class="cursor-pointer p-2 hover:bg-blue-600 rounded-md mt-1">Tüm Cihazlar</a>
+        // Agregar evento de clic a cada opción principal
+        opcionesConDesplegable.forEach(function (opcion) {
+            opcion.addEventListener("click", function () {
+                // Obtener el desplegable asociado a la opción
+                const desplegable = opcion.querySelector(".desplegable");
 
-            </h1>
-            <h1 class="cursor-pointer p-2 hover:bg-blue-600 rounded-md mt-1">
-                <a href="{{ route('devices.index.type', ['type' => 'switches']) }}"  class="cursor-pointer p-2 hover:bg-blue-600 rounded-md mt-1">Switchler</a>
-
-            </h1>
-            <h1 class="cursor-pointer p-2 hover:bg-blue-600 rounded-md mt-1">
-                <a href="{{ route('devices.index.type', ['type' => 'ap']) }}"  class="cursor-pointer p-2 hover:bg-blue-600 rounded-md mt-1">Access Pointler</a>
-
-            </h1>
-            @can('view deviceInfo')
-            <h1 class="cursor-pointer p-2 hover:bg-blue-600 rounded-md mt-1">
-                <a href="/devices/orphans"  class="cursor-pointer p-2 hover:bg-blue-600 rounded-md mt-1">Öksüz cihazlar</a>
-            </h1>
-            @endcan
-
-        </div>
-        @endcan
-        @can('view location')
-        <div class="my-4 bg-gray-600 h-[1px]"></div>
-
-
-        <div
-            class="p-2.5 mt-3 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-blue-600 text-white"
-        >
-            <i class="bi bi-house-door-fill"></i>
-            <a href="/locations" class="text-[15px] ml-4 text-gray-200 font-bold">Yer Bilgisi</a>
-        </div>
-        @endcan
-        @can('view deviceType')
-        <div class="my-4 bg-gray-600 h-[1px]"></div>
-
-        <div
-            class="p-2.5 mt-3 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-blue-600 text-white"
-        >
-            <i class="bi bi-house-door-fill"></i>
-            <a href="/device_types" class="text-[15px] ml-4 text-gray-200 font-bold">Cihaz Tipleri</a>
-        </div>
-        @endcan
-        <div class="my-4 bg-gray-600 h-[1px]"></div>
-        <div class="flex flex-col mt-auto space-y-2">
-
-        @can('view user')
-        <div
-            class="p-2.5 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-blue-600 text-white"
-        >
-            <i class="bi bi-house-door-fill"></i>
-                <a href="/users" class="text-[15px] ml-4 text-gray-200 font-bold">Kullanıcılar</a>
-        </div>
-        @endcan
-        @can('view permission')
-        <div
-            class="p-2.5 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-blue-600 text-white"
-        >
-            <i class="bi bi-house-door-fill"></i>
-            <a href="/permissions" class="text-[15px] ml-4 text-gray-200 font-bold">Permissions</a>
-        </div>
-        @endcan
-            @can('view role')
-        <div
-            class="p-2.5 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-blue-600 text-white"
-        >
-            <i class="bi bi-house-door-fill"></i>
-            <a href="/roles" class="text-[15px] ml-4 text-gray-200 font-bold">Roles</a>
-        </div>
-            @endcan
-        <div
-            class="p-2.5 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-blue-600 text-white"
-        >
-            <i class="bi bi-house-door-fill"></i>
-            <a href="{{ route('dashboard') }}" class="text-[15px] ml-4 text-gray-200 font-bold">Dashboard</a>
-        </div>
-
-        <div class="p-2.5 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-blue-600 text-white">
-            <i class="bi bi-box-arrow-in-right"></i>
-            <form method="POST" action="{{ route('logout') }}">
-                @csrf
-                <a href="{{ route('logout') }}"
-                   onclick="event.preventDefault(); this.closest('form').submit();"
-                   class="text-[15px] ml-4 text-gray-200 font-bold"
-                >
-                    Logout
-                </a>
-            </form>
-        </div>
-    </div>
-    </div>
-
-    <script type="text/javascript">
-        function dropdown(event) {
-            //document.querySelector("#submenu").classList.toggle("hidden");
-            document.querySelector("#arrow").classList.toggle("rotate-0");
-
-        }
-        dropdown();
-
-        function openSidebar() {
-            //document.querySelector(".sidebar").classList.toggle("hidden");
-        }
-    </script>
-</body>
-</html>
+                // Alternar la clase "hidden" para mostrar u ocultar el desplegable
+                desplegable.classList.toggle("hidden");
+            });
+        });
+    });
+</script>

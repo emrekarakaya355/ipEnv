@@ -1,4 +1,5 @@
 <x-layout>
+
     @can('view deviceType')
     <x-slot name="heading">Device Types</x-slot>
 
@@ -12,31 +13,57 @@
         </button>
         @endcan
 
+        @if (session('error'))
+            <div class="bg-red-500 text-white p-4 rounded">
+                {{ session('error') }}
+            </div>
+        @endif
+        @if (session('successful'))
+            <div class="bg-green-500 text-white p-4 rounded">
+                {{ session('successful') }}
+            </div>
+        @endif
         <div class="overflow-x-auto bg-white shadow-md rounded-xl">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                 <tr>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cihaz Tipi</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Marka</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Model</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Port Sayısı</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
+                    <x-table-header title="Cihaz Tipi" filterName="type" />
+                    <x-table-header title="Marka" filterName="brand" />
+                    <x-table-header title="Model" filterName="model" />
+                    <x-table-header title="Port Sayısı" filterName="port_number" />
+
+                    <th scope="col" class="flex justify-between items-center px-6 py-3 text-left font-bold uppercase tracking-wider border-l border-gray-300">
+                        İşlemler
+                        <div class="flex space-x-2">
+
+                            <button onclick="openBulkAddModal()" class="ml-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500 hover:text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7l5-5 5 5M12 21V7M4 4h16a1 1 0 011 1v16a1 1 0 01-1 1H4a1 1 0 01-1-1V5a1 1 0 011-1z" />
+                                </svg>
+                            </button>
+                            <a href="{{ url('/device_types/export') }}?{{ http_build_query(request()->query()) }}" class="ml-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500 hover:text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17l5 5 5-5M12 3v14M4 4h16a1 1 0 011 1v16a1 1 0 01-1 1H4a1 1 0 01-1-1V5a1 1 0 011-1z" />
+                                </svg>
+                            </a>
+                        </div>
+                    </th>
                 </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                 @foreach($device_types as $device_type)
                     <tr class="border-b border-gray-200">
-                        <td class="px-6 py-4 whitespace-nowrap">{{ $device_type->type }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">{{ $device_type->brand }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">{{ $device_type->model }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">{{ $device_type->port_number }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">
+                        <td class="px-6 py-4 whitespace-nowrap border-l border-gray-300">{{ $device_type->type }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap border-l border-gray-300">{{ $device_type->brand }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap border-l border-gray-300">{{ $device_type->model }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap border-l border-gray-300">{{ $device_type->port_number }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap border-l border-gray-300">
                             @can('update deviceType')
                             <x-edit-button onclick="editDeviceType({{ $device_type->id }})"/>
                             @endcan
                             @can('delete deviceType')
                             <x-delete-button onclick="deleteDeviceType({{ $device_type->id }})"/>
-                                @endcan
+                            @endcan
                         </td>
                     </tr>
                 @endforeach
@@ -44,9 +71,11 @@
             </table>
         </div>
 
+        @if($device_types->hasPages())
         <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-blue-gray-200 sm:px-6" id="pagination-links">
             {{ $device_types->links() }}
         </div>
+        @endif
 
         @if ($device_types->isEmpty())
             <p class="text-center py-4">No device types found.</p>
@@ -104,8 +133,52 @@
             </div>
         </div>
     </div>
-        @endcanany
+        <!-- Modal for Bulk Add -->
+        <div id="bulkAddModal" class="fixed z-10 inset-0 overflow-y-auto hidden" aria-labelledby="bulkAddModalLabel" role="dialog" aria-modal="true">
+            <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
+                <!-- Background overlay -->
+                <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+
+                <!-- Modal content -->
+                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                    <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                        <div class="flex justify-between">
+                            <h3 class="text-lg font-medium text-gray-900" id="bulkAddModalLabel">Toplu Ekle</h3>
+                            <x-primary-button onclick="window.location.href='{{ url('/device_types/template/download') }}'">
+                                Şablonu İndir
+                            </x-primary-button>
+                        </div>
+                        <div class="mt-4">
+                            <!-- Form for Import -->
+                            <form id="bulkAddForm" action="device_types/import" method="post" enctype="multipart/form-data">
+                                @csrf
+                                <div class="form-group">
+                                    <label for="file">Dosya Seç</label>
+                                    <input type="file" name="file" class="form-control mt-2" />
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                        <button type="submit"  form="bulkAddForm" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm">
+                            Import Et
+                        </button>
+                        <button type="button" onclick="closeBulkAddModal()" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm">
+                            İptal
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+@endcanany
 <script>
+    function openBulkAddModal() {
+        document.getElementById('bulkAddModal').classList.remove('hidden');
+    }
+
+    function closeBulkAddModal() {
+        document.getElementById('bulkAddModal').classList.add('hidden');
+    }
     let editingDeviceTypeId = null;
     function openCreateModal() {
         document.getElementById('deviceTypeForm').reset();
@@ -211,7 +284,8 @@
             fetch(`/device_types/${deviceTypeId}`, {
                 method: 'DELETE',
                 headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
                 }
             })
                 .then(response => {

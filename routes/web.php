@@ -41,6 +41,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/get-models', [DeviceTypeController::class, 'getModelsByBrand']);
     Route::get('/api/switches', [DeviceController::class, 'getSwitches']);
 
+    Route::get('/locations/template/download', [LocationController::class, 'downloadTemplate']);
+    Route::post('/locations/import', [LocationController::class, 'import'])->name('locations.import');
+    Route::get('/locations/export', [LocationController::class, 'export'])->name('locations.export');
+
+    Route::get('/device_types/template/download', [DeviceTypeController::class, 'downloadTemplate']);
+    Route::post('/device_types/import', [DeviceTypeController::class, 'import'])->name('device_types.import');
+    Route::get('/device_types/export', [DeviceTypeController::class, 'export'])->name('device_types.export');
+
     Route::apiResource('locations', LocationController::class);
     Route::get('/get-units/{building}', [LocationController::class, 'getUnitsByBuilding']);
 
@@ -59,6 +67,7 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('users', App\Http\Controllers\UserController::class);
     Route::get('users/{userId}/delete', [App\Http\Controllers\UserController::class, 'destroy']);
+
 
 });
 

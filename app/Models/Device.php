@@ -120,6 +120,17 @@ class Device extends Model implements Auditable
         return $this->hasOne(DeviceInfo::class)->latest();
     }
 
+    public function scopeWithoutDepo($query)
+    {
+        // Kullanıcının "view-depo" yetkisine sahip olup olmadığını kontrol et
+        if (!auth()->user()->can('view-depo')) {
+            // Eğer yetkisi yoksa, depoda olanları hariç tut
+            return $query->where('status', '!=', DeviceStatus::STORAGE);
+        }
+
+        // Yetkisi varsa tüm cihazları göster
+        return $query;
+    }
     // Device oluşturan kullanıcı
     public function createdBy()
     {

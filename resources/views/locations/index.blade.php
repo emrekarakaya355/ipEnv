@@ -1,4 +1,5 @@
 <x-layout >
+
         @can('view location')
         <x-slot name="heading">Lokasyonlar</x-slot>
 
@@ -6,28 +7,59 @@
             <h2 class="text-lg font-semibold mb-4">Lokasyonlar</h2>
 
             @can('create location')
+            <div class="flex items-center space-x-4 mb-4">
 
-            <!-- Add New Location Button -->
-            <button class="mb-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="openCreateModal()">
+                <!-- Add New Location Button -->
+                <x-primary-button onclick="openCreateModal()">
 
-                Yeni Lokasyon Ekle
-            </button>
+                    Yeni Lokasyon Ekle
+                </x-primary-button>
+                <!-- Clear Filters Button -->
+                <button type="button" onclick="clearFilters()" class="ml-2 bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700">
+                    Filtreleri Temizle
+                </button>
+
+                @if (session('error'))
+                    <div class="bg-red-500 text-white p-4 rounded">
+                        {{ session('error') }}
+                    </div>
+                @endif
+                @if (session('successful'))
+                    <div class="bg-green-500 text-white p-4 rounded">
+                        {{ session('successful') }}
+                    </div>
+                @endif
+            </div>
             @endcan
-            <div class="overflow-x-auto bg-white shadow-md rounded-xl">
+            <th class="overflow-x-auto bg-white shadow-md rounded-xl">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                     <tr>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bina</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Birim</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">İşlemler</th>
+                        <x-table-header title="Bina" filterName="building" />
+                        <x-table-header title="Birim" filterName="unit" />
+                        <th scope="col" class="flex justify-between items-center px-6 py-3 font-bold uppercase tracking-wider border-l border-gray-300">
+                            İşlemler
+                            <div class="flex space-x-2">
+                                <button onclick="openBulkAddModal()" class="ml-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500 hover:text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7l5-5 5 5M12 21V7M4 4h16a1 1 0 011 1v16a1 1 0 01-1 1H4a1 1 0 01-1-1V5a1 1 0 011-1z" />
+                                    </svg>
+                                </button>
+                                <a href="{{ url('/locations/export') }}?{{ http_build_query(request()->query()) }}" class="ml-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500 hover:text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17l5 5 5-5M12 3v14M4 4h16a1 1 0 011 1v16a1 1 0 01-1 1H4a1 1 0 01-1-1V5a1 1 0 011-1z" />
+                                    </svg>
+                                </a>
+                            </div>
+                        </th>
                     </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
                     @foreach($locations as $location)
                         <tr>
-                            <td class="px-6 py-4 whitespace-nowrap">{{ $location->building }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap">{{ $location->unit }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap">
+                            <td class="px-6 py-4 whitespace-nowrap border-l border-gray-300">{{ $location->building }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap border-l border-gray-300">{{ $location->unit }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap border-l border-gray-300">
                                 @can('update location')
                                 <x-edit-button class="text-blue-600 hover:text-blue-900" onclick="editLocation({{ $location->id }})">Düzenle</x-edit-button>
                                 @endcan
@@ -41,15 +73,17 @@
                 </table>
             </div>
 
-            <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-blue-gray-200 sm:px-6" id="pagination-links">
-                {{ $locations->links() }}
-            </div>
+                @if($locations->hasPages())
+                    <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-blue-gray-200 sm:px-6" id="pagination-links">
+                    {{ $locations->links() }}
+                    </div>
+                @endif
 
             @if ($locations->isEmpty())
                 <p class="text-center py-4">No records found.</p>
             @endif
 
-        </div>
+
         @canany(['create location','update location'])
         <!-- Add/Edit Location Modal -->
         <div id="locationModal" class="fixed z-10 inset-0 overflow-y-auto hidden" aria-labelledby="locationModalLabel" role="dialog" aria-modal="true">
@@ -84,8 +118,54 @@
                 </div>
             </div>
         </div>
+
+        <!-- Modal for Bulk Add -->
+        <div id="bulkAddModal" class="fixed z-10 inset-0 overflow-y-auto hidden" aria-labelledby="bulkAddModalLabel" role="dialog" aria-modal="true">
+            <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
+                <!-- Background overlay -->
+                <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+
+                <!-- Modal content -->
+                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                    <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                        <div class="flex justify-between font-bold">
+                            <h3 class="text-lg" id="bulkAddModalLabel">Toplu Ekle</h3>
+                            <x-primary-button onclick="window.location.href='{{ url('/locations/template/download') }}'">
+                                Şablonu İndir
+                            </x-primary-button>
+                        </div>
+                        <div class="mt-4">
+
+                            <!-- Form for Import -->
+                            <form id="bulkAddForm" action="locations/import" method="post" enctype="multipart/form-data">
+                                @csrf
+                                <div class="form-group">
+                                    <label for="file">Dosya Seç</label>
+                                    <input type="file" name="file" class="form-control mt-2" />
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                        <button type="submit"  form="bulkAddForm" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm">
+                            Import Et
+                        </button>
+                        <button type="button" onclick="closeBulkAddModal()" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm">
+                            İptal
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
         @endcanany
         <script>
+            function openBulkAddModal() {
+                document.getElementById('bulkAddModal').classList.remove('hidden');
+            }
+
+            function closeBulkAddModal() {
+                document.getElementById('bulkAddModal').classList.add('hidden');
+            }
             let editingLocationId = null; // Global variable to store the ID of the location being edited
 
             function openCreateModal() {
@@ -165,7 +245,8 @@
                   fetch(`/locations/${locationId}`, {
                       method: 'DELETE',
                       headers: {
-                          'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                          'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                          'Accept': 'application/json'
                       }
                   })
                       .then(response => {
@@ -191,6 +272,8 @@
           function closeLocationModal() {
                 document.getElementById('locationModal').classList.add('hidden');
             }
+
+
         </script>
     @endcan
 
