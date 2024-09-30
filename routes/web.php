@@ -30,12 +30,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/', function () { return view('welcome'); });
 
-    Route::get('/devices/orphans', [DeviceController::class, 'orphans']);
 
-    Route::resource('devices', DeviceController::class);
-    Route::get('/devices/type/{type}', [DeviceController::class, 'index'])->name('devices.index.type');
-
-    Route::post('/devices/{device}/archive', [DeviceController::class, 'archive'])->name('devices.archive');
 
     Route::get('/get-brands/{type}', [DeviceTypeController::class, 'getBrandsByType']);
     Route::get('/get-models', [DeviceTypeController::class, 'getModelsByBrand']);
@@ -48,6 +43,17 @@ Route::middleware('auth')->group(function () {
     Route::get('/device_types/template/download', [DeviceTypeController::class, 'downloadTemplate']);
     Route::post('/device_types/import', [DeviceTypeController::class, 'import'])->name('device_types.import');
     Route::get('/device_types/export', [DeviceTypeController::class, 'export'])->name('device_types.export');
+
+    Route::get('/devices/template/download', [DeviceController::class, 'downloadTemplate']);
+    Route::post('/devices/import', [DeviceController::class, 'import'])->name('devices.import');
+    Route::get('/devices/export', [DeviceController::class, 'export'])->name('devices.export');
+
+    Route::get('/devices/orphans', [DeviceController::class, 'orphans']);
+
+    Route::resource('devices', DeviceController::class);
+    Route::get('/devices/type/{type}', [DeviceController::class, 'index'])->name('devices.index.type');
+
+    Route::post('/devices/{device}/archive', [DeviceController::class, 'archive'])->name('devices.archive');
 
     Route::apiResource('locations', LocationController::class);
     Route::get('/get-units/{building}', [LocationController::class, 'getUnitsByBuilding']);

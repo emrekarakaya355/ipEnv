@@ -7,16 +7,6 @@ use App\Models\Location;
 
 class LocationImport extends BaseImport
 {
-    /**
-     * @param array $row
-     * @return mixed
-     */
-    public function model(array $row)
-    {
-
-            return $this->createLocation($row);
-
-    }
     public function rules(): array
     {
         return [
@@ -27,39 +17,26 @@ class LocationImport extends BaseImport
             'unit' => [
                 'required',
                 'string',
-                'unique:locations,unit,NULL,id,building,' .  request()->input('building'), // unit ve building kombinasyonu için benzersiz kural
             ],
 
         ];
     }
-    public function customValidationMessages()
-    {
-        return [
-            'unit.unique' => 'Kayıt Zaten Var',
-        ];
-    }
-    protected function createLocation(array $row)
+    protected function processRow(array $row)
     {
         try {
-            return Location::Create(
-                [
-                    'building' => $row['building'],
-                    'unit' => $row['unit']
-                ]
-            );
-
+            // Satırı model olarak kaydedelim
+            Location::create([
+                'building' => $row['building'],
+                'unit' => $row['unit'],
+            ]);
         } catch (\Exception $e) {
-            // Hatanın unique violation olup olmadığını kontrol et
             if ($this->isUniqueConstraintViolation($e)) {
-                // Validasyon hatası gibi ele al ve Failure dizisine ekle
-                $this->fail($row, ['Kayıt Zaten var']);
+                // Eğer satır zaten varsa hata olarak işaretleyelim
+                $this->fail($row, ['Kayıt zaten var']);
             } else {
-                // Diğer hataları onError'a yönlendir
-                $this->onError($e);
+                // Diğer hataları tekrar fırlatalım
+                $this->fail($row, (array)$e->getMessage());
             }
         }
-        return null;
     }
-
-
 }

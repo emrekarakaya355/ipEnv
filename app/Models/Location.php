@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Exceptions\ConflictException;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use OwenIt\Auditing\Contracts\Auditable;
@@ -24,9 +25,19 @@ class Location extends Model implements Auditable
         static::updating(function ($model) {
             $model->updated_by = auth()->id();
         });
+        static::saving(function ($model) {
+            // Var olan bir kaydı kontrol et (unique validation)
+            $existingModel = Location::where([
+                ['building', '=', $model->building],
+                ['unit', '=', $model->unit],
+            ])->first();
+
+            if ($existingModel && $existingModel->id !== $model->id) {
+                throw new ConflictException("Yer Bilgisi Zaten Var!");
+            }
+        });
+
     }
-
-
     /**
      * DeviceInfo ile ilişkisi
      */

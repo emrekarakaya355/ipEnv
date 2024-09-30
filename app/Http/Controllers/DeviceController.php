@@ -2,7 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\DeviceExport;
+use App\Exports\DeviceTemplateExport;
+use App\Exports\LocationTemplateExport;
 use App\Http\Requests\StoreDeviceRequest;
+use App\Http\Responses\ErrorResponse;
+use App\Http\Responses\SuccessResponse;
+use App\Imports\DeviceImport;
 use App\Models\AccessPoint;
 use App\Models\Device;
 use App\Models\DeviceInfo;
@@ -12,6 +18,7 @@ use App\Services\DeviceService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 
 class DeviceController extends Controller
 {
@@ -169,4 +176,51 @@ class DeviceController extends Controller
         return view('devices.index', compact('devices','columns'));
 
     }
+
+    public function import(Request $request)
+    {
+        // Validate the uploaded file
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx,xls,csv|max:2048', // Adjust max size as needed
+        ]);
+        $file = $request->file('file');
+
+        try {
+            $import = new DeviceImport();
+            $import->import($file);
+
+
+            if (!empty($import->getFailures())) {
+                return $import->exportFailures(); // Ensure this is returned
+            }
+            return new SuccessResponse('Kayıtlar Başarı ile aktarıldı.');
+        } catch (\Exception $e) {
+            // Hata durumunda kullanıcıya bildirim yap
+            return new ErrorResponse($e);
+        }
+
+    }
+    public function export(Request $request)
+    {
+
+        // Filtre kriterlerini al
+        $filterCriteria = $request->only(['serial_number']);
+        //$filterCriteria = $request->only(['type', 'model', 'brand', 'port_number', 'building', 'unit', 'serial_number', 'registry_number', 'device_name', 'ip_address', 'description', 'block', 'floor', 'room_number']);
+        try {
+            return Excel::download(
+                new DeviceExport(Device::class, $filterCriteria,[]),
+                'device_types.xlsx'
+            );
+        }catch (\Exception $e){
+            return new ErrorResponse($e);
+        }
+        // BaseExport sınıfını kullanarak export işlemi yap
+    }
+
+
+    public function downloadTemplate()
+    {
+        return \Maatwebsite\Excel\Facades\Excel::download(new DeviceTemplateExport(), 'device_import_template.xlsx');
+    }
+
 }

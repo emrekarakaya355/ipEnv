@@ -64,10 +64,7 @@ class DeviceTypeController extends Controller
         }
 
         try {
-            $existingModel = DeviceType::where($validator->validated())->first();
-            if ($existingModel) {
-                throw new ConflictException("Cihaz Tipi Bilgisi Zaten Var!");
-            }
+
             //DeviceType::updateOrCreate( $validator->validated(), $validator->validated() );
             DeviceType::create($validator->validated());
         } catch (\Exception $exception) {

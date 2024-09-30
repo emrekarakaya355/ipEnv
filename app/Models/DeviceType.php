@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Exceptions\ConflictException;
 use App\Exceptions\NotFoundException;
 use Exception;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -27,6 +28,18 @@ class DeviceType extends Model  implements Auditable
             if ($model->type == 'access_point' && $model->port_number) {
                 $model->port_number = null;
             }
+            // Var olan bir kaydı kontrol et (unique validation)
+            $existingModel = DeviceType::where([
+                ['type', '=', $model->type],
+                ['brand', '=', $model->brand],
+                ['model', '=', $model->model],
+                ['port_number', '=', $model->port_number]
+            ])->first();
+
+            if ($existingModel && $existingModel->id !== $model->id) {
+                throw new ConflictException("Cihaz Tipi Bilgisi Zaten Var!");
+            }
+
         });
     }
 

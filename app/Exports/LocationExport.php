@@ -21,7 +21,6 @@ class LocationExport extends BaseExport
                 }
             }
         }
-
         return $query;
     }
 

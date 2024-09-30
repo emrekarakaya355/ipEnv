@@ -3,12 +3,14 @@
 namespace App\Imports;
 
 use App\Exports\FailuresExport;
+use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\Importable;
 use Maatwebsite\Excel\Concerns\RegistersEventListeners;
 use Maatwebsite\Excel\Concerns\SkipsErrors;
 use Maatwebsite\Excel\Concerns\SkipsFailures;
 use Maatwebsite\Excel\Concerns\SkipsOnError;
 use Maatwebsite\Excel\Concerns\SkipsOnFailure;
+use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
@@ -19,64 +21,50 @@ use Maatwebsite\Excel\Events\AfterSheet;
 use Maatwebsite\Excel\Validators\Failure;
 use PhpOffice\PhpSpreadsheet\Exception;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-abstract class BaseImport implements ToModel, WithHeadingRow , SkipsOnError, SkipsOnFailure, WithSkipDuplicates, WithEvents
+abstract class BaseImport implements ToCollection, WithHeadingRow, SkipsOnError, SkipsOnFailure, WithSkipDuplicates, WithEvents
 {
 
-    use Importable, RegistersEventListeners,SkipsErrors, SkipsFailures;
+    use Importable, RegistersEventListeners, SkipsErrors, SkipsFailures;
     protected $failures = [];
     protected $rowNumber = 0;
 
 
     /**
+     * Abstract method to handle each row after validation
      * @param array $row
      */
-    abstract public function model(array $row);
+    abstract protected function processRow(array $row);
 
-    /**
-     * @throws Exception
-     * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
-     */
-    /*
-    public static function afterSheet(AfterSheet $event)
+    public function collection(Collection $rows)
     {
-        $importInstance = $event->getConcernable();
+        foreach ($rows as $row) {
+            $this->setRowNumber();
 
-        // Hatalı satırları işleyip renklendirme ve mesaj ekleme
-        if (!empty($importInstance->failures)) {
-            $sheet = $event->sheet->getDelegate();
-            $lastColumn = $sheet->getHighestColumn();
-            $lastColumnIndex = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::columnIndexFromString($lastColumn);
-            $errorColumn = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($lastColumnIndex + 1);
-
-            // Yeni bir sütun ekleyip hata mesajlarını buraya yazalım
-            $sheet->setCellValue("{$errorColumn}1", 'Error Message');
-
-            foreach ($importInstance->failures as $failure) {
-
-                $rowNumber = $failure->row();
-                $errorMessages = implode(", ", $failure->errors());
-                // Hatalı satırların rengini değiştirme
-                $sheet->getStyle("A{$rowNumber}:{$lastColumn}{$rowNumber}")->applyFromArray([
-                    'fill' => [
-                        'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                        'color' => ['rgb' => 'FFCCCC'],
-                    ],
-                ]);
-
-                // Hata mesajını yeni bir sütuna yazalım
-                $sheet->setCellValue("{$errorColumn}{$rowNumber}", $errorMessages);
+            try {
+                // İşlem yapılacak satırı `processRow` metodunda yönetin
+                $this->processRow($row->toArray());
+            } catch (\Exception $e) {
+                // Eğer bir hata varsa, bu hatayı Failure olarak kaydedelim
+                $this->fail($row->toArray(), [$e->getMessage()]);
             }
-
-            // Dosyayı kaydetme
-            $writer = new Xlsx($event->sheet->getDelegate()->getParent());
-            $filePath = storage_path('C:/Users/NEVU/Desktop/test/failed_imports.xlsx'); // Kaydedilecek dosya yolu
-            $writer->save($filePath);
-            return response()->download($filePath)->deleteFileAfterSend(true); // Dosyayı indir ve ardından sil
         }
-
-        return null ;
     }
-*/
+    protected function fail(array $row, array $messages)
+    {
+        $rowNumber = $this->getRowNumber();
+        // Başarısızlığı kaydedin
+        $this->failures[] = new Failure($rowNumber, implode(",", $row), $messages, $row);
+    }
+
+    protected function getRowNumber()
+    {
+        return $this->rowNumber;
+    }
+
+    protected function setRowNumber()
+    {
+        $this->rowNumber++;
+    }
     public function onFailure(Failure ...$failures){
         // Başarısız olan satırları topla
         foreach ($failures as $failure) {
@@ -109,22 +97,6 @@ abstract class BaseImport implements ToModel, WithHeadingRow , SkipsOnError, Ski
     public function getFailures()
     {
         return $this->failures;
-    }
-
-    public  function getRowNumber()
-    {
-        return $this->rowNumber;
-    }
-    public  function setRowNumber()
-    {
-        $this->rowNumber++;
-    }
-
-    protected function fail(array $row, array $messages)
-    {
-        $rowNumber = $this->getRowNumber();
-        // Add the Failure instance to the import failures
-        $this->failures[] = new Failure($rowNumber, implode(",", $row), $messages, $row);
     }
 
     // This method can be used to register the failure
