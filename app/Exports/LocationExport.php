@@ -7,24 +7,6 @@ use App\Models\Location;
 class LocationExport extends BaseExport
 {
     /**
-     * Override the query method for the Location model.
-     */
-    public function query()
-    {
-        $query = Location::query();
-
-        // Apply filter criteria if available
-        if (!empty($this->filterCriteria)) {
-            foreach ($this->filterCriteria as $field => $value) {
-                if (!empty($value)) {
-                    $query->where($field, $value);
-                }
-            }
-        }
-        return $query;
-    }
-
-    /**
      * Mapping the data for custom output.
      *
      * @param Location $location

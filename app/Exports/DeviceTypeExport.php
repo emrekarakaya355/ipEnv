@@ -6,21 +6,7 @@ use App\Models\DeviceType;
 
 class DeviceTypeExport extends BaseExport
 {
-    public function query()
-    {
-        $query = DeviceType::query();
 
-        // Apply filter criteria if available
-        if (!empty($this->filterCriteria)) {
-            foreach ($this->filterCriteria as $field => $value) {
-                if (!empty($value)) {
-                    $query->where($field, $value);
-                }
-            }
-        }
-
-        return $query;
-    }
 
     /**
      * Mapping the data for custom output.

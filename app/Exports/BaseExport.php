@@ -12,7 +12,7 @@ use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\WithMapping;
 
-abstract class BaseExport implements FromQuery, FromArray, WithHeadings, WithMapping,WithColumnWidths
+abstract class BaseExport implements FromQuery, FromArray, WithMapping, WithHeadings,  WithColumnWidths
 {
     use Exportable;
 
@@ -57,8 +57,26 @@ abstract class BaseExport implements FromQuery, FromArray, WithHeadings, WithMap
     /**
      * Abstract method to be implemented by child classes
      */
-    abstract public function query();
+    public function query()
+    {
+        if (!class_exists($this->model)) {
+            throw new \Exception("Model sınıfı bulunamadı: " . $this->model);
+        }
 
+        // Dinamik olarak modeli oluştur
+        $modelInstance = new $this->model();
+        $query = $modelInstance->query();
+
+        // Apply filter criteria if available
+        if (!empty($this->filterCriteria)) {
+            foreach ($this->filterCriteria as $field => $value) {
+                if (!empty($value)) {
+                    $query->where($field, 'LIKE', '%' . $value . '%');
+                }
+            }
+        }
+        return $query;
+    }
     /**
      * Returns data as an array if provided.
      */

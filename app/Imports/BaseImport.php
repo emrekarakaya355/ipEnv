@@ -21,7 +21,7 @@ use Maatwebsite\Excel\Events\AfterSheet;
 use Maatwebsite\Excel\Validators\Failure;
 use PhpOffice\PhpSpreadsheet\Exception;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-abstract class BaseImport implements ToCollection, WithHeadingRow, SkipsOnError, SkipsOnFailure, WithSkipDuplicates, WithEvents
+abstract class BaseImport implements ToCollection, WithHeadingRow, SkipsOnError, SkipsOnFailure, WithValidation, WithSkipDuplicates, WithEvents
 {
 
     use Importable, RegistersEventListeners, SkipsErrors, SkipsFailures;

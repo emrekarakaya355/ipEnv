@@ -43,7 +43,6 @@ class DeviceTypeImport extends BaseImport
             }
         });
     }
-
     protected function isUnique($type, $brand, $model, $port_number)
     {
         return DeviceType::where('type', $type)

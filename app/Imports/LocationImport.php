@@ -30,13 +30,9 @@ class LocationImport extends BaseImport
                 'unit' => $row['unit'],
             ]);
         } catch (\Exception $e) {
-            if ($this->isUniqueConstraintViolation($e)) {
-                // Eğer satır zaten varsa hata olarak işaretleyelim
-                $this->fail($row, ['Kayıt zaten var']);
-            } else {
-                // Diğer hataları tekrar fırlatalım
-                $this->fail($row, (array)$e->getMessage());
-            }
+            // Diğer hataları tekrar fırlatalım
+            $this->fail($row, (array)$e->getMessage());
+
         }
     }
 }

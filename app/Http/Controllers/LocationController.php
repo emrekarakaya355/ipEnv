@@ -157,6 +157,7 @@ class LocationController extends Controller
 
     public function import(Request $request)
     {
+
         // Validate the uploaded file
         $request->validate([
             'file' => 'required|file|mimes:xlsx,xls,csv|max:2048', // Adjust max size as needed
@@ -168,8 +169,13 @@ class LocationController extends Controller
             $import->import($file);
 
 
+            // Hatalı kayıtlar var mı kontrol et
             if (!empty($import->getFailures())) {
-                return $import->exportFailures(); // Ensure this is returned
+                // Hatalı kayıtları al
+                $failures = $import->getFailures();
+
+                // Hatalı kayıtları içeren Excel dosyasını oluştur ve kullanıcıya sun
+                return \Maatwebsite\Excel\Facades\Excel::download(new FailuresExport($failures), 'failed_imports.xlsx');
             }
             return new SuccessResponse('Kayıtlar Başarı ile aktarıldı.');
         } catch (\Exception $e) {

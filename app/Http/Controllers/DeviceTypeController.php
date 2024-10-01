@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Exceptions\ConflictException;
 use App\Exports\DeviceTypeExport;
 use App\Exports\DeviceTypeTemplateExport;
+use App\Exports\FailuresExport;
 use App\Http\Responses\ErrorResponse;
 use App\Http\Responses\SuccessResponse;
 use App\Http\Responses\ValidatorResponse;
@@ -148,6 +149,10 @@ class DeviceTypeController extends Controller
 
     public function import(Request $request)
     {
+        // Validate the uploaded file
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx,xls,csv|max:2048', // Adjust max size as needed
+        ]);
         $file = $request->file('file');
 
         try {
@@ -155,7 +160,8 @@ class DeviceTypeController extends Controller
             $import->import($file);
             // Return the failures export if there are any
             if (!empty($import->getFailures())) {
-                return $import->exportFailures(); // Ensure this is returned
+                $failures = $import->getFailures();
+                return \Maatwebsite\Excel\Facades\Excel::download(new FailuresExport($failures), 'failed_imports.xlsx');
             }
             return new SuccessResponse('Kayıtlar Başarı ile aktarıldı.');
         } catch (\Exception $e) {

@@ -28,6 +28,7 @@ class ErrorResponse implements Responsable
 
     public function toResponse($request)
     {
+
         if($this->exception){
                 //return response()->json(['success' => false,'message' => $this->message], $this->statusCode);
             if ($this->exception instanceof CustomException) {
@@ -62,6 +63,7 @@ class ErrorResponse implements Responsable
         if ($request->expectsJson()) {
             return response()->json($response, $this->statusCode, $this->headers);
         } else {
+
             return back()
                 ->with(['error' => $this->message])
                 ->withHeaders($this->headers)

@@ -35,6 +35,7 @@ class SuccessResponse implements Responsable
 
     public function toResponse($request)
     {
+
         // Eğer AJAX isteği ise JSON döndür
         if ($request->expectsJson()) {
 
