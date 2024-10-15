@@ -15,8 +15,8 @@ class DeviceTemplateExport implements withHeadings, FromArray
     {
         return [
             'Type',
-            'Model',
             'Brand',
+            'Model',
             'Port Number',
             'Building',
             'Unit',
@@ -39,8 +39,8 @@ class DeviceTemplateExport implements withHeadings, FromArray
         return [
             [
                 'Switch',                // Type
-                'Cisco',              // Model
-                '9105',              // Brand
+                'Cisco',              // Brand
+                '9105',              // Model
                 48,                     // Port Number (Örnek: 24)
                 'Rektörlük',           // Building
                 'Bilgi İşlem',               // Unit
@@ -55,8 +55,8 @@ class DeviceTemplateExport implements withHeadings, FromArray
             ],
             [
                 'Access_point',                // Type
-                'Cisco',              // Model
-                '9105',              // Brand
+                'Cisco',              // Brand
+                '9105',              // Model
                 '',                     // Port Number (Örnek: 24)
                 'Rektörlük',           // Building
                 'Bilgi İşlem',               // Unit

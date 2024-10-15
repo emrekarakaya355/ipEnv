@@ -2,17 +2,16 @@
 
     @can('view deviceType')
     <x-slot name="heading">Device Types</x-slot>
-
     <div class="flex-auto p-8">
-        <h2 class="text-lg font-semibold mb-4">Cihaz Tipleri</h2>
-
-        @can('create deviceType')
-        <!-- Add New Device Type Button -->
-        <button id="openModal" class="mb-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="openCreateModal()">
-            Yeni Cihaz Tipi Ekle
-        </button>
-        @endcan
-
+        <div class="flex items-center justify-between">
+            <span></span>
+            <h2 class="text-2xl font-semibold mb-4" >Cihaz Tipleri</h2>
+            <x-button-group
+                route="device_types"
+                addOnClick="openCreateModal()"
+                viewName="deviceType"
+            />
+        </div>
         @if (session('error'))
             <div class="bg-red-500 text-white p-4 rounded">
                 {{ session('error') }}
@@ -32,32 +31,18 @@
                     <x-table-header title="Model" filterName="model" />
                     <x-table-header title="Port Sayısı" filterName="port_number" />
 
-                    <th scope="col" class="flex justify-between items-center px-6 py-3 text-left font-bold uppercase tracking-wider border-l border-gray-300">
-                        İşlemler
-                        <div class="flex space-x-2">
+                    <th scope="col" class="border-l border-gray-300" style="width: 10px; height: 5px;"></th>
 
-                            <button onclick="openBulkAddModal()" class="ml-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500 hover:text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7l5-5 5 5M12 21V7M4 4h16a1 1 0 011 1v16a1 1 0 01-1 1H4a1 1 0 01-1-1V5a1 1 0 011-1z" />
-                                </svg>
-                            </button>
-                            <a href="{{ url('/device_types/export') }}?{{ http_build_query(request()->query()) }}" class="ml-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500 hover:text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17l5 5 5-5M12 3v14M4 4h16a1 1 0 011 1v16a1 1 0 01-1 1H4a1 1 0 01-1-1V5a1 1 0 011-1z" />
-                                </svg>
-                            </a>
-                        </div>
-                    </th>
                 </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                 @foreach($device_types as $device_type)
                     <tr class="border-b border-gray-200">
-                        <td class="px-6 py-4 whitespace-nowrap border-l border-gray-300">{{ $device_type->type }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap border-l border-gray-300">{{ $device_type->brand }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap border-l border-gray-300">{{ $device_type->model }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap border-l border-gray-300">{{ $device_type->port_number }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap border-l border-gray-300">
+                        <td class="px-6 py-2 whitespace-nowrap border-l border-gray-300">{{ $device_type->type }}</td>
+                        <td class="px-6 py-2 whitespace-nowrap border-l border-gray-300">{{ $device_type->brand }}</td>
+                        <td class="px-6 py-2 whitespace-nowrap border-l border-gray-300">{{ $device_type->model }}</td>
+                        <td class="px-6 py-2 whitespace-nowrap border-l border-gray-300">{{ $device_type->port_number }}</td>
+                        <td class="px-6  whitespace-nowrap border-l border-gray-300">
                             @can('update deviceType')
                             <x-edit-button onclick="editDeviceType({{ $device_type->id }})"/>
                             @endcan
@@ -133,15 +118,9 @@
             </div>
         </div>
     </div>
-        <!-- Modal for Bulk Add -->
-        <div id="bulkAddModal" class="fixed z-10 inset-0 overflow-y-auto hidden" aria-labelledby="bulkAddModalLabel" role="dialog" aria-modal="true">
-            <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
-                <!-- Background overlay -->
-                <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
 
-                <x-bulk-add-modal title="Toplu Ekle" actionClass="device_types"></x-bulk-add-modal>
 
-                @endcanany
+    @endcanany
 <script>
     let editingDeviceTypeId = null;
     function openCreateModal() {

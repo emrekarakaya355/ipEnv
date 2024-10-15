@@ -1,124 +1,106 @@
 <x-layout >
 
-        @can('view location')
+    @can('view location')
         <x-slot name="heading">Lokasyonlar</x-slot>
 
         <div class="flex-auto p-8" >
-            <h2 class="text-lg font-semibold mb-4">Lokasyonlar</h2>
 
-            @can('create location')
-            <div class="flex items-center space-x-4 mb-4">
+            @if (session('error'))
+                <div class="bg-red-500 text-white p-4 rounded">
+                    {{ session('error') }}
+                </div>
+            @endif
+            @if (session('successful'))
+                <div class="bg-green-500 text-white p-4 rounded">
+                    {{ session('successful') }}
+                </div>
+            @endif
 
-                <!-- Add New Location Button -->
-                <x-primary-button onclick="openCreateModal()">
+            <div class="flex items-center justify-between">
+                <span></span>
+                <h2 class="text-2xl font-semibold mb-4">Lokasyonlar</h2>
+                <x-button-group
+                    route="locations"
+                    addOnClick="openCreateModal()"
+                    viewName="location"
+                />
 
-                    Yeni Lokasyon Ekle
-                </x-primary-button>
-                <!-- Clear Filters Button -->
-                <button type="button" onclick="clearFilters()" class="ml-2 bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700">
-                    Filtreleri Temizle
-                </button>
-
-                @if (session('error'))
-                    <div class="bg-red-500 text-white p-4 rounded">
-                        {{ session('error') }}
-                    </div>
-                @endif
-                @if (session('successful'))
-                    <div class="bg-green-500 text-white p-4 rounded">
-                        {{ session('successful') }}
-                    </div>
-                @endif
             </div>
-            @endcan
             <th class="overflow-x-auto bg-white shadow-md rounded-xl">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                     <tr>
                         <x-table-header title="Bina" filterName="building" />
                         <x-table-header title="Birim" filterName="unit" />
-                        <th scope="col" class="flex justify-between items-center px-6 py-3 font-bold uppercase tracking-wider border-l border-gray-300">
-                            İşlemler
-                            <div class="flex space-x-2">
-                                <button onclick="openBulkAddModal()" class="ml-2">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500 hover:text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7l5-5 5 5M12 21V7M4 4h16a1 1 0 011 1v16a1 1 0 01-1 1H4a1 1 0 01-1-1V5a1 1 0 011-1z" />
-                                    </svg>
-                                </button>
-                                <a href="{{ url('/locations/export') }}?{{ http_build_query(request()->query()) }}" class="ml-2">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500 hover:text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17l5 5 5-5M12 3v14M4 4h16a1 1 0 011 1v16a1 1 0 01-1 1H4a1 1 0 01-1-1V5a1 1 0 011-1z" />
-                                    </svg>
-                                </a>
-                            </div>
+                        <th scope="col" class="border-l border-gray-300" style="width: 10px; height: 5px;">
+
                         </th>
                     </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
                     @foreach($locations as $location)
                         <tr>
-                            <td class="px-6 py-4 whitespace-nowrap border-l border-gray-300">{{ $location->building }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap border-l border-gray-300">{{ $location->unit }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap border-l border-gray-300">
+                            <td class="px-6 py-2 whitespace-nowrap border-l border-gray-300">{{ $location->building }}</td>
+                            <td class="px-6 py-2 whitespace-nowrap border-l border-gray-300">{{ $location->unit }}</td>
+                            <td class="px-6  whitespace-nowrap border-l border-gray-300">
                                 @can('update location')
-                                <x-edit-button class="text-blue-600 hover:text-blue-900" onclick="editLocation({{ $location->id }})">Düzenle</x-edit-button>
+                                    <x-edit-button class="text-blue-600 hover:text-blue-900" onclick="editLocation({{ $location->id }})">Düzenle</x-edit-button>
                                 @endcan
                                 @can('delete location')
-                                <x-delete-button class="text-red-600 hover:text-red-900 ml-4" onclick="deleteLocation({{ $location->id }})">Sil</x-delete-button>
+                                    <x-delete-button class="text-red-600 hover:text-red-900 ml-4" onclick="deleteLocation({{ $location->id }})">Sil</x-delete-button>
                                 @endcan
                             </td>
                         </tr>
                     @endforeach
                     </tbody>
                 </table>
+        </div>
+
+        @if($locations->hasPages())
+            <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-blue-gray-200 sm:px-6" id="pagination-links">
+                {{ $locations->links() }}
             </div>
+        @endif
 
-                @if($locations->hasPages())
-                    <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-blue-gray-200 sm:px-6" id="pagination-links">
-                    {{ $locations->links() }}
-                    </div>
-                @endif
-
-            @if ($locations->isEmpty())
-                <p class="text-center py-4">No records found.</p>
-            @endif
+        @if ($locations->isEmpty())
+            <p class="text-center py-4">No records found.</p>
+        @endif
 
 
         @canany(['create location','update location'])
-        <!-- Add/Edit Location Modal -->
-        <div id="locationModal" class="fixed z-10 inset-0 overflow-y-auto hidden" aria-labelledby="locationModalLabel" role="dialog" aria-modal="true">
-            <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
-                <!-- Background overlay -->
-                <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+            <!-- Add/Edit Location Modal -->
+            <div id="locationModal" class="fixed z-10 inset-0 overflow-y-auto hidden" aria-labelledby="locationModalLabel" role="dialog" aria-modal="true">
+                <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
+                    <!-- Background overlay -->
+                    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
 
-                <!-- Modal content -->
-                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                    <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                        <h3 class="text-lg font-medium text-gray-900" id="locationModalLabel">Lokasyon</h3>
-                        <div class="mt-4">
-                            <!-- Form goes here -->
-                            <form id="locationForm" method="POST">
-                                @csrf
-                                <input type="hidden" name="_method" id="method" value="{{ csrf_token() }}">
-                                <div>
-                                    <label for="building" class="block text-sm font-medium text-gray-700">Fakülte Adı</label>
-                                    <input type="text" id="building" name="building" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                                </div>
-                                <div>
-                                    <label for="unit" class="block text-sm font-medium text-gray-700">Birim Adı</label>
-                                    <input type="text" id="unit" name="unit" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                                </div>
-                            </form>
+                    <!-- Modal content -->
+                    <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                        <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                            <h3 class="text-lg font-medium text-gray-900" id="locationModalLabel">Lokasyon</h3>
+                            <div class="mt-4">
+                                <!-- Form goes here -->
+                                <form id="locationForm" method="POST">
+                                    @csrf
+                                    <input type="hidden" name="_method" id="method" value="{{ csrf_token() }}">
+                                    <div>
+                                        <label for="building" class="block text-sm font-medium text-gray-700">Fakülte Adı</label>
+                                        <input type="text" id="building" name="building" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                    </div>
+                                    <div>
+                                        <label for="unit" class="block text-sm font-medium text-gray-700">Birim Adı</label>
+                                        <input type="text" id="unit" name="unit" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                    </div>
+                                </form>
+                            </div>
                         </div>
-                    </div>
-                    <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                        <button type="button" id="saveLocationButton" onclick="saveLocation()" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm">Save</button>
-                        <button type="button" id="closeLocationModalButton" onclick="closeLocationModal()" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm">Cancel</button>
+                        <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                            <button type="button" id="saveLocationButton" onclick="saveLocation()" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm">Save</button>
+                            <button type="button" id="closeLocationModalButton" onclick="closeLocationModal()" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm">Cancel</button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <x-bulk-add-modal title="Toplu Ekle" actionClass="locations"></x-bulk-add-modal>
         @endcanany
         <script>
             let editingLocationId = null; // Global variable to store the ID of the location being edited
@@ -194,36 +176,36 @@
             }
 
 
-          function deleteLocation(locationId) {
-              if (confirm('Bu Yer Bilgisini Silmek İstediğinizden Eminmisiniz?')) {
-                  fetch(`/locations/${locationId}`, {
-                      method: 'DELETE',
-                      headers: {
-                          'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                          'Accept': 'application/json'
-                      }
-                  })
-                      .then(response => {
-                          if (!response.ok) {
-                              return response.json().then(errorData => {
-                                  throw new Error(errorData.message || 'Network response was not ok');
-                              });
-                          }
-                          return response.json();
-                      })
-                      .then(data => {
-                          toastr.success(data.message || 'Yer Bilgisi Başarı ile Silindi.');
-                          setTimeout(() => location.reload(), 500);
-                      })
-                      .catch(error => {
-                          toastr.error(error.message || 'Beklenmedik bir hata oluştu.');
-                      });
-              }
+            function deleteLocation(locationId) {
+                if (confirm('Bu Yer Bilgisini Silmek İstediğinizden Eminmisiniz?')) {
+                    fetch(`/locations/${locationId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json'
+                        }
+                    })
+                        .then(response => {
+                            if (!response.ok) {
+                                return response.json().then(errorData => {
+                                    throw new Error(errorData.message || 'Network response was not ok');
+                                });
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            toastr.success(data.message || 'Yer Bilgisi Başarı ile Silindi.');
+                            setTimeout(() => location.reload(), 500);
+                        })
+                        .catch(error => {
+                            toastr.error(error.message || 'Beklenmedik bir hata oluştu.');
+                        });
+                }
 
-          }
+            }
 
 
-          function closeLocationModal() {
+            function closeLocationModal() {
                 document.getElementById('locationModal').classList.add('hidden');
             }
 

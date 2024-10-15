@@ -6,7 +6,8 @@ namespace App\Imports;
 use App\Models\Device;
 use App\Models\DeviceInfo;
 use App\Models\DeviceType;
-use phpDocumentor\Reflection\Location;
+use App\Models\Location;
+use Illuminate\Support\Facades\DB;
 
 class DeviceImport extends  BaseImport
 {
@@ -27,11 +28,9 @@ class DeviceImport extends  BaseImport
             ],
             'model' => [
                 'required',
-                'string',
             ],
             'brand' => [
                 'required',
-                'string',
             ],
             'port_number' => [
                 'required_if:type,switch', // 'port_number' is required if 'type' is 'switch'
@@ -72,7 +71,7 @@ class DeviceImport extends  BaseImport
              * **/
             'ip_address' => [
                 'nullable',
-                'string',
+                'ipv4',
             ],
             'description' => [
                 'nullable',
@@ -80,36 +79,40 @@ class DeviceImport extends  BaseImport
             ],
             'block' => [
                 'nullable',
-                'string',
             ],
             'floor' => [
                 'nullable',
-                'string',
             ],
             'room_number' => [
                 'nullable',
-                'string',
             ],
         ];
     }
 
     protected function processRow(array $row)
     {
-        try {
+
             $deviceType = DeviceType::where('type', $row['type'])
                 ->where('brand', $row['brand'])
                 ->where('model', $row['model'])
                 ->where('port_number', $row['port_number'])
                 ->first();
+
             if(!$deviceType){
                 $this->fail($row, (array)'Cihaz Tipi Bulunamadı!.');
+                return;
             }
+
             $location = Location::where('building', $row['building'])
                 ->where('unit', $row['unit'])
                 ->first();
+
             if(!$location){
                 $this->fail($row, (array)'Yer Bilgisi Bulunamadı!.');
+                return ;
             }
+        try {
+            DB::beginTransaction(); // Transaction başlat
 
             // Satırı model olarak kaydedelim
             $device = Device::create([
@@ -130,11 +133,12 @@ class DeviceImport extends  BaseImport
                 'floor' => $row['floor'],
                 'room_number' => $row['room_number'],
             ]);
+
+            DB::commit(); // Eğer her şey başarılıysa commit yap
         } catch (\Exception $e) {
             // Diğer hataları tekrar fırlatalım
+            DB::rollBack(); // Hata olursa rollback yap
             $this->fail($row, (array)$e->getMessage());
         }
     }
-
-
 }

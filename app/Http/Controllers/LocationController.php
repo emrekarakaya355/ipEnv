@@ -177,7 +177,7 @@ class LocationController extends Controller
                 // Hatalı kayıtları içeren Excel dosyasını oluştur ve kullanıcıya sun
                 return \Maatwebsite\Excel\Facades\Excel::download(new FailuresExport($failures), 'failed_imports.xlsx');
             }
-            return new SuccessResponse('Kayıtlar Başarı ile aktarıldı.');
+            return new SuccessResponse('Yer Bilgileri Başarı ile aktarıldı.');
         } catch (\Exception $e) {
             // Hata durumunda kullanıcıya bildirim yap
             return new ErrorResponse($e);
@@ -188,7 +188,6 @@ class LocationController extends Controller
         // Filtre kriterlerini al
         $filterCriteria = $request->only(['building', 'unit']);
         // Excel başlıklarını belirle
-
         // BaseExport sınıfını kullanarak export işlemi yap
         return Excel::download(
             new LocationExport(Location::class, $filterCriteria,[]),

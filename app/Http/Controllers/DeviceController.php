@@ -34,31 +34,107 @@ class DeviceController extends Controller
         $this->middleware('permission:update device', ['only' => ['update','edit']]);
         $this->middleware('permission:delete device', ['only' => ['destroy']]);
     }
-
+/*
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request, $type = null)
     {
 
+
         $columns = Device::getColumnMapping();
         $sortColumn = $columns[$request->get('sort', 'created_at')] ?? 'created_at';
         $sortOrder = $request->get('order', 'desc');
         $modelClass = $this->getModelClass($type);
+        $query = $modelClass::query();
+
+        $perPage = $request->get('perPage', 10);
+
+        $this->deviceService->filter($request,$query);
 
         if ($request->ajax()) {
-            $devices = $this->deviceService->search($request, $modelClass);
+            $this->deviceService->search($request, $query);
+            $devices = $query->with('latestDeviceInfo')->sorted()->paginate($perPage);
             return view('devices.partials.device_table', compact('devices','columns'))->render();
         }
-        $devices = $modelClass::with('latestDeviceInfo')
+        $devices = $query->with('latestDeviceInfo')
             ->withoutDepo() // Depoda olanları hariç tutma
-            ->sorted($sortColumn, $sortOrder)
-            ->paginate(10);
+            ->sorted(request('sort', 'created_at'), request('direction', 'desc'))
+            ->paginate($perPage);
+
+
         return view('devices.index', compact('devices','columns'));
+
+/*
+        $device_types = Device::query()
+            ->when(request('type'), function ($query) {
+                return $query->where('type', 'like', '%' . request('type') . '%');
+            })
+            ->when(request('brand'), function ($query) {
+                return $query->where('brand', 'like', '%' . request('brand') . '%');
+            })
+            ->when(request('model'), function ($query) {
+                return $query->where('model', 'like', '%' . request('model') . '%');
+            })
+            ->when(request('port_number'), function ($query) {
+                return $query->where('port_number', 'like', '%' . request('port_number') . '%');
+            })
+            ->orderBy(request('sort', 'type'), request('direction', 'asc')) // Sıralama ekleme
+            ->paginate(10);
+
+        return view('device_types.index', compact('device_types'));*/
     }
 
+/*
+    public function index(Request $request, $type = null)
+    {
+        // Sütunlar ve sıralama işlemleri
+        $columns = Device::getColumnMapping();
+        $sortColumn = $columns[$request->get('sort', 'created_at')] ?? 'created_at';
+        $sortOrder = $request->get('order', 'desc');
+        $modelClass = $this->getModelClass($type);
+        $perPage = $request->get('perPage', 10); // Sayfa başına gösterilecek kayıt sayısı
 
+        // Arama ve filtreleme işlemi
+        $devicesQuery = $modelClass::query()
+            ->with('latestDeviceInfo')
+            ->withoutDepo() // Depoda olanları hariç tutma
+            ->sorted($sortColumn, $sortOrder)
+            ->when($request->get('search'), function ($query, $search) {
+                // Genel arama işlemi
+                return $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', '%' . $search . '%')
+                        ->orWhere('type', 'like', '%' . $search . '%')
+                        ->orWhere('brand', 'like', '%' . $search . '%');
+                });
+            })
+            // Filtreleme işlemleri
+            ->when($request->get('type'), function ($query, $type) {
+                return $query->where('type', $type);
+            })
+            ->when($request->get('brand'), function ($query, $brand) {
+                return $query->where('brand', 'like', '%' . $brand . '%');
+            })
+            ->when($request->get('model'), function ($query, $model) {
+                return $query->where('model', 'like', '%' . $model . '%');
+            })
+            ->when($request->get('port_number'), function ($query, $port_number) {
+                return $query->where('port_number', 'like', '%' . $port_number . '%');
+            });
 
+        if ($request->ajax()) {
+            $devices = $devicesQuery->paginate($perPage);
+
+            return view('devices.partials.device_table', compact('devices', 'columns'))->render();
+        }
+
+        // Sayfalandırılmış sonuçlar
+        $devices = $devicesQuery->paginate($perPage);
+
+        return view('devices.index', compact('devices', 'columns'));
+    }
+
+*/
     public function create()
     {
         $locations = Location::all()->sortBy(['faculty']);
@@ -189,7 +265,6 @@ class DeviceController extends Controller
             $import = new DeviceImport();
             $import->import($file);
 
-
             if (!empty($import->getFailures())) {
                 return $import->exportFailures(); // Ensure this is returned
             }
@@ -204,12 +279,13 @@ class DeviceController extends Controller
     {
 
         // Filtre kriterlerini al
-        $filterCriteria = $request->only(['serial_number']);
-        //$filterCriteria = $request->only(['type', 'model', 'brand', 'port_number', 'building', 'unit', 'serial_number', 'registry_number', 'device_name', 'ip_address', 'description', 'block', 'floor', 'room_number']);
+        //$filterCriteria = $request->only(['serial_number']);
+        $filterCriteria = $request->only(['type', 'model', 'brand', 'port_number', 'building', 'unit', 'serial_number', 'registry_number', 'device_name', 'ip_address', 'description', 'block', 'floor', 'room_number']);
+        $selectedColumns = $request->get('columns', Device::getColumnMapping() );
         try {
             return Excel::download(
-                new DeviceExport(Device::class, $filterCriteria,[]),
-                'device_types.xlsx'
+                new DeviceExport(Device::class, $filterCriteria,[],$selectedColumns),
+                'devices.xlsx'
             );
         }catch (\Exception $e){
             return new ErrorResponse($e);

@@ -2,26 +2,49 @@
 namespace App\Exports;
 
 use App\Models\Device;
+use App\Services\DeviceService;
 
 class DeviceExport extends BaseExport
 {
-    /**
-     * Override the query method for the Device model.
-     */
+
+/*
     public function query()
     {
-        $query = Device::query();
+        // Mevcut search() fonksiyonunu kullanarak sorgu oluştur
+        $modelInstance = new $this->model();
+        $query = $modelInstance->newQuery();
 
-        // Apply filter criteria if available
-        if (!empty($this->filterCriteria)) {
-            foreach ($this->filterCriteria as $field => $value) {
-                if (!empty($value)) {
-                    $query->where($field, $value);
-                }
+        // request ve gerekli parametreleri alarak search metodunu çağırıyoruz
+        (new DeviceService())->filter(request(), $query);
+        // Dışa aktarım için 'selected_columns' parametresini al
+        $selectedColumns = request()->get('selected_columns');
+
+        if ($selectedColumns) {
+            // Seçilen sütunları diziye dönüştür
+            $columnsArray = json_decode($selectedColumns, true);
+
+            // Eğer sütun dizisi geçerliyse, sorguya sadece bu sütunları ekle
+            if (is_array($columnsArray)) {
+
+                $query->select($columnsArray);
+
             }
         }
-        return $query;
+        dd($query->toSql());
+        // Verilerin dışa aktarımı için pagination yerine düz get() kullanıyoruz
+        return $query;  // Dışa aktarım için verileri al
+    }*/
+    public function query()
+    {
+        // Mevcut search() fonksiyonunu kullanarak sorgu oluştur
+        $modelInstance = new $this->model();
+        $query = $modelInstance->newQuery();
+
+        // request ve gerekli parametreleri alarak search metodunu çağırıyoruz
+        (new DeviceService())->filter(request(), $query);
+        return $query;  // Dışa aktarım için verileri al
     }
+
 
     /**
      * Mapping the data for custom output.
@@ -31,24 +54,34 @@ class DeviceExport extends BaseExport
      */
     public function map($device): array
     {
-        // Format the date and fetch related 'created by' user
-        return [
 
-            'Location' => optional($device->latestDeviceLocation)->building ?? 'N/A',
-            'Unit' => optional($device->latestDeviceLocation)->unit ?? 'N/A',
-            'Type' => $device->type ?? 'N/A',
-            'Model' => optional($device->deviceType)->model ?? 'N/A',
-            'Brand' => optional($device->deviceType)->brand ?? 'N/A',
-            'Port Number' => $device->port_number ?? 'N/A',
-            'Serial Number' => $device->serial_number ?? 'N/A',
-            'Registry Number' => $device->registry_number ?? 'N/A',
-            'Ip_address' => optional($device->latestDeviceInfo)->ip_address ?? 'N/A',
-            'Device Name' => $device->device_name ?? 'N/A',
-            'Status' => $device->status->value ?? 'N/A',
-            'Created Date' => $device->created_at->format('d-M-Y'),
-            'Created By' => optional($device->createdBy)->name ?? 'N/A',
+        // Seçilen sütunları al
+        $selectedColumns = json_decode(request()->get('selected_columns'), true);
+        // Varsayılan değerleri belirle
+        // Her zaman görünmesini istediğiniz sütunları ekle
+        $alwaysVisibleColumns = ['created Date', 'created By'];
 
+        // Seçilen sütunlara bu sütunları ekle
+        $selectedColumns = array_merge($selectedColumns, $alwaysVisibleColumns);
+
+        $data =  [
+            'building' => optional($device->latestDeviceLocation)->building ?? 'N/A',
+            'unit' => optional($device->latestDeviceLocation)->unit ?? 'N/A',
+            'type' => $device->type ?? 'N/A',
+            'brand' => optional($device->deviceType)->brand ?? 'N/A',
+            'model' => optional($device->deviceType)->model ?? 'N/A',
+            'port Number' => $device->port_number ?? 'N/A',
+            'serial Number' => $device->serial_number ?? 'N/A',
+            'registry Number' => $device->registry_number ?? 'N/A',
+            'ip_address' => optional($device->latestDeviceInfo)->ip_address ?? 'N/A',
+            'device Name' => $device->device_name ?? 'N/A',
+            'status' => $device->status->value ?? 'N/A',
+            'created Date' => $device->created_at->format('d-M-Y'),
+            'created By' => optional($device->createdBy)->name ?? 'N/A',
         ];
+
+        // Sadece seçilen sütunları döndür
+        return array_intersect_key($data, array_flip($selectedColumns));
     }
 
     /**
@@ -58,22 +91,34 @@ class DeviceExport extends BaseExport
      */
     public function headings(): array
     {
-        return [
+        // Seçilen sütunları al
+        $selectedColumns = json_decode(request()->get('selected_columns'), true);
 
-            'Building',
-            'Unit',
-            'Type',
-            'Model',
-            'Brand',
-            'Port Number',
-            'Serial Number',
-            'Registry Number',
-            'Device Name',
-            'Ip_address',
-            'Status',
-            'Created Date',
-            'Created By',
+        // Her zaman görünmesini istediğiniz sütunları ekle
+        $alwaysVisibleColumns = ['created Date', 'created By'];
+
+        // Seçilen sütunlara bu sütunları ekle
+        $selectedColumns = array_merge($selectedColumns, $alwaysVisibleColumns);
+
+        // Tüm olası başlıklar
+        $allHeadings = [
+            'building' => 'Bina',
+            'unit' => 'Birim',
+            'type' => 'Cihaz Tipi',
+            'brand' => 'Marka',
+            'model' => 'Model',
+            'port Number' => 'Port Numarası',
+            'serial Number' => 'Seri Numarası',
+            'registry Number' => 'Sicil Number',
+            'ip_address' => 'İp Adresi',
+            'device Name' => 'Cihaz Name',
+            'status' => 'Durumu',
+            'created Date' => 'Oluşturma Tarihi',
+            'created By' => 'Oluşturan Kişi',
         ];
+
+        // Sadece seçilen sütunların başlıklarını döndür
+        return array_intersect_key($allHeadings, array_flip($selectedColumns));
     }
 }
 

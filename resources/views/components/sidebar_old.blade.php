@@ -34,27 +34,20 @@
             >
                 <i class="bi bi-chat-left-text-fill"></i>
                 <div class="flex justify-between w-full items-center">
-                    <a href="/devices" class="w-1 p-2.5 mt-3 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-blue-600 text-white">
-                         Cihazlar
+                    <a href="{{ route('devices.index') }}" class="w-full p-3 flex items-center rounded-md">
+                        Cihazlar
                     </a>
                     <span class="text-sm rotate-180" id="arrow">
-                    <i class="bi bi-chevron-down"></i>
-                </span>
+            <i class="bi bi-chevron-down"></i>
+        </span>
                 </div>
             </div>
             <div
                 class="text-left text-sm mt-2 w-4/5 mx-auto text-gray-200 font-bold"
                 id="submenu"
             >
-
-                <a href="{{ route('devices.index.type', ['type' => 'switches']) }}" class="block p-2 hover:bg-blue-600 rounded-md mt-1">
-                    Switchler
-                </a>
-                <a href="{{ route('devices.index.type', ['type' => 'ap']) }}" class="block p-2 hover:bg-blue-600 rounded-md mt-1">
-                    Access Pointler
-                </a>
                 @can('view deviceInfo')
-                    <a href="/devices/orphans" class="block p-2 hover:bg-blue-600 rounded-md mt-1">
+                    <a href="/devices/orphans" class="block p-3 hover:bg-blue-600 rounded-md px-3">
                         Öksüz cihazlar
                     </a>
                 @endcan

@@ -7,11 +7,22 @@
     document.getElementById('searchInput').addEventListener('input', function() {
         const form = document.getElementById('searchForm');
         const formData = new FormData(form);
+
+        // Filtre inputlarını al
+        const filterInputs = document.querySelectorAll('.filter-input-container input');
+        filterInputs.forEach(input => {
+            if (input.value) {
+                formData.append(input.name, input.value); // Filtre değerlerini de FormData'ya ekle
+            }
+        });
+
         const searchParams = new URLSearchParams(formData).toString();
 
         fetch(`?${searchParams}`, {
             headers: {
                 'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json',
+
             }
         })
             .then(response => response.text())
@@ -46,6 +57,7 @@
             })
                 .then(response => response.text())
                 .then(html => {
+
                     console.log("html",html);
                     const parser = new DOMParser();
                     const doc = parser.parseFromString(html, 'text/html');

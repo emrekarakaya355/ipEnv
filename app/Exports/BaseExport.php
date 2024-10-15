@@ -54,6 +54,7 @@ abstract class BaseExport implements FromQuery, FromArray, WithMapping, WithHead
 
         return []; // Return empty if model doesn't exist
     }
+
     /**
      * Abstract method to be implemented by child classes
      */
@@ -75,8 +76,10 @@ abstract class BaseExport implements FromQuery, FromArray, WithMapping, WithHead
                 }
             }
         }
+
         return $query;
     }
+
     /**
      * Returns data as an array if provided.
      */
@@ -85,7 +88,6 @@ abstract class BaseExport implements FromQuery, FromArray, WithMapping, WithHead
         if (!empty($this->data)) {
             return $this->data;
         }
-
         return [];
     }
 

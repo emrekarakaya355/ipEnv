@@ -70,10 +70,144 @@ class DeviceService
             return new SuccessResponse('Cihaz Başarı İle Update Edildi.',['data' => $device->id]);
         });
     }
-    public function search(Request $request, $type): LengthAwarePaginator
+
+    public function filter(Request $request,$query){
+           $query
+           ->when(request('device_name'), function ($query) {
+               if (canView('view-device_name')) {
+                   return $query->where('device_name', 'like', '%' . request('device_name') . '%');
+               }
+               return $query;
+           })
+               ->when(request('type'), function ($query) {
+                   if (canView('view-type')) {
+                       return $query->where('type', 'like', '%' . request('type') . '%');
+                   }
+                   return $query;
+               })
+               ->when(request('serial_number'), function ($query) {
+                   if (canView('view-serial_number')) {
+                       return $query->where('serial_number', 'like', '%' . request('serial_number') . '%');
+                   }
+                   return $query;
+               })
+               ->when(request('registry_number'), function ($query) {
+                   if (canView('view-registry_number')) {
+                       return $query->where('registry_number', 'like', '%' . request('registry_number') . '%');
+                   }
+                   return $query;
+               })
+               ->when(request('status'), function ($query) {
+                   if (canView('view-status')) {
+                       return $query->where('status', 'like', '%' . request('status') . '%');
+                   }
+                   return $query;
+               })
+
+               ->when(request('building') || request('ip_address') || request('description') || request('unit'), function ($query) {
+                   if (canView('view-building') || canView('view-ip_address') || canView('view-description') || canView('view-unit')) {
+                       return $query->WhereHas('latestDeviceInfo.location', function ($q) {
+                           $q
+                               ->when(canView('view-building') && request('building'), function ($q) {
+                               return $q->where('building', 'like', '%' . request('building') . '%');
+                           })
+                               ->when(canView('view-ip_address') && request('ip_address'), function ($q) {
+                                   return $q->Where('ip_address', 'like', '%' . request('ip_address') . '%');
+                               })
+                               ->when(canView('view-description') && request('description'), function ($q) {
+                                   return $q->Where('description', 'like', '%' . request('description') . '%');
+                               })
+                               ->when(canView('view-unit') && request('unit'), function ($q) {
+                                   return $q->Where('unit', 'like', '%' . request('unit') . '%');
+                               });
+                       });
+                   }
+                   return $query;
+               })
+               ->when(request('model') || request('brand'), function ($query) {
+                   if (canView('view deviceType')) {
+                       return $query->WhereHas('deviceType', function ($q) {
+                           $q->when(request('model'), function ($q) {
+                               return $q->where('model', 'like', '%' . request('model') . '%');
+                           })
+                               ->when(request('brand'), function ($q) {
+                                   return $q->Where('brand', 'like', '%' . request('brand') . '%');
+                               });
+                       });
+                   }
+                   return $query;
+               });
+
+                   /*
+            $query->where(function ($query) use ($request) {
+                $firstConditionAdded = false;
+                if (canView('view-device_name')) {
+                    $query->where('device_name', 'like', '%' . request('device_name') . '%');
+                    $firstConditionAdded = true;
+                }
+                if (canView('view-type')) {
+                    $firstConditionAdded
+                        ? $query->orWhere('type', 'like', '%' . request('type') . '%')
+                        : $query->where('type', 'like', '%' . request('type') . '%');
+                    $firstConditionAdded = true;
+                }
+                if (canView('view-serial_number')) {
+                    $firstConditionAdded
+                        ? $query->orWhere('serial_number', 'like', '%' . request('serial_number') . '%')
+                        : $query->where('serial_number', 'like', '%' . request('serial_number') . '%');
+                    $firstConditionAdded = true;
+                }
+                if (canView('view-building') || canView('view-ip_address') || canView('view-description')|| canView('view-unit')) {
+                    $query->orWhereHas('latestDeviceInfo.location', function ($q) use ($query
+                        , &$firstConditionAdded) {
+                        $q->where(function ($q) use ($query, &$firstConditionAdded) {
+                            if (canView('view-building')) {
+                                $firstConditionAdded
+                                    ? $q->orWhere('building', 'like', '%' . request('building') . '%')
+                                    : $q->where('building', 'like', '%' . request('building') . '%');
+                                $firstConditionAdded = true;
+                            }
+
+                            if (canView('view-ip_address')) {
+                                $firstConditionAdded
+                                    ? $q->orWhere('ip_address', 'like', '%' . request('ip_address') . '%')
+                                    : $q->where('ip_address', 'like', '%' . request('ip_address') . '%');
+                                $firstConditionAdded = true;
+                            }
+
+                            if (canView('view-description')) {
+                                $firstConditionAdded
+                                    ? $q->orWhere('description', 'like', '%' . request('description') . '%')
+                                    : $q->where('description', 'like', '%' . request('description') . '%');
+                                $firstConditionAdded = true;
+                            }
+                            if (canView('view-unit')) {
+                                $firstConditionAdded
+                                    ? $q->orWhere('unit', 'like', '%' . request('unit') . '%')
+                                    : $q->where('unit', 'like', '%' . request('unit') . '%');
+                                $firstConditionAdded = true;
+                            }
+                        });
+                    });
+                }
+
+                if (canView('view-device_type')) {
+                    $query->orWhereHas('deviceType', function ($q) use ($search, &$firstConditionAdded) {
+                        $q->where(function($q) use ($search, &$firstConditionAdded) {
+                            $firstConditionAdded
+                                ? $q->orWhere('model', 'like', '%' . request('model') . '%')
+                                : $q->where('model', 'like', '%' . request('model') . '%');
+                            $q->orWhere('brand', 'like', '%' . request('brand') . '%');
+                        });
+                        $firstConditionAdded = true;
+                    });
+                }
+            });*/
+    }
+
+    public function search(Request $request, $query)
     {
         $search = $request->input('search');
-        $query = $type::query();
 
         if ($search) {
             $query->where(function ($query) use ($search) {
@@ -141,8 +275,6 @@ class DeviceService
                 }
             });
         }
-
-        return $query->with('latestDeviceInfo')->sorted()->paginate(10);
     }
 
 

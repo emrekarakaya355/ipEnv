@@ -56,6 +56,7 @@ class SuccessResponse implements Responsable
             }
             // Eğer routeName belirtilmişse redirect et, belirtilmemişse bir önceki sayfaya yönlendir
             return back()->with([
+
                 'success' => $this->message,
                 'data' => $this->data,
             ]);

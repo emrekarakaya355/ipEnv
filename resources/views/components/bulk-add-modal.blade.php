@@ -7,6 +7,7 @@
                     <h3 class="text-lg" id="bulkAddModalLabel">{{ $title }}</h3>
                     <x-primary-button onclick="window.location.href='{{ url($actionClass . '/template/download') }}'">Şablonu İndir</x-primary-button>
                 </div>
+                {{$actionClass}}
                 <div class="mt-4">
                     <form id="bulkAddForm" action="{{ url('/'.$actionClass . '/import') }}" method="post" enctype="multipart/form-data">
                         @csrf
@@ -38,35 +39,43 @@
             method: 'POST',
             body: formData,
             headers: {
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json' // JSON yanıtı bekliyoruz
+
             }
         })
             .then(response => {
                 if (response.ok) {
                     // Eğer dönen içerik bir Excel dosyasıysa
-                    return response.blob();
+                    const contentType = response.headers.get('content-type');
+                    if (contentType.includes('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')) {
+                        return response.blob();
+                    } else {
+                        return response.json(); // Başarılı JSON yanıtı bekleniyor
+                    }
                 } else {
                     return response.json().then(data => {
                         throw new Error(data.message);
                     });
                 }
             })
-            .then(blob => {
-                if (confirm('Hatalı kayıtlar var. İndirmek ister misiniz?')) {
-
-                    const url = window.URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = 'failed_imports.xlsx'; // İndirilecek dosya ismi
-                    document.body.appendChild(a);
-                    a.click();
-                    a.remove();
-
-                    // Modalı kapat
-                    closeBulkAddModal();
-                }else{
-                    closeBulkAddModal();
-
+            .then(dataOrBlob => {
+                if (dataOrBlob instanceof Blob) {
+                    // Eğer bir Excel dosyası döndü ise
+                    if (confirm('Hatalı kayıtlar var. İndirmek ister misiniz?')) {
+                        const url = window.URL.createObjectURL(dataOrBlob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = 'failed_imports.xlsx'; // Dosya adı
+                        document.body.appendChild(a);
+                        a.click();
+                        a.remove();
+                        closeBulkAddModal();
+                    }
+                } else {
+                    // Başarı mesajı var ise bunu gösterebilirsiniz
+                    toastr.success(dataOrBlob.message || 'Başarı ile kaydedildi.');
+                    closeBulkAddModal(); // Modalı kapatma
                 }
             })
             .catch(error => {
