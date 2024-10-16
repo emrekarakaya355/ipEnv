@@ -236,6 +236,7 @@ class Device extends Model implements Auditable
         return $this->hasMany(Device::class, 'parent_device_id');
     }
 
+
     public function scopeSorted($query, $sortColumn = 'created_at', $sortOrder = 'desc')
     {
 
@@ -254,11 +255,10 @@ class Device extends Model implements Auditable
 
         $column = $validColumns[$sortColumn] ?? 'created_at';
         // İlişkilendirilmiş tablolarda sıralama yapmak için join işlemi
-        if (strpos($column, '.') !== false) {
+        if (str_contains($column, '.')) {
             list($table, $column) = explode('.', $column);
 
             if ($table === 'locations') {
-
                 return $query->join('device_infos', 'device_infos.device_id', '=', 'devices.id')
                     ->join('locations', 'locations.id', '=', 'device_infos.location_id')
                     ->orderBy('locations.' . $column, $sortOrder);
@@ -274,8 +274,34 @@ class Device extends Model implements Auditable
 
         // Diğer sütunlar için doğrudan sıralama
         return $query->orderBy($column, $sortOrder);
-    }
+    }/*
+    public function scopeSorted($query, $sortColumn = 'created_at', $sortOrder = 'desc')
+    {
+        // Sıralama yapılacak sütunlar
+        $validColumns = [
+            'building' => 'locations.building',
+            'unit' => 'locations.unit',
+            'block' => 'device_infos.block',
+            'floor' => 'device_infos.floor',
+            'description' => 'device_infos.description',
+            'room_number' => 'device_infos.room_number',
+            'ip_address' => 'device_infos.ip_address',
+            'brand' => 'device_types.brand',
+            'model' => 'device_types.model',
+        ];
 
+        // İlgili tabloları bir defada join yapıyoruz
+        $query->join('device_infos', 'device_infos.device_id', '=', 'devices.id')
+            ->join('locations', 'locations.id', '=', 'device_infos.location_id')
+            ->join('device_types', 'device_types.id', '=', 'devices.device_type_id');
+
+        // Eğer sıralama yapılacak sütun geçerli değilse 'created_at' kullan
+        $column = $validColumns[$sortColumn] ?? 'created_at';
+
+        // Sıralama işlemi
+        return $query->orderBy($column, $sortOrder);
+    }
+*/
     /**
      * @throws Exception
      */

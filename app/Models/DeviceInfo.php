@@ -36,6 +36,7 @@ class DeviceInfo extends Model implements Auditable
             $model->isDeleted = true;
             $model->save();
         });
+
         static::saving(function ($model) {
             // Aynı IP adresine sahip silinmemiş (soft deleted olmayan) bir kayıt olup olmadığını kontrol et
             $existingDevice = static::where('ip_address', $model->ip_address)
