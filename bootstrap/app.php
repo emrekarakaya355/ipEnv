@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Responses\ErrorResponse;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -33,13 +34,13 @@ return Application::configure(basePath: dirname(__DIR__))
             if ($exception instanceof \App\Exceptions\ModelNotFoundException || $exception instanceof \Symfony\Component\HttpKernel\Exception\NotFoundHttpException) {
                 return response()->view('errors.404', [], 404);
             }
+            if($exception instanceof \Illuminate\Validation\ValidationException){
+                return new \App\Http\Responses\ValidatorResponse($exception->validator);
+            }
             if ($exception instanceof \App\Exceptions\CustomException) {
-                return (new \App\Http\Responses\ErrorResponse($exception));
+                return new ErrorResponse($exception);
             }
 
-            //return parent::render($request, $exception);
-
-            // Diğer tüm durumlarda genel bir hata sayfası döndür
             return response()->view('errors.error', ['exception' => $exception]);
         });
 

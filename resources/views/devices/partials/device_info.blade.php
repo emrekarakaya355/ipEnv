@@ -159,11 +159,12 @@
 @can('view-device_family')
 {{-- Altta Solda Bağlı Olan Cihazlar ve Sağda Çocuk Cihazlar --}}
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8  ">
+
     <!-- Parent Switch Alanı -->
-    <div class="mb-6">
-        <label for="parent_device_id" class="block text-sm font-medium text-gray-700">Parent Switch</label>
+    <div class="bg-white shadow-md rounded-xl p-6">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">Bağlı Olduğu Switch</h2>
         <a href="{{ $device->parentDevice ? '/devices/' . $device->parentDevice->id : '#' }}"
-           class="flex items-center p-4 border rounded-lg border-gray-300 bg-gray-50 mt-1"
+           class="flex items-center p-2  rounded-lg border-gray-300"
             {{ !$device->parentDevice ? 'style="pointer-events: none; cursor: default;"' : '' }}>
             <div class="flex-1">
                 <!-- Bilgileri göstermek için div -->
@@ -358,7 +359,6 @@
                             });
 
                             $("#confirmationButtonNo").click(function () {
-                                // Kullanıcı "Hayır"e tıkladı, Toastr mesajı kapatılsın
                                 toastr.clear(toast, {force: true});
                             });
                         },

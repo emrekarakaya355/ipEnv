@@ -9,12 +9,19 @@
             <h3 class="text-xl font-semibold mb-4">Sütunları Seç</h3>
             <form id="columnSelectionForm">
                 @foreach ($columns as $header => $column)
-                    <div class="mb-2">
+                    @if (canView('view-' . strtolower($column)))
+                    <div class="mb-2 flex justify-between">
                         <label>
                             <input type="checkbox" class="column-checkbox" name="columns[]" value="{{ $column }}" checked>
                             {{ $header }}
                         </label>
+                        <!-- Yukarı ve aşağı butonları -->
+                        <div class="flex space-x-2">
+                            <button type="button" class="move-up bg-gray-200 p-1 rounded-md">⬆️</button>
+                            <button type="button" class="move-down bg-gray-200 p-1 rounded-md">⬇️</button>
+                        </div>
                     </div>
+                    @endif
                 @endforeach
                     <!-- Gizli inputlar burada oluşturulacak -->
                     <input type="hidden" name="selected_columns" id="selectedColumnsInput" value="">

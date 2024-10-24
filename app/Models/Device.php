@@ -3,6 +3,9 @@
 namespace App\Models;
 
 use App\Enums\DeviceStatus;
+use App\Exceptions\ConflictException;
+use App\Exceptions\DeviceCreationException;
+use App\Exceptions\PortConflictException;
 use App\Http\Responses\ErrorResponse;
 use App\Http\Responses\SuccessResponse;
 use Exception;
@@ -64,22 +67,23 @@ class Device extends Model implements Auditable
 
         static::saving(function ($model) {
             if ($model->parent_device_id) {
-                if (!$model->parent_device_port) {
-                    throw new \Exception('Port numarasını girmek zorundasınız.');
-                }
+
+                /*if (!$model->parent_device_port) {
+                    //throw new \Exception('Port numarasını girmek zorundasınız.');
+                }*/
                 $parentDevice = self::find($model->parent_device_id);
 
                 if($parentDevice === null) return;
 
                 if ( $parentDevice->deviceType->type == 'access_point') {
-                    throw new \Exception('Access Point parent olarak seçilemez');
+                    throw new DeviceCreationException('Access Point parent olarak seçilemez');
                 }
-                if ($model->parent_device_port > $parentDevice->deviceType->port_number) {
-                    throw new \Exception('Seçtiğiniz cihaz '.$parentDevice->deviceType->port_number.' adet porta sahiptir. Lütfen bu sayıdan küçük bir değer giriniz.');
+                if ( $model->parent_device_port > $parentDevice->deviceType->port_number) {
+                    throw new ConflictException('Seçtiğiniz cihaz '.$parentDevice->deviceType->port_number.' adet porta sahiptir. Lütfen bu sayıdan küçük bir değer giriniz.');
                 }
                 foreach ($parentDevice->connectedDevices as $connectedDevice) {
                    if ($connectedDevice->parent_device_port == $model->parent_device_port && $connectedDevice->id != $model->id ) {
-                       throw new \Exception('Bu port '.$connectedDevice->latest_deviced_info->ip_address.' ip adresine sahip cihaz tarafından kullanılıyor');
+                       throw new PortConflictException('Bu port '.$connectedDevice->latestDeviceInfo?->ip_address.' ip adresine sahip cihaz tarafından kullanılıyor' );
                    }
                 }
             }
@@ -107,7 +111,7 @@ class Device extends Model implements Auditable
             'access_point' => AccessPoint::class,
         ];
 
-        return $types[$type] ?? self::class;
+        return $types[ strtolower($type)] ?? self::class;
     }
     public function deviceInfos(): HasMany
     {
@@ -239,7 +243,6 @@ class Device extends Model implements Auditable
 
     public function scopeSorted($query, $sortColumn = 'created_at', $sortOrder = 'desc')
     {
-
         // Sıralama yapılacak sütunlar
         $validColumns = [
             'building' => 'locations.building',
@@ -251,24 +254,47 @@ class Device extends Model implements Auditable
             'ip_address' => 'device_infos.ip_address',
             'brand' => 'device_types.brand',
             'model' => 'device_types.model',
+            'port_number' => 'device_types.port_number',
+            'type' => 'device_types.type',
+            'status' => 'status',
         ];
 
         $column = $validColumns[$sortColumn] ?? 'created_at';
+
         // İlişkilendirilmiş tablolarda sıralama yapmak için join işlemi
         if (str_contains($column, '.')) {
             list($table, $column) = explode('.', $column);
-
             if ($table === 'locations') {
-                return $query->join('device_infos', 'device_infos.device_id', '=', 'devices.id')
-                    ->join('locations', 'locations.id', '=', 'device_infos.location_id')
-                    ->orderBy('locations.' . $column, $sortOrder);
+                return $query
+                    ->has('latestDeviceInfo')  // latestDeviceInfo ilişkisini kullanarak sorgulama yapar
+                    ->orderBy(
+                        DeviceInfo::select('locations.' . $column)  // locations tablosundaki dinamik bir sütuna göre sıralama yapar
+                        ->join('locations', 'locations.id', '=', 'device_infos.location_id')  // latestDeviceInfo ile locations'u birleştirir
+                        ->whereColumn('device_infos.device_id', 'devices.id')  // device_id ile devices.id eşleşmesini sağlar
+                        ->orderBy('locations.' . $column, $sortOrder)  // İstediğiniz sıralama düzeni (asc/desc)
+                        ->limit(1)  // Her cihaz için en yeni veriyi al
+                        , $sortOrder  // Dış sıralama yönü
+                    );
             } elseif ($table === 'device_infos') {
-                return $query->join('device_infos', 'device_infos.device_id', '=', 'devices.id')
-                    ->orderBy('device_infos.' . $column, $sortOrder);
+                return($query
+                    ->has('latestDeviceInfo')  // latestDeviceInfo ilişkisini kullanarak sorgulama yapar
+                    ->orderBy(
+                        DeviceInfo::select($column)  // latestDeviceInfo'daki 'building' sütununa göre sıralama
+                        ->whereColumn('device_infos.device_id', 'devices.id')  // device_id ile devices.id eşleşmesini sağla
+                        ->orderBy($column, $sortOrder)  // İstediğiniz sıralama düzeni
+                        ->limit(1)  // Her cihaz için bir tane en yeni veriyi al
+                        ,$sortOrder
+                    ));
             } elseif ($table === 'device_types') {
 
-                return $query->join('device_types', 'device_types.id', '=', 'devices.device_type_id')
-                    ->orderBy('device_types.' . $column, $sortOrder);
+                return $query
+                    ->orderBy(
+                        DeviceType::select( $column)  // locations tablosundaki dinamik bir sütuna göre sıralama yapar
+                        ->whereColumn('device_types.id', 'device_type_id')  // device_id ile devices.id eşleşmesini sağlar
+                        ->orderBy($column, $sortOrder)  // İstediğiniz sıralama düzeni (asc/desc)
+                        ->limit(1)  // Her cihaz için en yeni veriyi al
+                        , $sortOrder  // Dış sıralama yönü
+                    );
             }
         }
 
@@ -331,14 +357,16 @@ class Device extends Model implements Auditable
     public static function getColumnMapping()
     {
         return [
-            'Bina' => 'building',
-            'Birim' => 'unit',
             'Cihaz Tipi' => 'type',
-            'Marka' => 'brand',
-            'Model' => 'model',
-            'Seri Numarası' => 'serial_number',
             'Cihaz İsmi' => 'device_name',
             'IP Adresi' => 'ip_address',
+            'Seri No' => 'serial_number',
+            'Sicil No' => 'registry_number',
+            'Bina' => 'building',
+            'Birim' => 'unit',
+            'Marka' => 'brand',
+            'Model' => 'model',
+            'Port' => 'port_number',
             'Durum' => 'status',
         ];
     }

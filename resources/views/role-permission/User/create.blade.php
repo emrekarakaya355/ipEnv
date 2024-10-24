@@ -28,6 +28,10 @@
                                 <label for="">Name</label>
                                 <input type="text" name="name" id="name" class="form-control ml-7" value="{{old('name')}}" />
                             </div>
+                            <div class="mb-3">
+                                <label for="">Username</label>
+                                <input type="text" name="username" id="username" class="form-control ml-5" value="{{old('username')}}" />
+                            </div>
 
                             <div class="mb-3">
                                 <label for="email">Email</label>

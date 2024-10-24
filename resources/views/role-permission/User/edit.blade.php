@@ -26,6 +26,14 @@
                                        readonly/>
                                 @error('name') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
+                            <div class="mb-3">
+                                <label for="">Username</label>
+                                <input type="text"
+                                       class="form-control ml-7"
+                                       value="{{ $user->username }}"
+                                       readonly/>
+                                @error('username') <span class="text-danger">{{ $message }}</span> @enderror
+                            </div>
 
                             <div class="mb-3">
                                 <label for="email">Email</label>

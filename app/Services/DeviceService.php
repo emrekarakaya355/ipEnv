@@ -43,7 +43,7 @@ class DeviceService
             $this->fillDevice($deviceValidated,$device);
             $deviceInfo = $this->fillDeviceInfo($deviceValidated,$device);
             if (!$device->isDirty() and !$deviceInfo->isDirty()) {
-                if ($deviceValidated['description'] !== null){ // eğer sadece açıklama değişti ise update ediliyor yeni info eklenmiyor.
+                if ($deviceValidated['description'] !== null){ //eğer sadece açıklama değişti ise update ediliyor yeni info eklenmiyor.
                     $deviceInfo->update(['description' => $deviceValidated['description']]);
 
                     return new SuccessResponse('Açıklama Update Edildi.',['data' => $deviceInfo->id]);
@@ -124,7 +124,7 @@ class DeviceService
                    }
                    return $query;
                })
-               ->when(request('model') || request('brand'), function ($query) {
+               ->when(request('model') || request('brand')|| request('port_number'), function ($query) {
                    if (canView('view deviceType')) {
                        return $query->WhereHas('deviceType', function ($q) {
                            $q->when(request('model'), function ($q) {
@@ -132,6 +132,9 @@ class DeviceService
                            })
                                ->when(request('brand'), function ($q) {
                                    return $q->Where('brand', 'like', '%' . request('brand') . '%');
+                               })
+                               ->when(request('port_number'), function ($q) {
+                                   return $q->Where('port_number', 'like', '%' . request('port_number') . '%');
                                });
                        });
                    }
@@ -305,8 +308,6 @@ class DeviceService
              'room_number' => $deviceValidated['room_number'] ?? null,
              'description' => $deviceValidated['description'] ?? null,
          ]);
-
-
 
     }
     /**

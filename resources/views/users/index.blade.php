@@ -9,7 +9,7 @@
             <table class="min-w-full bg-white">
                 <thead>
                 <tr class="bg-gray-100 text-gray-700">
-                    @foreach (['İsim', 'Email', 'Hesap Açılma Tarihi', 'Roller'] as $header)
+                    @foreach (['İsim','Username', 'Email', 'Hesap Açılma Tarihi', 'Roller'] as $header)
                         <th class="py-3 px-4 text-left">
                             {{ $header }}
                         </th>
@@ -20,7 +20,7 @@
                 <tbody class="text-gray-700" id="deviceTableBody">
                 @foreach ($users as $user)
                     <tr class="border-b border-gray-200 cursor-pointer" onclick="window.location='{{ route('users.show', $user->id) }}'">
-                        @foreach (['name', 'email', 'created_at'] as $field)
+                        @foreach (['name', 'username','email', 'created_at'] as $field)
                             <td class="py-3 px-4">{{ $user->$field }}</td>
                         @endforeach
 

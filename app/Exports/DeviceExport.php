@@ -42,7 +42,8 @@ class DeviceExport extends BaseExport
 
         // request ve gerekli parametreleri alarak search metodunu çağırıyoruz
         (new DeviceService())->filter(request(), $query);
-        return $query;  // Dışa aktarım için verileri al
+        return $query->sorted(request('sort', 'created_at'), request('direction', 'desc'))
+            ;  // Dışa aktarım için verileri al
     }
 
 
@@ -70,16 +71,15 @@ class DeviceExport extends BaseExport
             'type' => $device->type ?? 'N/A',
             'brand' => optional($device->deviceType)->brand ?? 'N/A',
             'model' => optional($device->deviceType)->model ?? 'N/A',
-            'port Number' => $device->port_number ?? 'N/A',
-            'serial Number' => $device->serial_number ?? 'N/A',
-            'registry Number' => $device->registry_number ?? 'N/A',
+            'port_number' => optional($device->deviceType)->port_number ?? 'N/A',
+            'serial_number' => $device->serial_number ?? 'N/A',
+            'registry_number' => $device->registry_number ?? 'N/A',
             'ip_address' => optional($device->latestDeviceInfo)->ip_address ?? 'N/A',
-            'device Name' => $device->device_name ?? 'N/A',
+            'device_name' => $device->device_name ?? 'N/A',
             'status' => $device->status->value ?? 'N/A',
             'created Date' => $device->created_at->format('d-M-Y'),
             'created By' => optional($device->createdBy)->name ?? 'N/A',
         ];
-
         // Sadece seçilen sütunları döndür
         return array_intersect_key($data, array_flip($selectedColumns));
     }
@@ -107,16 +107,15 @@ class DeviceExport extends BaseExport
             'type' => 'Cihaz Tipi',
             'brand' => 'Marka',
             'model' => 'Model',
-            'port Number' => 'Port Numarası',
-            'serial Number' => 'Seri Numarası',
-            'registry Number' => 'Sicil Number',
+            'port_number' => 'Port Numarası',
+            'serial_number' => 'Seri Numarası',
+            'registry_number' => 'Sicil Numarası',
             'ip_address' => 'İp Adresi',
-            'device Name' => 'Cihaz Name',
+            'device_name' => 'Cihaz Adı',
             'status' => 'Durumu',
             'created Date' => 'Oluşturma Tarihi',
             'created By' => 'Oluşturan Kişi',
         ];
-
         // Sadece seçilen sütunların başlıklarını döndür
         return array_intersect_key($allHeadings, array_flip($selectedColumns));
     }

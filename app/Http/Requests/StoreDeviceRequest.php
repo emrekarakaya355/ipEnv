@@ -3,6 +3,8 @@
 namespace App\Http\Requests;
 
 use App\Enums\DeviceStatus;
+use App\Exceptions\ConflictException;
+use App\Exceptions\ModelNotFoundException;
 use App\Models\Device;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -76,13 +78,12 @@ class StoreDeviceRequest extends FormRequest
     protected function hasCircularReference($deviceId, $parentDevice): bool
     {
         if (!$parentDevice) {
-
-            throw new \Exception('Seçilen Parent Bulunamadı.');
+            throw new ModelNotFoundException('Parent Bulunamadı.');
         }
         $device = Device::find($deviceId);
 
         if ($parentDevice->id === $deviceId) {
-            throw new \Exception('Cihazın çocuklarından birini parent olarak seçemezsiniz.');
+            throw new ConflictException('Cihazın çocuklarından birini parent olarak seçemezsiniz.');
         }
 
         foreach ($device->connectedDevices as $connectedDevice) {

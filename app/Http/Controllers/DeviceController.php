@@ -34,107 +34,41 @@ class DeviceController extends Controller
         $this->middleware('permission:update device', ['only' => ['update','edit']]);
         $this->middleware('permission:delete device', ['only' => ['destroy']]);
     }
-/*
-    /**
-     * Display a listing of the resource.
-     */
-    public function index(Request $request, $type = null)
-    {
 
+    private function applyFiltersAndSorting(Request $request, $query){
 
         $columns = Device::getColumnMapping();
-        $sortColumn = $columns[$request->get('sort', 'created_at')] ?? 'created_at';
-        $sortOrder = $request->get('order', 'desc');
-        $modelClass = $this->getModelClass($type);
-        $query = $modelClass::query();
-
         $perPage = $request->get('perPage', 10);
-
         $this->deviceService->filter($request,$query);
-
         if ($request->ajax()) {
             $this->deviceService->search($request, $query);
-            $devices = $query->with('latestDeviceInfo')->sorted()->paginate($perPage);
+            $devices = $query
+                ->with('latestDeviceInfo')
+                ->sorted(request('sort', 'created_at'), request('direction', 'desc'))
+                ->paginate($perPage)
+                ->withQueryString();
             return view('devices.partials.device_table', compact('devices','columns'))->render();
         }
-        $devices = $query->with('latestDeviceInfo')
-            ->withoutDepo() // Depoda olanları hariç tutma
+        $devices = $query
             ->sorted(request('sort', 'created_at'), request('direction', 'desc'))
-            ->paginate($perPage);
-
-
+            ->with('latestDeviceInfo')
+            ->paginate($perPage)
+            ->withQueryString();  // Tüm parametreleri URL'e ekle
         return view('devices.index', compact('devices','columns'));
 
-/*
-        $device_types = Device::query()
-            ->when(request('type'), function ($query) {
-                return $query->where('type', 'like', '%' . request('type') . '%');
-            })
-            ->when(request('brand'), function ($query) {
-                return $query->where('brand', 'like', '%' . request('brand') . '%');
-            })
-            ->when(request('model'), function ($query) {
-                return $query->where('model', 'like', '%' . request('model') . '%');
-            })
-            ->when(request('port_number'), function ($query) {
-                return $query->where('port_number', 'like', '%' . request('port_number') . '%');
-            })
-            ->orderBy(request('sort', 'type'), request('direction', 'asc')) // Sıralama ekleme
-            ->paginate(10);
-
-        return view('device_types.index', compact('device_types'));*/
     }
 
-/*
-    public function index(Request $request, $type = null)
-    {
-        // Sütunlar ve sıralama işlemleri
-        $columns = Device::getColumnMapping();
-        $sortColumn = $columns[$request->get('sort', 'created_at')] ?? 'created_at';
-        $sortOrder = $request->get('order', 'desc');
+    public function index(Request $request, $type = null){
         $modelClass = $this->getModelClass($type);
-        $perPage = $request->get('perPage', 10); // Sayfa başına gösterilecek kayıt sayısı
+        $query = $modelClass::query();
+        return($this->applyFiltersAndSorting($request, $query));
 
-        // Arama ve filtreleme işlemi
-        $devicesQuery = $modelClass::query()
-            ->with('latestDeviceInfo')
-            ->withoutDepo() // Depoda olanları hariç tutma
-            ->sorted($sortColumn, $sortOrder)
-            ->when($request->get('search'), function ($query, $search) {
-                // Genel arama işlemi
-                return $query->where(function ($q) use ($search) {
-                    $q->where('name', 'like', '%' . $search . '%')
-                        ->orWhere('type', 'like', '%' . $search . '%')
-                        ->orWhere('brand', 'like', '%' . $search . '%');
-                });
-            })
-            // Filtreleme işlemleri
-            ->when($request->get('type'), function ($query, $type) {
-                return $query->where('type', $type);
-            })
-            ->when($request->get('brand'), function ($query, $brand) {
-                return $query->where('brand', 'like', '%' . $brand . '%');
-            })
-            ->when($request->get('model'), function ($query, $model) {
-                return $query->where('model', 'like', '%' . $model . '%');
-            })
-            ->when($request->get('port_number'), function ($query, $port_number) {
-                return $query->where('port_number', 'like', '%' . $port_number . '%');
-            });
-
-        if ($request->ajax()) {
-            $devices = $devicesQuery->paginate($perPage);
-
-            return view('devices.partials.device_table', compact('devices', 'columns'))->render();
-        }
-
-        // Sayfalandırılmış sonuçlar
-        $devices = $devicesQuery->paginate($perPage);
-
-        return view('devices.index', compact('devices', 'columns'));
     }
-
-*/
+    public function orphans(Request $request)
+    {
+        $query = Device::whereNull('parent_device_id');
+        return($this->applyFiltersAndSorting($request, $query));
+    }
     public function create()
     {
         $locations = Location::all()->sortBy(['faculty']);
@@ -238,20 +172,7 @@ class DeviceController extends Controller
         };
     }
 
-    private function getOrphans()
-    {
-        // parent_device_id'sı NULL olan tüm cihazları al
-        return Device::whereNull('parent_device_id')->orderBy('updated_at','desc')->paginate(10);
-    }
 
-    public function orphans()
-    {
-        $devices = $this->getOrphans();
-        $columns = Device::getColumnMapping();
-
-        return view('devices.index', compact('devices','columns'));
-
-    }
 
     public function import(Request $request)
     {

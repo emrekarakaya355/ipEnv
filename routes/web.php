@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DeviceController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\ProfileController;
@@ -8,10 +9,8 @@ use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 
-// Dashboard route'u oturum açmış kullanıcılar için
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 
 // Profile ilgili route'lar oturum açmış kullanıcılar için
 Route::middleware('auth')->group(function () {
@@ -29,9 +28,6 @@ Route::get('/error', function () {
 Route::middleware('auth')->group(function () {
 
     Route::get('/', function () { return view('welcome'); });
-
-
-
     Route::get('/get-brands/{type}', [DeviceTypeController::class, 'getBrandsByType']);
     Route::get('/get-models', [DeviceTypeController::class, 'getModelsByBrand']);
     Route::get('/api/switches', [DeviceController::class, 'getSwitches']);

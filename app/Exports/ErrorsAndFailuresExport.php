@@ -6,7 +6,7 @@ use Maatwebsite\Excel\Concerns\FromArray;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 
-class ErrorAndFailuresExport extends BaseExport implements FromArray, WithHeadings, WithMapping
+class ErrorsAndFailuresExport extends BaseExport implements FromArray, WithHeadings, WithMapping
 {
     protected $failures;
     protected $errors;

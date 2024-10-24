@@ -1,5 +1,4 @@
 <x-layout>
-    <div class="flex flex-wrap">
         <div class="lg:w-6/12 xl:w-3/12 px-4">
             <div class="relative flex flex-col min-w-0 break-words bg-white rounded-lg mb-6 xl:mb-0 shadow-lg">
                 <div class="flex-auto p-4">
@@ -18,6 +17,7 @@
                 </div>
             </div>
         </div>
+
     <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 

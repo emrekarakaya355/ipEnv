@@ -54,18 +54,33 @@
                     @endforeach
                     </tbody>
                 </table>
-        </div>
+
+                <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-blue-gray-200 sm:px-6 " id="pagination-links">
 
         @if($locations->hasPages())
-            <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-blue-gray-200 sm:px-6" id="pagination-links">
-                {{ $locations->links() }}
+            {{ $locations->links()}}
+        @else
+            {{-- Sonuç Sayısı Bilgisi --}}
+            <div>
+                @if ($locations->count() > 0)
+                    {{-- İlk ve Son Gösterilen Sonuçların İndekslerini Hesapla --}}
+                    Showing {{ ($locations->currentPage() - 1) * $locations->perPage() + 1 }}
+                    to {{ min($locations->currentPage() * $locations->perPage(), $locations->total()) }}
+                    of {{ $locations->total() }} results
+                @else
+                    No results found.
+                @endif
             </div>
         @endif
-
-        @if ($locations->isEmpty())
-            <p class="text-center py-4">No records found.</p>
-        @endif
-
+            <form method="GET" action="{{ url()->current() }}" class="flex items-center">
+                <label for="perPage" class="mr-2">Sayfada kaç kayıt gösterilsin:</label>
+                <select name="perPage" id="perPage" onchange="this.form.submit()" class="border border-gray-300 rounded-md px-4 py-1">
+                    <option value="10" {{ request('perPage') == 10 ? 'selected' : '' }}>10</option>
+                    <option value="25" {{ request('perPage') == 25 ? 'selected' : '' }}>25</option>
+                    <option value="50" {{ request('perPage') == 50 ? 'selected' : '' }}>50</option>
+                </select>
+            </form>
+                </div>
 
         @canany(['create location','update location'])
             <!-- Add/Edit Location Modal -->

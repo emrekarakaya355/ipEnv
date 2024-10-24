@@ -44,7 +44,8 @@ class LocationController extends Controller
                 return $query->where('unit', 'like', '%' . request('unit') . '%');
             })
             ->orderBy(request('sort', 'building'), request('direction', 'asc')) // Sıralama ekleme
-            ->paginate(10);
+            ->paginate(10)
+            ->withQueryString();
 
         return view('locations.index', compact('locations'));
     }

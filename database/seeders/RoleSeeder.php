@@ -57,7 +57,9 @@ class RoleSeeder extends Seeder
         Permission::create(['name' => 'view-type']);
         Permission::create(['name' => 'view-brand']);
         Permission::create(['name' => 'view-model']);
+        Permission::create(['name' => 'view-port_number']);
         Permission::create(['name' => 'view-serial_number']);
+        Permission::create(['name' => '	view-registry_number']);
         Permission::create(['name' => 'view-device_name']);
         Permission::create(['name' => 'view-ip_address']);
         Permission::create(['name' => 'view-status']);

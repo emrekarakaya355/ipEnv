@@ -3,7 +3,7 @@
 
         @can("create {$viewName}")
             <!-- Ekle Butonu -->
-            <button type="button" class="btn btn-primary" style="color: blue" onclick="{{$addOnClick}}"  >
+            <button type="button" class="btn btn-primary hover:bg-amber-400" style="color: blue" onclick="{{$addOnClick}}"  >
                 <i class="fas fa-plus"></i> <!-- Ekle Icon -->
             </button>
         @endcan
@@ -13,14 +13,14 @@
             <i class="fas fa-upload"></i> <!-- Toplu Ekle Icon -->
         </button>
         <!-- Toplu İndir Butonu -->
-        <button type="button" class="btn btn-info" style="color: chocolate"
+        <button type="button" class="btn btn-info hover:bg-amber-400" style="color: chocolate"
                 onclick="exportData()">
 
         <i class="fas fa-download"></i> <!-- Toplu İndir Icon -->
         </button>
 
         <!-- Filtreleri Temizle Butonu -->
-        <button type="button" class="btn btn-danger" style="color: darkviolet" onclick="window.location.href='{{ $route }}'">
+        <button type="button" class="btn btn-danger hover:bg-amber-400" style="color: darkviolet" onclick="window.location.href='{{ $route }}'">
             <i class="fas fa-arrow-right-rotate"></i> <!-- Filtreleri Temizle Icon -->
         </button>
     </div>

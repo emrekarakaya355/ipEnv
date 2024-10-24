@@ -40,7 +40,8 @@ class DeviceTypeController extends Controller
                 return $query->where('port_number', 'like', '%' . request('port_number') . '%');
             })
             ->orderBy(request('sort', 'type'), request('direction', 'asc')) // Sıralama ekleme
-            ->paginate(10);
+            ->paginate(10)
+            ->withQueryString();
 
         return view('device_types.index', compact('device_types'));
     }

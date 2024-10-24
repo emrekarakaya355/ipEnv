@@ -27,6 +27,7 @@
                             <tr>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Id</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Username</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Roles</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
@@ -37,6 +38,7 @@
                                 <tr>
                                     <td class="px-6 py-2 whitespace-nowrap">{{ $user->id }}</td>
                                     <td class="px-6 py-2 whitespace-nowrap">{{ $user->name }}</td>
+                                    <td class="px-6 py-2 whitespace-nowrap">{{ $user->username }}</td>
                                     <td class="px-6 py-2 whitespace-nowrap">{{ $user->email }}</td>
                                     <td class="px-6 py-2 whitespace-nowrap">
                                         @if (!empty($user->getRoleNames()))

@@ -19,9 +19,14 @@ class DeviceInfo extends Model implements Auditable
     {
         parent::boot();
 
+
         static::creating(function ($model) {
             // Aynı device_id'ye sahip mevcut kayıtları bul ve sil
-            self::where('device_id', $model->device_id)->delete();
+            $oldRecords = self::where('device_id', $model->device_id)->get();
+            foreach ($oldRecords as $record) {
+                $record->delete(); // Her kayıt için deleting event'i tetiklenir
+            }
+
             $model->created_by = auth()->id();
 
         });
@@ -32,10 +37,12 @@ class DeviceInfo extends Model implements Auditable
         });
 
         static::deleting(function ($model) {
-            $model->deleted_by = auth()->id();
-            $model->isDeleted = true;
-            $model->save();
+                $model->deleted_by = auth()->id();
+                $model->isDeleted = true;
+                $model->save();
         });
+
+
 
         static::saving(function ($model) {
             // Aynı IP adresine sahip silinmemiş (soft deleted olmayan) bir kayıt olup olmadığını kontrol et

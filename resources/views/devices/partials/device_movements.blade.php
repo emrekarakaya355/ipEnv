@@ -10,7 +10,7 @@
     @else
         <div class="grid grid-cols-1 gap-4">
             @foreach($device->deviceInfos as $deviceInfo)
-                <div class="bg-gray-100 p-4 rounded-lg shadow-md mb-4">
+                <div class="{{ !$loop->first ? 'bg-gray-200' : 'bg-blue-100' }} p-4 rounded-lg shadow-md mb-4">
                     <div class="grid grid-cols-3 gap-4 items-center">
                         <div>
                             @can('view-building')

@@ -6,6 +6,7 @@
                 <thead>
                 <tr>
                     <th>Kullanıcı Adı</th>
+                    <th>Username</th>
                     <th>Email</th>
                     <th>Rol</th>
                     <th>İzinler</th>
@@ -15,6 +16,7 @@
                 @foreach($users as $user)
                     <tr>
                         <td>{{ $user->name }}</td>
+                        <td>{{ $user->username }}</td>
                         <td>{{ $user->email }}</td>
                         <td>{{ $user->roles->pluck('name')->implode(', ') }}</td>
                         <td>

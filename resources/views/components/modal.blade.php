@@ -20,9 +20,9 @@
                             </div>
                         </div>
                         <div class="overflow-x-auto mt-4">
-                            <div class="mb-2 flex justify-end ">
+                            <div class="mb-2 flex justify-end items-center">
+                                <label for="port" class="block text-sm font-medium text-gray-700 mr-2">Takılı Olduğu Port</label>
                                 <div style="width: 80px;">
-                                    <label for="port" class="block text-sm font-medium text-gray-700">Port</label>
                                     <input type="number"
                                            required
                                            id="port"
@@ -88,6 +88,13 @@
         // Eğer ilgili switchRadio bulunursa, işaretle
         if (switchToSelect) {
             switchToSelect.checked = true;
+        } else {
+            const firstSwitchRadio = document.querySelector('input[name="switchRadio"]');
+            if (firstSwitchRadio) {
+                firstSwitchRadio.checked = true;
+                // Max port değerini de ilk switch için güncelle
+                updatePortMax(firstSwitchRadio);
+            }
         }
         document.getElementById('modal').classList.remove('hidden');
     }
@@ -176,6 +183,7 @@
         if (parseInt(input.value) > parseInt(maxPortValue)) {
             input.value = maxPortValue;
             alert(`Port değeri ${maxPortValue} değerinden büyük olamaz.`);
+
         }
     }
     document.getElementById('searchSwitch').addEventListener('input', filterSwitches);
