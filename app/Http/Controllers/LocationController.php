@@ -36,6 +36,7 @@ class LocationController extends Controller
      */
     public function index(Request $request)
     {
+        $columns = Location::getColumnMapping();
         $locations = Location::query()
             ->when(request('building'), function ($query) {
                 return $query->where('building', 'like', '%' . request('building') . '%');
@@ -47,7 +48,7 @@ class LocationController extends Controller
             ->paginate(10)
             ->withQueryString();
 
-        return view('locations.index', compact('locations'));
+        return view('locations.index', compact('locations','columns'));
     }
 
     /**

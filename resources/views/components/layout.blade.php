@@ -7,6 +7,7 @@
     <title>{{ config('app.name', 'Laravel') }}</title>
 
     <!--link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet"-->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 

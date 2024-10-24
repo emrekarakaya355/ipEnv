@@ -14,6 +14,8 @@ class Location extends Model implements Auditable
 
     protected $fillable = ['building', 'unit'];
 
+
+
     protected static function boot()
     {
         parent::boot();
@@ -93,5 +95,14 @@ class Location extends Model implements Auditable
             ->first();
 
         return $location === null ? 1 : $location->id;
+    }
+
+
+    public static function getColumnMapping()
+    {
+        return [
+            'Bina' => 'building',
+            'Birim' => 'unit',
+        ];
     }
 }

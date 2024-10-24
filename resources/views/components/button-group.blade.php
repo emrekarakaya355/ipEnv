@@ -31,23 +31,23 @@
 
 <script>
     function exportData() {
-        document.getElementById('selectedColumnsInput').value =  localStorage.getItem('selectedColumns');
 
-        const selectedColumnsInput = document.getElementById('selectedColumnsInput').value;
+        // selectedColumnsInput öğesini kontrol et, yoksa boş bir string kullan
+        const selectedColumnsInputElement = document.getElementById('selectedColumnsInput');
 
-       // const selectedColumns = JSON.parse(localStorage.getItem('selectedColumns')) || []; // localStorage'dan al ve parse et
-       // document.getElementById('selectedColumnsInput').value = JSON.stringify(selectedColumns); // Hidden inputa ata
+        let selectedColumnsInput = '';
+
+        if (selectedColumnsInputElement) {
+            selectedColumnsInputElement.value = localStorage.getItem('selectedColumns');
+            selectedColumnsInput = selectedColumnsInputElement.value;
+        }
+
         const queryParams = new URLSearchParams(window.location.search);
 
         // Seçilen sütunları sorgu parametrelerine ekle
-       // if (selectedColumns.length > 0) {
-      // //     queryParams.set('selected_columns', JSON.stringify(selectedColumns)); // Sorgu parametrelerine ekle
-      //  }
+        queryParams.append('selected_columns', selectedColumnsInput || '');
 
-
-        // Seçilen sütunları sorgu parametrelerine ekle
-        queryParams.append('selected_columns', selectedColumnsInput);
-
+        alert(localStorage.getItem('selectedColumns').toString());
         // Yeni URL ile dışa aktarma işlemi
         window.location.href = `{{ url($route . '/export') }}?${queryParams.toString()}`;
     }

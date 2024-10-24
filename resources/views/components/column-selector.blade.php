@@ -59,6 +59,17 @@
             const selectedColumns = JSON.parse(localStorage.getItem('selectedColumns')) || [];
             const columnCheckboxes = document.querySelectorAll('.column-checkbox');
 
+            if (selectedColumns.length === 0) {
+                columnCheckboxes.forEach(checkbox => {
+                    checkbox.checked = true; // Tüm checkbox'ları işaretle
+                });
+            } else {
+                // Eğer var ise, seçili olanları işaretle
+                columnCheckboxes.forEach(checkbox => {
+                    checkbox.checked = selectedColumns.includes(checkbox.value);
+                });
+            }
+            /*
             // Checkbox'ların durumunu localStorage'dan yükle
             columnCheckboxes.forEach((checkbox, index) => {
                 // Eğer selectedColumns içinde checkbox'ın değeri varsa, checkbox'ı işaretle
@@ -67,7 +78,7 @@
                 checkbox.addEventListener('change', function() {
                     filterTableColumns();
                 });
-            });
+            });*/
 
             // Sayfa yüklendiğinde tabloyu mevcut seçimlere göre filtrele
             filterTableColumns();

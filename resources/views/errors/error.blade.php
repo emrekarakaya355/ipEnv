@@ -8,7 +8,7 @@
             @if(config('app.debug'))
                 <div class="bg-gray-100 p-4 rounded-lg overflow-auto">
                     <h2 class="text-lg font-semibold mb-2">Hata Detayları:</h2>
-                    <pre class="text-sm text-gray-700">{{ $exception->getMessage() }}</pre>
+                    <pre class="text-sm text-gray-700">{{ $exception->getMessage() ??'Hata Oluştu.' }}</pre>
                 </div>
             @endif
 

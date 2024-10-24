@@ -24,10 +24,10 @@
     <script>
         const ctx = document.getElementById('deviceStatusChart').getContext('2d');
         const data = {
-            labels: ['Aktif Cihazlar', 'Pasif Cihazlar',"test"],
+            labels: ['Aktif Cihazlar', 'Pasif Cihazlar',"test","yok"],
             datasets: [{
-                data: [120, 30,50],
-                backgroundColor: ['#4CAF50', '#F44336','black']
+                data: [20, 30,50,10],
+                backgroundColor: ['#4CAF50', '#F44336','black','blue']
             }]
         };
 

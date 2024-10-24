@@ -2,7 +2,6 @@
 
     @can('view location')
         <x-slot name="heading">Lokasyonlar</x-slot>
-
         <div class="flex-auto p-8" >
 
             @if (session('error'))
