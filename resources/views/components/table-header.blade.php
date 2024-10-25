@@ -1,5 +1,5 @@
-<th scope="col" class="px-6 py-3 text-center font-bold uppercase tracking-wider border-l  border-gray-300">
-    <div class="flex items-center justify-between">
+<th scope="col" class="px-6 py-3 text-center font-bold uppercase tracking-tighter border-l  border-gray-300">
+    <div class="flex justify-between">
         <span></span>
         <a href="{{ request()->fullUrlWithQuery(['sort' => strtolower($filterName), 'direction' => request('direction') === 'asc' ? 'desc' : 'asc']) }}">
             <span class="font-semibold" >{{ $title }}</span>
@@ -73,6 +73,4 @@
             window.location.href = `{{ request()->url() }}?${queryString}`; // Sayfayı güncelle
         }
     }
-
-
 </script>

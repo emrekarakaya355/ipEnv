@@ -32,12 +32,11 @@ class DeviceService
             $routname = route('devices.show', $device->id);
             return new SuccessResponse('Cihaz Başarı İle Oluşturuldu.',['data' => $device->id],$routname);
         } catch (\Exception $exception) {
-            return new ErrorResponse($exception,'Cihaz Oluşturulamadı. Lütfen tekrar deneyiniz.');
+            return new ErrorResponse($exception,$exception->getMessage()??'Cihaz Oluşturulamadı. Lütfen tekrar deneyiniz.');
         }
     }
     public function updateDeviceWithInfo($deviceValidated, $device)
     {
-
         return DB::transaction(function () use ($deviceValidated, $device) {
             //değişiklik varmı diye dolduruyoruz.
             $this->fillDevice($deviceValidated,$device);
@@ -94,6 +93,12 @@ class DeviceService
                ->when(request('registry_number'), function ($query) {
                    if (canView('view-registry_number')) {
                        return $query->where('registry_number', 'like', '%' . request('registry_number') . '%');
+                   }
+                   return $query;
+               })
+               ->when(request('mac_address'), function ($query) {
+                   if (canView('view-mac_address')) {
+                       return $query->where('mac_address', 'like', '%' . request('mac_address') . '%');
                    }
                    return $query;
                })
@@ -296,9 +301,7 @@ class DeviceService
             is_null($deviceValidated['room_number'] ?? null) &&
             is_null($deviceValidated['description'] ?? null);
 
-        if($isAllNull) {
 
-        }
          return DeviceInfo::create([
              'device_id' => $device->id,
              'ip_address' => $deviceValidated['ip_address'] ?? null,
@@ -315,19 +318,18 @@ class DeviceService
      */
     private function createDevice($deviceValidated){
 
-
         $deviceType = DeviceType::getDeviceType($deviceValidated['type'],$deviceValidated['model'], $deviceValidated['brand']);
-
         if($deviceType === null){
             throw new ModelNotFoundException('Cihaz Tipi Bulunamadı!');
         }
 
         $attributes = [
-            'type' => $deviceType->type,
+            'type' => strtolower($deviceType->type),
             'device_type_id' => $deviceType->id,
             'device_name' => $deviceValidated['device_name']?? null,
             'serial_number' => $deviceValidated['serial_number'],
-            'registry_number' => $deviceValidated['registry_number'],
+            'registry_number' => $deviceValidated['registry_number']??null,
+            'mac_address' => $deviceValidated['mac_address'],
             'parent_device_id' => $deviceValidated['parent_device_id'] ?? null,
             'parent_device_port' => $deviceValidated['parent_device_port'] ?? null,
             'status' => $deviceValidated['status'] ?? "Depo",
@@ -338,11 +340,13 @@ class DeviceService
 
     private function fillDevice($deviceValidated,$device){
 
+
         $deviceType = DeviceType::getDeviceType($deviceValidated['type'],$deviceValidated['model'], $deviceValidated['brand']);
 
         if($deviceType === null){
             throw new ModelNotFoundException('Cihaz Tipi Bulunamadı!');
         }
+
         // Device verilerinde değişiklik kontrolü
         $deviceData = ([
             'type' => $deviceType->type,
@@ -350,15 +354,12 @@ class DeviceService
             'device_name' => $deviceValidated['device_name']?? null,
             'serial_number' => $deviceValidated['serial_number'],
             'registry_number' => $deviceValidated['registry_number'],
+            'mac_address' => $deviceValidated['mac_address'],
             'parent_device_id' => $deviceValidated['parent_device_id']?? null,
             'parent_device_port' => $deviceValidated['parent_device_port']?? null,
             'status' => $deviceValidated['status'] ?? "Depo",
-
-
         ]);
-
         $device->fill($deviceData);
-
     }
 
     private function fillDeviceInfo($deviceValidated,$device){

@@ -58,6 +58,10 @@
                           id="device-registry-number"
                           dataName="registry_number"
                           value="{{ $device->registry_number }}"/>
+            <x-input-text label="Mac Adresi"
+                          id="device-mac_address"
+                          dataName="mac_address"
+                          value="{{ $device->mac_address }}"/>
 
             <div>
                 <label class="text-sm font-medium text-gray-500">Durum</label>

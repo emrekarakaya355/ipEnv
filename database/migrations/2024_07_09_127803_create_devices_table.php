@@ -17,7 +17,8 @@ return new class extends Migration
             $table->string('type');
             $table->string('device_name')->nullable();
             $table->string('serial_number')->unique();
-            $table->string('registry_number')->unique();
+            $table->string('registry_number')->unique()->nullable();
+            $table->string('mac_address')->unique();
             $table->enum('status', ['Çalışıyor', 'Depo', 'Garanti', 'Hurda'])->default('Çalışıyor');
             $table->unsignedBigInteger('parent_device_id')->nullable();
             $table->foreign('parent_device_id')->references('id')->on('devices');

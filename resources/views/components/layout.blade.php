@@ -13,11 +13,11 @@
 
 </head>
 <body class="bg-gray-200 font-sans leading-normal tracking-normal">
-<div class="flex flex-col md:flex-row">
+<div class="">
     <!-- Sidebar -->
     <x-sidebar/>
     <!-- Main Content -->
-    <main class="flex-auto ml-64">
+    <main class="ml-64">
         {{$slot}}
     </main>
 </div>

@@ -38,7 +38,7 @@ class DeviceController extends Controller
     private function applyFiltersAndSorting(Request $request, $query){
 
         $columns = Device::getColumnMapping();
-        $perPage = $request->get('perPage', 10);
+        $perPage = $request->get('perPage', 50);
         $this->deviceService->filter($request,$query);
         if ($request->ajax()) {
             $this->deviceService->search($request, $query);
@@ -111,7 +111,6 @@ class DeviceController extends Controller
     {
             // Doğrulama başarılı, veriler kullanılabilir
             $deviceValidated = $request->validated();
-
             return $this->deviceService->updateDeviceWithInfo($deviceValidated, $device);
     }
 

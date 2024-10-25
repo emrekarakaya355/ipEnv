@@ -31,9 +31,6 @@ return Application::configure(basePath: dirname(__DIR__))
                 return response()->view('errors.403', [], 403);
             }
 
-            if ($exception instanceof \App\Exceptions\ModelNotFoundException || $exception instanceof \Symfony\Component\HttpKernel\Exception\NotFoundHttpException) {
-                return response()->view('errors.404', [], 404);
-            }
             if($exception instanceof \Illuminate\Validation\ValidationException){
                 return new \App\Http\Responses\ValidatorResponse($exception->validator);
             }

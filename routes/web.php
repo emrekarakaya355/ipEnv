@@ -27,7 +27,7 @@ Route::get('/error', function () {
 // Cihaz ve diğer resource route'ları oturum açmış kullanıcılar için
 Route::middleware('auth')->group(function () {
 
-    Route::get('/', function () { return view('welcome'); });
+    //Route::get('/', function () { return view('welcome'); });
     Route::get('/get-brands/{type}', [DeviceTypeController::class, 'getBrandsByType']);
     Route::get('/get-models', [DeviceTypeController::class, 'getModelsByBrand']);
     Route::get('/api/switches', [DeviceController::class, 'getSwitches']);

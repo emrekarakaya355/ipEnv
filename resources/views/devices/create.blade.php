@@ -107,9 +107,19 @@
                             <input type="text" name="registry_number"
                                    value="{{ old('registry_number') }}"
                                    id="registry_number"
-                                   required
                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
                             @error('registry_number')
+                            <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        <div class="mb-4">
+                            <label for="mac_address" class="block text-sm font-medium text-gray-700">Mac Adresi</label>
+                            <input type="text" name="mac_address"
+                                   value="{{ old('mac_address') }}"
+                                   id="mac_address"
+                                   required
+                                   class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                            @error('mac_address')
                             <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
                             @enderror
                         </div>
@@ -212,8 +222,7 @@
                             @enderror
                         </div>
                         <div class="mb-4">
-                            <label for="room_number" class="block text-sm font-medium text-gray-700">Oda
-                                Numarası</label>
+                            <label for="room_number" class="block text-sm font-medium text-gray-700">Oda Numarası</label>
                             <input type="text"
                                    name="room_number"
                                    id="room_number"
@@ -281,7 +290,7 @@
                             // Başarılı mesajını göster
                             document.querySelector('.messages').innerHTML = '<div class="bg-green-500 text-white p-4 rounded-md mb-4">' + data.message + '</div>';
                             setTimeout(() => {
-                                window.location.href = data.redirect_url;
+                                //window.location.href = data.redirect_url;
                             }, 1000); // 2 saniye sonra yönlendirme
                             form.reset();
                         } else {
@@ -290,7 +299,7 @@
                         }
                     })
                     .catch(error => {
-                        console.error('Hata:', error);
+                        console.error('Hata:', error.message);
                         document.querySelector('.messages').innerHTML = '<div class="bg-red-500 text-white p-4 rounded-md mb-4">Bir hata oluştu.</div>';
                     });
             });

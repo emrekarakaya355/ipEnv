@@ -3,11 +3,13 @@
 namespace App\Models;
 
 use App\Exceptions\ConflictException;
+use App\Exceptions\ModelNotFoundException;
 use App\Exceptions\NotFoundException;
 use Exception;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use OwenIt\Auditing\Contracts\Auditable;
+use function PHPUnit\Framework\assertIsInt;
 
 
 class DeviceType extends Model  implements Auditable
@@ -69,13 +71,17 @@ class DeviceType extends Model  implements Auditable
     public static function getDeviceType($type, $model, $brand)
     {
 
-        // Modelde port numarasını ayırmak için regex kullanıyoruz
-        if (preg_match('/^(.*?)(?:\((\d+)\))?$/', $model, $matches)) {
-            $modelName = $matches[1];
-            $port = isset($matches[2]) ? (int) $matches[2] : null; // Port varsa integer olarak al, yoksa null
-        } else {
-            // Regex uymazsa varsayılan değerler
-            $modelName = $model;
+
+        $modelParts = explode('(', $model, 2); // 2, yalnızca ilk bulduğu paranteze göre ayırmasını sağlar
+
+        $modelName = trim($modelParts[0]); // İlk parçayı al ve boşlukları temizle
+
+        // Eğer ikinci parça varsa (port numarası) onu al
+        $port = isset($modelParts[1]) ? rtrim(trim($modelParts[1]), ')') : null; // Sonundaki ')' karakterini de kaldır
+
+        if(is_int($port)){
+            $port = (int)$port;
+        }else{
             $port = null;
         }
 
@@ -85,8 +91,11 @@ class DeviceType extends Model  implements Auditable
             ->where('model', $modelName)
             ->where('port_number', $port)
             ->first();
+
+
+
         if($deviceType === null){
-            throw New NotFoundException('Cihaz Tipi Bulunamadı!');
+            throw New ModelNotFoundException('Cihaz Tipi Bulunamadı!');
         }
         return $deviceType;
     }

@@ -1,7 +1,9 @@
     <!-- Modal Tetikleyici -->
-    <button type="button" class="bg-blue-500 text-white px-4 py-2 rounded-md" onclick="openColumnModal()">
-        Sütunları Seç
-    </button>
+    <div class="flex justify-start ">
+        <button type="button" onclick="openColumnModal()" class="text-blue-500 p-2 rounded-full hover:bg-blue-100">
+            <i class="fas fa-cog text-xl"></i> <!-- Dişli ikonu -->
+        </button>
+    </div>
 
     <!-- Modal İçeriği -->
     <div id="columnModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
@@ -67,8 +69,13 @@
                 // Eğer var ise, seçili olanları işaretle
                 columnCheckboxes.forEach(checkbox => {
                     checkbox.checked = selectedColumns.includes(checkbox.value);
+                    checkbox.addEventListener('change', function() {
+                        filterTableColumns();
+                    });
                 });
             }
+
+
             /*
             // Checkbox'ların durumunu localStorage'dan yükle
             columnCheckboxes.forEach((checkbox, index) => {

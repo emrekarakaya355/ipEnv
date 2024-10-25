@@ -34,6 +34,7 @@ class StoreDeviceRequest extends FormRequest
             'device_name' => 'nullable|string|max:255',
             'serial_number' => 'required|string|max:255',
             'registry_number' => 'nullable|string|max:255',
+            'mac_address' => 'required|string|max:255',
             'status' => ['nullable', 'string', 'in:' . implode(',', DeviceStatus::toArray())],
             'parent_device_id' =>[
                 'nullable',
