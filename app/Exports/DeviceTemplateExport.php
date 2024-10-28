@@ -22,6 +22,7 @@ class DeviceTemplateExport implements withHeadings, FromArray
             'Unit',
             'Serial Number',
             'Registry Number',
+            'Mac Address',
             'Device Name',
             'IP Address',
             'Description',
@@ -46,6 +47,7 @@ class DeviceTemplateExport implements withHeadings, FromArray
                 'Bilgi İşlem',               // Unit
                 'SN123456',             // Serial Number
                 'REG123',               // Registry Number
+                'aa:aa:aa:aa',               // Registry Number
                 'REK',     // Device Name
                 '192.168.1.1',          // IP Address
                 'aciklama',      // Description
@@ -62,6 +64,7 @@ class DeviceTemplateExport implements withHeadings, FromArray
                 'Bilgi İşlem',               // Unit
                 'SN1234567',             // Serial Number
                 'REG1234',               // Registry Number
+                'aa:aa:aa:aa',               // Registry Number
                 'Device Adı',     // Device Name
                 '192.168.1.2',          // IP Address
                 'Açıklama buraya',      // Description

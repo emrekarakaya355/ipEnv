@@ -30,8 +30,8 @@ class DeviceTypeTemplateExport implements WithHeadings,FromArray
     public function array(): array
     {
         return [
-            ['Switch', 'Cisco','2960S POE','48'],
-            ['Access_point', 'Cisco','9105',''],
+            ['switch', 'Cisco','2960S POE','48'],
+            ['access_point', 'Cisco','9105',''],
         ];
     }
 }

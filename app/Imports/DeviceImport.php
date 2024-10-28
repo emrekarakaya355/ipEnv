@@ -58,6 +58,10 @@ class DeviceImport extends  BaseImport
                 'string',
             ],
             'registry_number' => [
+                'nullable',
+                'string',
+            ],
+            'mac_address' => [
                 'required',
                 'string',
             ],
@@ -120,6 +124,7 @@ class DeviceImport extends  BaseImport
                 'type' => $row['type'],
                 'serial_number' => $row['serial_number'],
                 'registry_number' => $row['registry_number'],
+                'mac_address' => $row['mac_address'],
                 'device_name' => $row['device_name'],
                 'status' => 'Depo',
             ]);

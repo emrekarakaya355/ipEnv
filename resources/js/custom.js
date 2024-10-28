@@ -63,8 +63,5 @@ window.handleBuildingChange = function handleBuildingChange(building, container,
             alert('Birimler yüklenirken bir hata oluştu.');
         });
 }
-
-
-
 /* device Type ile ilgili script*/
 

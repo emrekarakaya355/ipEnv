@@ -8,6 +8,7 @@ use App\Exceptions\ModelNotFoundException;
 use App\Models\Device;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreDeviceRequest extends FormRequest
 {
@@ -32,9 +33,27 @@ class StoreDeviceRequest extends FormRequest
             'brand' => 'required|string|max:255',
             'model' => 'required|string|max:255',
             'device_name' => 'nullable|string|max:255',
-            'serial_number' => 'required|string|max:255',
-            'registry_number' => 'nullable|string|max:255',
-            'mac_address' => 'required|string|max:255',
+
+            'serial_number' => [
+            'required',
+            'string',
+            'max:255',
+            Rule::unique('devices', 'serial_number')->ignore($this->route('device')->id ?? null), // Ignore current device ID if editing
+            ],
+
+            'registry_number' => [
+                'nullable',
+                'string',
+                'max:255',
+                Rule::unique('devices', 'registry_number')->ignore($this->route('device')->id ?? null), // Ignore current device ID if editing
+            ],
+
+            'mac_address' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('devices', 'mac_address')->ignore($this->route('device')->id ?? null), // Ignore current device ID if editing
+            ],
             'status' => ['nullable', 'string', 'in:' . implode(',', DeviceStatus::toArray())],
             'parent_device_id' =>[
                 'nullable',

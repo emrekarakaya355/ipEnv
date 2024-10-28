@@ -1,5 +1,6 @@
 <x-layout>
         @can('view device')
+
         <div class="p-8">
             <div class="flex items-center justify-center">
                 <h2 class="text-2xl font-semibold mb-4">Ağ Cihazları</h2>
@@ -36,7 +37,9 @@
 
                 @include('devices.partials.device_table')
             </div>
-                @include('devices.partials.device_search')
+
         </div>
+        @vite(['resources/js/search.js'])
     @endcan
 </x-layout>
+

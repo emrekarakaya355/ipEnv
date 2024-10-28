@@ -2,11 +2,7 @@
 
 namespace App\Imports;
 
-use App\Exceptions\ConflictException;
-use App\Http\Responses\ValidatorResponse;
 use App\Models\DeviceType;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Validator;
 
 class DeviceTypeImport extends BaseImport
 {
@@ -33,17 +29,8 @@ class DeviceTypeImport extends BaseImport
             ],
         ];
     }
-    public function withValidator($validator)
-    {
-        $validator->after(function ($validator) {
-            foreach ($validator->getData() as $data) {
-                if ($this->isUnique($data['type'], $data['brand'], $data['model'], $data['port_number'])) {
-                    $validator->errors()->add('type', 'Bu kayıt zaten var.');
-                }
-            }
-        });
-    }
-    protected function isUnique($type, $brand, $model, $port_number)
+
+    private function isUnique($type, $brand, $model, $port_number)
     {
         return DeviceType::where('type', $type)
             ->where('brand', $brand)
@@ -54,6 +41,11 @@ class DeviceTypeImport extends BaseImport
     protected function processRow(array $row)
     {
         try {
+            if($this->isUnique($row['type'], $row['brand'], $row['model'], $row['port_number'])){
+                $this->fail($row, (array)'Aynı Kayıt Var.');
+                return;
+            }
+
             // Satırı model olarak kaydedelim
             DeviceType::create([
                 'type' => $row['type'],
@@ -61,6 +53,7 @@ class DeviceTypeImport extends BaseImport
                 'model' => $row['model'],
                 'port_number' => $row['port_number'],
             ]);
+
         } catch (\Exception $e) {
             $this->fail($row, (array)$e->getMessage());
 

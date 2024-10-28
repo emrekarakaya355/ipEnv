@@ -54,11 +54,19 @@
                 @endforeach
                 </tbody>
             </table>
+
         </div>
 
         @if($device_types->hasPages())
         <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-blue-gray-200 sm:px-6" id="pagination-links">
             {{ $device_types->links() }}
+            <form method="GET" action="{{ url()->current() }}" class="flex items-center">
+                <label for="perPage" class="mr-2">Sayfada kaç kayıt gösterilsin:</label>
+                <select name="perPage" id="perPage" onchange="this.form.submit()" class="border border-gray-300 rounded-md px-4.5">
+                    <option value="50" {{ request('perPage') == 50 ? 'selected' : '' }}>50</option>
+                    <option value="100" {{ request('perPage') == 100 ? 'selected' : '' }}>100</option>
+                </select>
+            </form>
         </div>
         @endif
 

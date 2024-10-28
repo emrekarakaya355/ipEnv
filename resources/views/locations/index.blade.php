@@ -73,10 +73,9 @@
         @endif
             <form method="GET" action="{{ url()->current() }}" class="flex items-center">
                 <label for="perPage" class="mr-2">Sayfada kaç kayıt gösterilsin:</label>
-                <select name="perPage" id="perPage" onchange="this.form.submit()" class="border border-gray-300 rounded-md px-4 py-1">
-                    <option value="10" {{ request('perPage') == 10 ? 'selected' : '' }}>10</option>
-                    <option value="25" {{ request('perPage') == 25 ? 'selected' : '' }}>25</option>
+                <select name="perPage" id="perPage" onchange="this.form.submit()" class="border border-gray-300 rounded-md px-6 py-1">
                     <option value="50" {{ request('perPage') == 50 ? 'selected' : '' }}>50</option>
+                    <option value="100" {{ request('perPage') == 100 ? 'selected' : '' }}>100</option>
                 </select>
             </form>
                 </div>
@@ -116,115 +115,7 @@
                 </div>
             </div>
         @endcanany
-        <script>
-            let editingLocationId = null; // Global variable to store the ID of the location being edited
-            function openCreateModal() {
-                document.getElementById('locationForm').reset(); // Reset form fields
-                document.getElementById('locationModal').classList.remove('hidden');
-                document.getElementById('method').value = "POST";
-                document.getElementById('locationForm').action = "{{ route('locations.store') }}";
-                document.getElementById('saveLocationButton').innerText = 'Save';
-                editingLocationId = null; // Reset editing ID
-            }
-
-            function editLocation(locationId) {
-                fetch(`/locations/${locationId}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        document.getElementById('building').value = data.building;
-                        document.getElementById('unit').value = data.unit;
-                        document.getElementById('locationModal').classList.remove('hidden');
-                        document.getElementById('method').value = "PUT";
-                        document.getElementById('locationForm').action = `/locations/${locationId}`;
-                        document.getElementById('saveLocationButton').innerText = 'Update';
-                        editingLocationId = locationId;
-                    })
-                    .catch(error => {
-                        console.error('Error fetching location details:', error);
-                    });
-            }
-
-
-            function saveLocation() {
-                const form = document.getElementById('locationForm');
-                const formData = new FormData(form);
-
-                let url = form.action;
-                let method = editingLocationId ? 'POST' : form.querySelector('input[name="_method"]').value;
-
-                // CSRF token is already included in the formData
-                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-                formData.append('_token', csrfToken);
-                fetch(url, {
-                    method: method,
-                    body: formData,
-                    headers: {
-                        'X-CSRF-TOKEN': csrfToken,
-                        'Accept': 'application/json'
-                    }
-                })
-                    .then(response => {
-                        if (!response.ok) {
-                            alert(2);
-
-                            return response.json().then(errorData => {
-                                throw new Error(errorData.message || 'Girdiğiniz verileri kontrol ediniz.');
-                            });
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-
-                        console.log('Location saved successfully:', data);
-                        closeLocationModal();
-                        toastr.success(data.message || 'Yer Bilgisi Başarı ile kaydedildi.');
-                        setTimeout(() =>
-                            location.reload(),1500);
-                    })
-                    .catch(error => {
-                        // Log error to console
-                        console.error('Error saving location: ', error);
-                        // Show error message to user
-                        toastr.error(error.message || 'Beklenmedik bir hata oluştu.');
-                    });
-            }
-
-
-            function deleteLocation(locationId) {
-                if (confirm('Bu Yer Bilgisini Silmek İstediğinizden Eminmisiniz?')) {
-                    fetch(`/locations/${locationId}`, {
-                        method: 'DELETE',
-                        headers: {
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                            'Accept': 'application/json'
-                        }
-                    })
-                        .then(response => {
-                            if (!response.ok) {
-                                return response.json().then(errorData => {
-                                    throw new Error(errorData.message || 'Network response was not ok');
-                                });
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-                            toastr.success(data.message || 'Yer Bilgisi Başarı ile Silindi.');
-                            setTimeout(() => location.reload(), 500);
-                        })
-                        .catch(error => {
-                            toastr.error(error.message || 'Beklenmedik bir hata oluştu.');
-                        });
-                }
-
-            }
-
-
-            function closeLocationModal() {
-                document.getElementById('locationModal').classList.add('hidden');
-            }
-
-
-        </script>
+        @vite('resources/js/location.js')
     @endcan
 
 </x-layout>

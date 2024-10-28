@@ -37,6 +37,7 @@ class LocationController extends Controller
     public function index(Request $request)
     {
         $columns = Location::getColumnMapping();
+        $perPage = $request->get('perPage', 50);
         $locations = Location::query()
             ->when(request('building'), function ($query) {
                 return $query->where('building', 'like', '%' . request('building') . '%');
@@ -45,7 +46,7 @@ class LocationController extends Controller
                 return $query->where('unit', 'like', '%' . request('unit') . '%');
             })
             ->orderBy(request('sort', 'building'), request('direction', 'asc')) // Sıralama ekleme
-            ->paginate(10)
+            ->paginate($perPage)
             ->withQueryString();
 
         return view('locations.index', compact('locations','columns'));
@@ -66,6 +67,7 @@ class LocationController extends Controller
         if ($validator->fails()) {
             return new ValidatorResponse($validator);
         }
+
         // Önce kaydın mevcut olup olmadığını kontrol et
         $existingModel = Location::where($validator->validated())->first();
         if ($existingModel) {
@@ -101,6 +103,7 @@ class LocationController extends Controller
      */
     public function update(Request $request, $id)
     {
+
         //gelen veriler validate ediliyor.
         $validator = Validator::make($request->all(), [
             'building' => 'required|string|max:255',
@@ -113,7 +116,6 @@ class LocationController extends Controller
         }
         try{
             $location = Location::findOrFail($id);
-
             $location->fill($validator->validated());
             //eğer değişiklik var ise update yapılıyor.!
             if($location->isDirty()){

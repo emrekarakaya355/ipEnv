@@ -1,6 +1,6 @@
 <x-column-selector :columns="$columns" />
 
-<table class="table w-full bg-white overflow-auto table-auto" >
+<table class="w-full bg-white overflow-auto table-auto" >
 
     <thead>
         <tr class="bg-gray-100 text-gray-700">
@@ -53,27 +53,5 @@
     <p class="text-center py-4">No records found.</p>
 @endif
 
-<style>
-    /* Tablo sütunlarına kenarlık koyarak yeniden boyutlandırılabilir alanı belirt */
-    th.resizable-header {
-        position: relative;
-    }
-
-    /* Sürükleyip bırakma için sütun kenarına ince bir çubuk ekle */
-    .resize-handle {
-        position: absolute;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        width: 5px;
-        cursor: col-resize;
-        background-color: transparent;
-    }
-
-    /* Sürükleme sırasında sütun arası çizgisini daha belirgin yap */
-    .resizing {
-        background-color: #ccc;
-    }
-</style>
 
 
