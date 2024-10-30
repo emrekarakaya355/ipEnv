@@ -3,7 +3,6 @@
     @can('view location')
         <x-slot name="heading">Lokasyonlar</x-slot>
         <div class="flex-auto p-8" >
-
             @if (session('error'))
                 <div class="bg-red-500 text-white p-4 rounded">
                     {{ session('error') }}
@@ -23,25 +22,25 @@
                     addOnClick="openCreateModal()"
                     viewName="location"
                 />
-
             </div>
-            <th class="overflow-x-auto bg-white shadow-md rounded-xl">
-                <table class="min-w-full divide-y divide-gray-200">
+            <th class="overflow-x-auto bg-white shadow-md rounded-md">
+                <table class="min-w-full divide-y divide-gray-200 ">
                     <thead class="bg-gray-50">
-                    <tr>
-                        <x-table-header title="Bina" filterName="building" />
-                        <x-table-header title="Birim" filterName="unit" />
-                        <th scope="col" class="border-l border-gray-300" style="width: 10px; height: 5px;">
-
-                        </th>
-                    </tr>
+                        <tr>
+                            <x-table-header title="Bina" filterName="building" />
+                            <x-table-header title="Birim" filterName="unit" />
+                            @canany(['update location','delete location'])
+                            <th scope="col" class="border-l border-gray-300" style="width: 10px; height: 5px;"></th>
+                            @endcanany
+                        </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
                     @foreach($locations as $location)
                         <tr>
                             <td class="px-6 py-2 whitespace-nowrap border-l border-gray-300">{{ $location->building }}</td>
                             <td class="px-6 py-2 whitespace-nowrap border-l border-gray-300">{{ $location->unit }}</td>
-                            <td class="px-6  whitespace-nowrap border-l border-gray-300">
+                            @canany(['update location','delete location'])
+                            <td class="px-2 whitespace-nowrap border-l border-gray-300">
                                 @can('update location')
                                     <x-edit-button class="text-blue-600 hover:text-blue-900" onclick="editLocation({{ $location->id }})">Düzenle</x-edit-button>
                                 @endcan
@@ -49,36 +48,12 @@
                                     <x-delete-button class="text-red-600 hover:text-red-900 ml-4" onclick="deleteLocation({{ $location->id }})">Sil</x-delete-button>
                                 @endcan
                             </td>
+                            @endcanany
                         </tr>
                     @endforeach
                     </tbody>
                 </table>
-
-                <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-blue-gray-200 sm:px-6 " id="pagination-links">
-
-        @if($locations->hasPages())
-            {{ $locations->links()}}
-        @else
-            {{-- Sonuç Sayısı Bilgisi --}}
-            <div>
-                @if ($locations->count() > 0)
-                    {{-- İlk ve Son Gösterilen Sonuçların İndekslerini Hesapla --}}
-                    Showing {{ ($locations->currentPage() - 1) * $locations->perPage() + 1 }}
-                    to {{ min($locations->currentPage() * $locations->perPage(), $locations->total()) }}
-                    of {{ $locations->total() }} results
-                @else
-                    No results found.
-                @endif
-            </div>
-        @endif
-            <form method="GET" action="{{ url()->current() }}" class="flex items-center">
-                <label for="perPage" class="mr-2">Sayfada kaç kayıt gösterilsin:</label>
-                <select name="perPage" id="perPage" onchange="this.form.submit()" class="border border-gray-300 rounded-md px-6 py-1">
-                    <option value="50" {{ request('perPage') == 50 ? 'selected' : '' }}>50</option>
-                    <option value="100" {{ request('perPage') == 100 ? 'selected' : '' }}>100</option>
-                </select>
-            </form>
-                </div>
+                <x-table-footer :footerData="$locations"></x-table-footer>
 
         @canany(['create location','update location'])
             <!-- Add/Edit Location Modal -->
@@ -95,7 +70,7 @@
                                 <!-- Form goes here -->
                                 <form id="locationForm" method="POST">
                                     @csrf
-                                    <input type="hidden" name="_method" id="method" value="{{ csrf_token() }}">
+                                    <input type="hidden" name="_method" id="method" value="POST">
                                     <div>
                                         <label for="building" class="block text-sm font-medium text-gray-700">Fakülte Adı</label>
                                         <input type="text" id="building" name="building" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">

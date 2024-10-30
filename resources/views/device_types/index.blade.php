@@ -56,19 +56,7 @@
             </table>
 
         </div>
-
-        @if($device_types->hasPages())
-        <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-blue-gray-200 sm:px-6" id="pagination-links">
-            {{ $device_types->links() }}
-            <form method="GET" action="{{ url()->current() }}" class="flex items-center">
-                <label for="perPage" class="mr-2">Sayfada kaç kayıt gösterilsin:</label>
-                <select name="perPage" id="perPage" onchange="this.form.submit()" class="border border-gray-300 rounded-md px-4.5">
-                    <option value="50" {{ request('perPage') == 50 ? 'selected' : '' }}>50</option>
-                    <option value="100" {{ request('perPage') == 100 ? 'selected' : '' }}>100</option>
-                </select>
-            </form>
-        </div>
-        @endif
+        <x-table-footer :footerData="$device_types"></x-table-footer>
 
         @if ($device_types->isEmpty())
             <p class="text-center py-4">No device types found.</p>
@@ -88,7 +76,7 @@
                     <h3 class="text-lg font-medium text-gray-900" id="deviceTypeModalLabel">Device Type</h3>
                     <div class="mt-4">
                         <!-- Form goes here -->
-                        <form id="deviceTypeForm" method="POST">
+                        <form id="deviceTypeForm" method="POST" action="{{ route('device_types.store') }}">
                             @csrf
                             <input type="hidden" name="_method" id="method" value="{{ csrf_token() }}">
                             <div>
@@ -129,151 +117,6 @@
 
 
     @endcanany
-<script>
-    let editingDeviceTypeId = null;
-    function openCreateModal() {
-        document.getElementById('deviceTypeForm').reset();
-        document.querySelectorAll('input[name="type"]').forEach(radio => {
-            radio.disabled = false;
-        });
-        document.getElementById('deviceTypeModal').classList.remove('hidden');
-        document.getElementById('method').value = "POST";
-        document.getElementById('deviceTypeForm').action = "{{ route('device_types.store') }}";
-        document.getElementById('saveDeviceTypeButton').innerText = 'Save';
-    }
-
-    function editDeviceType(deviceTypeId) {
-        fetch(`/device_types/${deviceTypeId}`)
-            .then(response => response.json())
-            .then(data => {
-                const typeInput = document.querySelector(`input[name="type"][value="${data.type}"]`);
-                if (typeInput) {
-                    typeInput.checked = true;
-                    togglePortNumber(data.type === 'switch'); // Trigger the function based on the selected type
-                }
-                document.querySelectorAll('input[name="type"]').forEach(radio => {
-                    radio.disabled = true;
-                });
-                document.getElementById('method').value = "PUT";
-                document.getElementById('brand').value = data.brand;
-                document.getElementById('model').value = data.model;
-                document.getElementById('port_number').value = data.port_number;
-                document.getElementById('deviceTypeModal').classList.remove('hidden');
-                document.getElementById('deviceTypeForm').action = `/device_types/${deviceTypeId}`;
-                document.getElementById('saveDeviceTypeButton').innerText = 'Update';
-                editingDeviceTypeId = deviceTypeId;
-
-            })
-            .catch(error => {
-                console.error('Cihaz Tipi Bilgilerini alırken hata oluştu lüften sonra tekrar deneyiniz.:', error);
-            });
-    }
-
-    function saveDeviceType() {
-        const form = document.getElementById('deviceTypeForm');
-
-
-        // Check if the form is valid
-        if (!form.checkValidity()) {
-            toastr.error('Lütfen tüm alanları doldurunuz.');
-            return; // Stop the form submission if validation fails
-        }
-
-        // Check if a radio button is selected
-        const typeRadios = form.querySelectorAll('input[name="type"]');
-        let typeSelected = false;
-        typeRadios.forEach(radio => {
-            if (radio.checked) {
-                typeSelected = true;
-            }
-        });
-
-        if (!typeSelected) {
-            toastr.error('Lütfen bir cihaz tipi seçin.');
-            return; // Stop the form submission if no radio button is selected
-        }
-        let method = editingDeviceTypeId ? 'POST' : form.querySelector('input[name="_method"]').value;
-        const formData = new FormData(form);
-        let url = form.action;
-        // CSRF token is already included in the formData
-        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-        formData.append('_token', csrfToken);
-        fetch(url, {
-            method: method,
-            body: formData,
-            headers: {
-                'X-CSRF-TOKEN': csrfToken,
-                'Accept': 'application/json'
-            }
-        })
-            .then(response => {
-                if (!response.ok) {
-                    return response.json().then(errorData => {
-                        throw new Error(errorData.message || 'Network response was not ok');
-                    });
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Device type saved successfully:', data);
-                closeDeviceTypeModal();
-                toastr.success(data.message || 'Device Tipi Başarı ile kaydedildi.');
-                setTimeout(() =>
-                    location.reload(), 1500);
-            })
-            .catch(error => {
-                // Log error to console
-
-                console.error('Error saving device type:', error);
-                // Show error message to user
-                toastr.error(error.message || 'Beklenmedik bir hata oluştu.');
-            });
-    }
-
-    function deleteDeviceType(deviceTypeId) {
-        if (confirm('Bu Cihazı Silmek İstediğinizden Emin misiniz?')) {
-            fetch(`/device_types/${deviceTypeId}`, {
-                method: 'DELETE',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Accept': 'application/json'
-                }
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        return response.json().then(errorData => {
-                            throw new Error(errorData.message || 'Network response was not ok');
-                        });
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    toastr.success(data.message || 'Cihaz Tipi Başarı ile Silindi.');
-                    setTimeout(() => location.reload(), 1000);
-                })
-                .catch(error => {
-                    toastr.error(error.message || 'Beklenmedik bir hata oluştu.');
-                });
-        }
-    }
-
-    function closeDeviceTypeModal() {
-        document.getElementById('deviceTypeModal').classList.add('hidden');
-    }
-
-    function togglePortNumber(isSwitch) {
-        const portNumberContainer = document.getElementById('portNumberContainer');
-        portNumberContainer.style.display = isSwitch ? 'block' : 'none';
-        const portNumberInput = document.getElementById('port_number');
-
-        if (isSwitch) {
-            portNumberContainer.style.display = 'block';
-            portNumberInput.setAttribute('required', 'required');
-        } else {
-            portNumberContainer.style.display = 'none';
-            portNumberInput.removeAttribute('required');
-        }
-    }
-</script>
-        @endcan
+    @vite('resources/js/deviceType.js')
+    @endcan
 </x-layout>

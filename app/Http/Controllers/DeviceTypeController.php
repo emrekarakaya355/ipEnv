@@ -26,6 +26,7 @@ class DeviceTypeController extends Controller
     }
     public function index()
     {
+        $perPage = request()->get('perPage', 50);
         $device_types = DeviceType::query()
             ->when(request('type'), function ($query) {
                 return $query->where('type', 'like', '%' . request('type') . '%');
@@ -40,7 +41,7 @@ class DeviceTypeController extends Controller
                 return $query->where('port_number', 'like', '%' . request('port_number') . '%');
             })
             ->orderBy(request('sort', 'type'), request('direction', 'asc')) // Sıralama ekleme
-            ->paginate(10)
+            ->paginate($perPage)
             ->withQueryString();
 
         return view('device_types.index', compact('device_types'));

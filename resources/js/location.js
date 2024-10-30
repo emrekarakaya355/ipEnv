@@ -1,7 +1,6 @@
 window.openCreateModal = function openCreateModal() {
     document.getElementById('locationForm').reset(); // Reset form fields
     document.getElementById('locationModal').classList.remove('hidden');
-    document.getElementById('method').value = "POST";
     document.getElementById('locationForm').action = "/locations";
     document.getElementById('saveLocationButton').innerText = 'Save';
 }
@@ -86,8 +85,6 @@ window.deleteLocation = function deleteLocation(locationId) {
     }
 
 }
-
-
 window.closeLocationModal = function closeLocationModal() {
     document.getElementById('locationModal').classList.add('hidden');
 }

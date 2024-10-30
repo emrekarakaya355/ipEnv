@@ -12,12 +12,12 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
 </head>
-<body class="bg-gray-200 font-sans leading-normal tracking-normal">
-<div class="">
+<body class="bg-gray-200 font-sans leading-normal tracking-normal ">
+<div class="flex">
     <!-- Sidebar -->
-    <x-sidebar/>
+    <x-sidebar class="w-64" />
     <!-- Main Content -->
-    <main class="ml-64">
+    <main class="flex-1 min-h-screen">
         {{$slot}}
     </main>
 </div>

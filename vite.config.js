@@ -10,6 +10,7 @@ export default defineConfig({
                 'resources/js/search.js',
                 'resources/js/deviceCreate.js',
                 'resources/js/location.js',
+                'resources/js/deviceType.js',
             ],
             refresh: true,
         }),

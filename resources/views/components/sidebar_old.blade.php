@@ -1,4 +1,4 @@
-<aside class="bg-blue-600">
+<aside class="w-64">
     <span
         class="absolute text-white text-4xl top-5 left-4 cursor-pointer"
         onclick="openSidebar()"
