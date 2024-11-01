@@ -16,13 +16,8 @@
             @endif
         </div>
     @endif
-    <form method="GET" action="{{ url()->current() }}" class="flex items-center">
-        <label for="perPage" class="mr-2">Sayfada kaç kayıt gösterilsin:</label>
-        <select name="perPage" id="perPage" onchange="this.form.submit()" class="border border-gray-300 rounded-md px-6 py-1">
-            <option value="10" {{ request('perPage') == 10 ? 'selected' : '' }}>10</option>
-            <option value="50" {{ request('perPage') == 50 ? 'selected' : '' }}>50</option>
-            <option value="100" {{ request('perPage') == 100 ? 'selected' : '' }}>100</option>
-        </select>
-    </form>
+
+    <span></span>
+
 </div>
 

@@ -14,6 +14,9 @@ export default {
             fontFamily: {
                 sans: ['Figtree', ...defaultTheme.fontFamily.sans],
             },
+            fontSize: {
+                base: '0.875rem', // Set this to your desired base size (e.g., 14px)
+            },
         },
     },
 

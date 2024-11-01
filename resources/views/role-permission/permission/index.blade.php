@@ -1,4 +1,6 @@
 <x-layout>
+    @section('title','Yetkiler')
+
     <x-slot name="heading"> Yetkiler </x-slot>
     <div class="flex-auto p-8">
         <h1 class="text-2xl font-semibold text-gray-900 mb-6">Yetkiler</h1>

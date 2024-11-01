@@ -1,13 +1,13 @@
     <!-- Modal Tetikleyici -->
     <div class="flex justify-start ">
         <button type="button" onclick="openColumnModal()" class="text-blue-500 p-2 rounded-full hover:bg-blue-100">
-            <i class="fas fa-cog text-xl"></i> <!-- Dişli ikonu -->
+            <i class="fas fa-filter-circle-xmark"></i> <!-- Dişli ikonu -->
         </button>
     </div>
 
     <!-- Modal İçeriği -->
-    <div id="columnModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
-        <div class="bg-white p-6 rounded-lg shadow-lg w-1/3">
+    <div id="columnModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+        <div class="bg-white p-6 rounded-lg shadow-lg w-1/3" style="pointer-events: auto;" tabindex="-1">
             <h3 class="text-xl font-semibold mb-4">Sütunları Seç</h3>
             <form id="columnSelectionForm">
                 @foreach ($columns as $header => $column)
@@ -40,11 +40,18 @@
         // Modal açma fonksiyonu
         function openColumnModal() {
             document.getElementById('columnModal').classList.remove('hidden');
+            const modalContent = document.querySelector('#columnModal .bg-white');
+            document.body.style.overflow = 'hidden'; // Sayfanın kaydırılmasını engelle
+
+            modalContent.focus(); // Modal içeriğine odaklan
+            document.getElementById('columnModal').style.pointerEvents = 'auto'; // Arka planı tıklanabilir yap
         }
 
         // Modal kapama fonksiyonu
         function closeColumnModal() {
             document.getElementById('columnModal').classList.add('hidden');
+            document.getElementById('columnModal').style.pointerEvents = 'none'; // Arka planı tıklanamaz yap
+
         }
 
         // Sütun seçimlerini kaydetme ve localStorage'a kaydetme
@@ -52,13 +59,14 @@
             const selectedColumns = Array.from(document.querySelectorAll('.column-checkbox'))
                 .filter(checkbox => checkbox.checked)
                 .map(checkbox => checkbox.value);
-
-            localStorage.setItem('selectedColumns', JSON.stringify(selectedColumns));
+            const pageKey = window.location.pathname.replace(/\//g, '_'); // Replace slashes for valid key
+            localStorage.setItem('selectedColumns', JSON.stringify(`selectedColumns_${pageKey}`));
             console.log(localStorage);
             closeColumnModal();
         }
         document.addEventListener('DOMContentLoaded', function() {
-            const selectedColumns = JSON.parse(localStorage.getItem('selectedColumns')) || [];
+            const pageKey = window.location.pathname.replace(/\//g, '_'); // Replace slashes for valid key
+            const selectedColumns = JSON.parse(localStorage.getItem(`selectedColumns_${pageKey}`)) || [];
             const columnCheckboxes = document.querySelectorAll('.column-checkbox');
 
             if (selectedColumns.length === 0) {

@@ -15,7 +15,6 @@ class DashboardController extends Controller
             ->with('latestDeviceInfo')
             ->get();
 
-
         // Group by building
         $groupedByBuilding = $devices->groupBy('building')->map(function ($group) {
             return $group->count(); // Count of devices per building

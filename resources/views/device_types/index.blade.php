@@ -1,17 +1,22 @@
 <x-layout>
-
+    @section('title','Cihaz Tipleri')
     @can('view deviceType')
-    <x-slot name="heading">Device Types</x-slot>
-    <div class="flex-auto p-8">
-        <div class="flex items-center justify-between">
-            <span></span>
-            <h2 class="text-2xl font-semibold mb-4" >Cihaz Tipleri</h2>
-            <x-button-group
-                route="device_types"
-                addOnClick="openCreateModal()"
-                viewName="deviceType"
-            />
-        </div>
+
+    <div class="flex-auto p-4">
+            <div class="flex items-center justify-between">
+                <span></span>
+                <header >
+                    <h2 class="text-2xl font-medium text-center text-gray-900 dark:text-gray-100">
+                        {{ __('Cihaz Tipleri') }}
+                    </h2>
+                </header>
+                <x-button-group
+                    route="device_types"
+                    addOnClick="openCreateModal()"
+                    viewName="deviceType"
+                />
+            </div>
+
         @if (session('error'))
             <div class="bg-red-500 text-white p-4 rounded">
                 {{ session('error') }}
@@ -117,6 +122,8 @@
 
 
     @endcanany
+    @vite('resources/css/table.css')
     @vite('resources/js/deviceType.js')
+
     @endcan
 </x-layout>

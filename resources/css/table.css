@@ -1,0 +1,84 @@
+/* Tablo genel stilleri */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: Arial, sans-serif;
+    transform: scale(0.98);
+    transform-origin: top left;
+    z-index: 1;
+
+}
+
+thead {
+    background-color: #f4f6f9; /* Başlık satırı için hafif gri bir arka plan */
+    color: #4a5568; /* Başlık yazısı rengi */
+    font-weight: bold;
+    z-index: 1;
+}
+
+th, td {
+    padding: 6px; /* Hücrelere boşluk ekleme */
+    border: 1px solid #e2e8f0; /* Hücre kenarlıkları */
+    text-align: center;
+    text-overflow: ellipsis; /* Uzun metinlerde üç nokta göster */
+    z-index: 1;
+}
+
+tbody tr:hover {
+    background-color: #edf2f7; /* Üzerine gelindiğinde satır rengi değişimi */
+}
+
+tbody tr:nth-child(even) {
+    background-color: #f7fafc; /* Alternatif satır rengi */
+}
+
+/* Responsive tablo ayarları */
+@media (max-width: 768px) {
+    table, thead, tbody, th, td, tr {
+        display: block; /* Küçük ekranlarda tabloyu blok düzenine geçir */
+    }
+
+    thead tr {
+        position: absolute;
+        top: -9999px;
+        left: -9999px; /* Başlıkları gizle */
+    }
+
+    tr {
+        margin-bottom: 10px;
+        border-bottom: 1px solid #e2e8f0; /* Satırların arasına çizgi */
+    }
+
+    td {
+        text-align: right;
+        padding-left: 50%; /* Sol kısımdan boşluk bırak */
+        position: relative;
+    }
+
+    td::before {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        width: 45%;
+        white-space: nowrap;
+        content: attr(data-label); /* Her hücreye başlık ismi ekle */
+        font-weight: bold;
+        color: #4a5568;
+    }
+}
+
+/* Laptop ekranları için ayarlar (örneğin 768px ve üzeri) */
+@media (min-width: 769px) {
+    th, td {
+        padding: 10px; /* Hücrelerde biraz daha fazla boşluk bırak */
+        font-size: 14px; /* Yazı boyutunu artır */
+    }
+
+    tbody tr:hover {
+        background-color: #e2e8f0; /* Laptoplarda hover rengi */
+    }
+
+    tbody tr:nth-child(even) {
+        background-color: #f7fafc; /* Alternatif satır rengi */
+    }
+}

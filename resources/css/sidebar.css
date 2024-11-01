@@ -1,0 +1,77 @@
+/* Sidebar container styles */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 220px;
+    background-color: #1a202c;
+    overflow-y: auto;
+    z-index: 999 !important;
+    transition: transform 0.3s ease;
+    transform: translateX(0); /* Başlangıçta gizli */
+}
+/* Display the sidebar for smaller screens */
+@media (max-width: 1276px) {
+    .sidebar {
+        transform: translateX(-100%); /* Küçük ekranlarda görünür yap */
+    }
+}
+.menu-item {
+    display: flex;
+    align-items: center;
+    padding: 5px;
+    cursor: pointer;
+    color: white;
+    transition: background 0.3s;
+}
+
+.menu-item:hover {
+    background-color: #2563eb;
+}
+
+.submenu {
+    padding-left: 2rem;
+}
+
+.submenu-item {
+    display: block;
+    padding: 0.5rem 1rem;
+    color: #d1d5db;
+}
+
+.submenu-item:hover {
+    background-color: #2563eb;
+    color: white;
+}
+
+.divider {
+    margin: 0 0;
+    height: 1px;
+    background-color: #4b5563;
+}
+.submenu-arrow {
+    display: inline-block;
+    margin-left: auto;
+    transform: rotate(0deg);
+    transition: transform 0.3s ease;
+}
+
+.menu-item:hover .submenu-arrow {
+    transform: rotate(180deg);
+}
+.submenu-arrow {
+    transition: transform 0.3s;
+}
+.rotate-180 {
+    transform: rotate(180deg);
+}
+
+/* Fare alanı */
+.sidebar-toggle-area {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 150px; /* Sidebar açılırken fareyi yakalamak için */
+    height: 100%;
+}

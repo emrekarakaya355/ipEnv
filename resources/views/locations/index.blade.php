@@ -1,8 +1,7 @@
 <x-layout >
-
+    @section('title','Yer Bilgileri')
     @can('view location')
-        <x-slot name="heading">Lokasyonlar</x-slot>
-        <div class="flex-auto p-8" >
+        <div class="flex-auto p-4" >
             @if (session('error'))
                 <div class="bg-red-500 text-white p-4 rounded">
                     {{ session('error') }}
@@ -15,16 +14,19 @@
             @endif
 
             <div class="flex items-center justify-between">
-                <span></span>
-                <h2 class="text-2xl font-semibold mb-4">Lokasyonlar</h2>
-                <x-button-group
-                    route="locations"
-                    addOnClick="openCreateModal()"
-                    viewName="location"
-                />
+                <header >
+                    <h2 class="text-2xl font-medium text-center text-gray-900 dark:text-gray-100">
+                        {{ __('Yer Bilgileri') }}
+                    </h2>
+                </header>
+
             </div>
-            <th class="overflow-x-auto bg-white shadow-md rounded-md">
-                <table class="min-w-full divide-y divide-gray-200 ">
+            <div class="bg-white rounded-xl mt-8  overflow-x-auto space-x-4 space-y-4">
+                <x-table-control
+                    :columns="$columns"
+                    route="devices"
+                    viewName="device"></x-table-control>
+                <table >
                     <thead class="bg-gray-50">
                         <tr>
                             <x-table-header title="Bina" filterName="building" />
@@ -42,10 +44,10 @@
                             @canany(['update location','delete location'])
                             <td class="px-2 whitespace-nowrap border-l border-gray-300">
                                 @can('update location')
-                                    <x-edit-button class="text-blue-600 hover:text-blue-900" onclick="editLocation({{ $location->id }})">Düzenle</x-edit-button>
+                                    <x-edit-button onclick="editLocation({{ $location->id }})">Düzenle</x-edit-button>
                                 @endcan
                                 @can('delete location')
-                                    <x-delete-button class="text-red-600 hover:text-red-900 ml-4" onclick="deleteLocation({{ $location->id }})">Sil</x-delete-button>
+                                    <x-delete-button onclick="deleteLocation({{ $location->id }})">Sil</x-delete-button>
                                 @endcan
                             </td>
                             @endcanany
@@ -53,6 +55,7 @@
                     @endforeach
                     </tbody>
                 </table>
+            </div>
                 <x-table-footer :footerData="$locations"></x-table-footer>
 
         @canany(['create location','update location'])
@@ -91,6 +94,6 @@
             </div>
         @endcanany
         @vite('resources/js/location.js')
+    @vite('resources/css/table.css')
     @endcan
-
 </x-layout>

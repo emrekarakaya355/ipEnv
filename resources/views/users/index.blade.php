@@ -1,4 +1,5 @@
 <x-layout>
+
     <div class="flex-auto justify-between space-y-8 py-6">
         <div>
             <a href="/register">
