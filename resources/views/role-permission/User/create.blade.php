@@ -1,23 +1,8 @@
 <x-layout>
-    <x-slot name="heading">Kullanıcı Ekle</x-slot>
+    @section('title','Kullanıcı Ekle')
 
-    <div class="w-full p-8">
-        <h1 class="text-2xl font-semibold text-gray-900 mb-6">
-            Kullanıcı Ekle
-        </h1>
-        {{-- Hata veya başarılı işlem mesajları --}}
-        @if(session('error'))
-            <div class="bg-red-500 text-white p-4 rounded-md mb-4">
-                {{ session('error') }}
+    <div class="w-full ">
 
-            </div>
-        @endif
-
-        @if(session('success'))
-            <div class="bg-green-500 text-white p-4 rounded-md mb-4">
-                {{ session('success') }}
-            </div>
-        @endif
                 <div class="card">
 
                     <div class="card-body">
@@ -50,8 +35,8 @@
                                         class="form-control ml-1"
                                         value="{{ old('password') }}"
                                     />
-                                    <button type="button" id="togglePassword" >
-                                        Göster
+                                    <button type="button" id="togglePassword" style="background: none; border: none;">
+                                        <i class="fas fa-eye" id="passwordIcon"></i>
                                     </button>
                                 </div>
                             </div>
@@ -86,11 +71,13 @@
     <script>
         document.getElementById('togglePassword').addEventListener('click', function () {
             const passwordField = document.getElementById('password');
+            const passwordIcon = document.getElementById('passwordIcon');
             const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
             passwordField.setAttribute('type', type);
 
-            // Butonun içeriğini 'Göster' ve 'Gizle' arasında değiştir
-            this.textContent = type === 'password' ? 'Göster' : 'Gizle';
+            passwordIcon.classList.toggle('fa-eye-slash');
+            passwordIcon.classList.toggle('fa-eye');
+
         });
     </script>
 </x-layout>

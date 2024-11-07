@@ -1,23 +1,17 @@
 <x-layout >
         @section('title', 'Cihazlar')
+        @section('infobox')
+            <x-info-box
+                :number1="$infobox['number1']"
+                :label1="$infobox['label1']"
+                :number2="$infobox['number2']"
+                :label2="$infobox['label2']"
+                :number3="$infobox['number3']"
+                :label3="$infobox['label3']"
+            ></x-info-box>
+        @endsection
         @can('view device')
-        <div class="p-4 ">
-            <header >
-                <h2 class="text-2xl font-semibold text-left text-gray-900 dark:text-gray-100">
-                    {{ __('Ağ Cihazları') }}
-                </h2>
-            </header>
-            <!-- Başarı ve hata mesajlarını göstermek için -->
-            @if (session('success'))
-                <div>
-                    <p>{{ session('success') }}</p>
-                </div>
-            @endif
-            @if (session('error'))
-                <div>
-                    <p>{{ session('error') }}</p>
-                </div>
-            @endif
+
 {{--
             <div class="flex justify-between items-center">
                 <form id="searchForm" class="flex-grow">
@@ -31,13 +25,11 @@
                     />
                 </div>
             </div>
-            --}}
-            <div class="bg-white rounded-xl mt-8  overflow-x-auto">
-                @include('devices.partials.device_table')
-            </div>
-
-        </div>
+--}}
+        @include('devices.partials.device_table')
+        @vite('resources/css/table.css')
         @vite(['resources/js/search.js'])
+        @vite(['resources/js/table-resizer.js'])
     @endcan
 </x-layout>
 

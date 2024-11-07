@@ -14,10 +14,8 @@
 </head>
 <body class="bg-gray-200 font-sans leading-normal tracking-normal ">
     <div class="flex min-h-screen">
-
         @include('layouts.sidebar')
         <!-- Page Heading -->
-
         <!-- Main Content -->
         <main class="ml-8 md:ml-64 flex-1">
             <!-- Üst Menü -->

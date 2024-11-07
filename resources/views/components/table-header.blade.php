@@ -1,22 +1,18 @@
-<th scope="col" class="px-6 py-3 text-center font-bold uppercase tracking-tighter border-l border-gray-300">
-    <div class="flex justify-between">
-        <span></span>
+    <div class="flex space-x-4">
         <a href="{{ request()->fullUrlWithQuery(['sort' => strtolower($filterName), 'direction' => request('direction') === 'asc' ? 'desc' : 'asc']) }}">
-            <span class="font-semibold"  style="font-size: 12px">{{ $title }}</span>
+            <div >{{ $title }}</div>
         </a>
+        @isset($title)
+        <button type="button" onclick="toggleFilter('{{ $filterName }}_header')">
+            <img src="{{ Vite::asset('resources/images/filter.svg') }}" alt="Filtrele" class="h-4 w-4 hover:bg-amber-400">
+        </button>
+        @endisset
+        <!--button type="button" onclick="clearFilter('{{ $filterName }}_headerInput')" class="flex items-center space-x-1 text-gray-500 hover:text-gray-700">
+            <img src="{{ Vite::asset('resources/images/reload.svg') }}" alt="reload" class="h-4 w-4">
+        </button-->
 
-        <div class="flex items-center space-x-4">
-            <button type="button" onclick="toggleFilter('{{ $filterName }}_header')">
-                <img src="{{ Vite::asset('resources/images/filter.svg') }}" alt="Filtrele" class="h-4 w-4 hover:bg-amber-400">
-            </button>
-
-            <!--button type="button" onclick="clearFilter('{{ $filterName }}_headerInput')" class="flex items-center space-x-1 text-gray-500 hover:text-gray-700">
-                <img src="{{ Vite::asset('resources/images/reload.svg') }}" alt="reload" class="h-4 w-4">
-            </button-->
-
-                <!-- Sorting icons -->
-                <!--img src="{{ Vite::asset('resources/images/sort.svg') }}" alt="sort" class="h-4 w-4 "-->
-        </div>
+            <!-- Sorting icons -->
+            <!--img src="{{ Vite::asset('resources/images/sort.svg') }}" alt="sort" class="h-4 w-4 "-->
     </div>
     <div id="{{ $filterName }}_header"  class="hidden mt-2 filter-input-container">
         <div class="flex space-x-2">
@@ -29,7 +25,6 @@
             </button>
         </div>
     </div>
-</th>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {

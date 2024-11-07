@@ -26,6 +26,7 @@ class DeviceTypeController extends Controller
     }
     public function index()
     {
+        $columns=DeviceType::getColumnMapping();
         $perPage = request()->get('perPage', 50);
         $device_types = DeviceType::query()
             ->when(request('type'), function ($query) {
@@ -44,7 +45,7 @@ class DeviceTypeController extends Controller
             ->paginate($perPage)
             ->withQueryString();
 
-        return view('device_types.index', compact('device_types'));
+        return view('device_types.index', compact('device_types','columns'));
     }
 
     public function create()

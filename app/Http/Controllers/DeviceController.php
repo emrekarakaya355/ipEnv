@@ -38,7 +38,7 @@ class DeviceController extends Controller
     private function applyFiltersAndSorting(Request $request, $query){
 
         $columns = Device::getColumnMapping();
-        $perPage = $request->get('perPage', 50);
+        $perPage = $request->get('perPage', 10);
         $this->deviceService->filter($request,$query);
         if ($request->ajax()) {
             $this->deviceService->search($request, $query);
@@ -54,7 +54,21 @@ class DeviceController extends Controller
             ->with('latestDeviceInfo')
             ->paginate($perPage)
             ->withQueryString();  // Tüm parametreleri URL'e ekle
-        return view('devices.index', compact('devices','columns'));
+
+        $total  = Device::query()->count();
+        $active = Device::where('status','Çalışıyor')->count();
+        $passive = Device::where('status','Depo')->count();
+        $infobox = [
+            'number1' => $total,
+            'number2' => $active,
+            'number3' => $passive,
+            'label1' =>'Toplam Cihaz Sayısı',
+            'label2' => 'Aktif Cihaz Sayısı',
+            'label3' => 'Pasif Cihaz Sayısı',
+
+        ];
+
+        return view('devices.index', compact('devices','columns','infobox'));
 
     }
 

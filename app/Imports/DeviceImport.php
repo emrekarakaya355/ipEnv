@@ -64,6 +64,8 @@ class DeviceImport extends  BaseImport
             'mac_address' => [
                 'required',
                 'string',
+                'regex:/^([0-9A-Fa-f]{2}([-:])?){5}[0-9A-Fa-f]{2}$/', // Ensures MAC address format
+                'unique:devices,mac_address', // Optional: check for uniqueness if needed
             ],
             'device_name' => [
                 'nullable',
@@ -121,10 +123,10 @@ class DeviceImport extends  BaseImport
             // Satırı model olarak kaydedelim
             $device = Device::create([
                 'device_type_id' => $deviceType->id,
-                'type' => $row['type'],
-                'serial_number' => $row['serial_number'],
-                'registry_number' => $row['registry_number'],
-                'mac_address' => $row['mac_address'],
+                'type' => strtolower($row['type']),
+                'serial_number' => strtolower($row['serial_number']),
+                'registry_number' => strtolower($row['registry_number']),
+                'mac_address' => strtolower($row['mac_address']),
                 'device_name' => $row['device_name'],
                 'status' => 'Depo',
             ]);

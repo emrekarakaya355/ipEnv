@@ -67,6 +67,8 @@ class Device extends Model implements Auditable
 
 
         static::saving(function ($model) {
+
+
             if ($model->parent_device_id) {
 
                 /*if (!$model->parent_device_port) {
@@ -358,7 +360,7 @@ class Device extends Model implements Auditable
     public static function getColumnMapping()
     {
         return [
-            'Cihaz Tipi' => 'type',
+            '' => 'type',
             'Cihaz İsmi' => 'device_name',
             'IP Adresi' => 'ip_address',
             'Seri No' => 'serial_number',
@@ -370,8 +372,9 @@ class Device extends Model implements Auditable
             'Model' => 'model',
             'Port' => 'port_number',
             'Durum' => 'status',
+
+
         ];
     }
-
 
 }

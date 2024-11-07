@@ -73,13 +73,12 @@ class DeviceType extends Model  implements Auditable
 
 
         $modelParts = explode('(', $model, 2); // 2, yalnızca ilk bulduğu paranteze göre ayırmasını sağlar
-
         $modelName = trim($modelParts[0]); // İlk parçayı al ve boşlukları temizle
 
         // Eğer ikinci parça varsa (port numarası) onu al
         $port = isset($modelParts[1]) ? rtrim(trim($modelParts[1]), ')') : null; // Sonundaki ')' karakterini de kaldır
 
-        if(is_int($port)){
+        if(is_numeric($port)){
             $port = (int)$port;
         }else{
             $port = null;
@@ -99,7 +98,15 @@ class DeviceType extends Model  implements Auditable
         }
         return $deviceType;
     }
-
+    public static function getColumnMapping()
+    {
+        return [
+            'Cihaz Tipi' => 'type',
+            'Marka' => 'brand',
+            'Model' => 'model',
+            'Port Adet' => 'port_number',
+        ];
+    }
     /**
      * Update the record if it exists, or create it if it doesn't.
      *

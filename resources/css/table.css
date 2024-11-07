@@ -1,29 +1,72 @@
 /* Tablo genel stilleri */
 table {
-    width: 100%;
+    table-layout: fixed;
+    overflow-x: auto;
     border-collapse: collapse;
     font-family: Arial, sans-serif;
     transform: scale(0.98);
     transform-origin: top left;
     z-index: 1;
-
 }
-
 thead {
     background-color: #f4f6f9; /* Başlık satırı için hafif gri bir arka plan */
     color: #4a5568; /* Başlık yazısı rengi */
     font-weight: bold;
-    z-index: 1;
 }
 
-th, td {
+table th {
+    border-left: 1px solid #d1d5db;
+    font-size: 0.80rem; /* text-xs */
+    font-weight: 500; /* font-medium */
+    line-height: 1rem; /* leading-4 */
+    text-align: left; /* text-left */
+    color: #6b7280; /* text-gray-500 */
+    text-transform: uppercase; /* uppercase */
+    background-color: #f9fafb; /* bg-gray-50 */
+    white-space: nowrap;
+    position: relative;
+    cursor: col-resize;
+    user-select: none;
+    width: min-content;
+}
+
+table td {
+    white-space: nowrap; /* Prevent text wrapping */
     padding: 6px; /* Hücrelere boşluk ekleme */
-    border: 1px solid #e2e8f0; /* Hücre kenarlıkları */
-    text-align: center;
-    text-overflow: ellipsis; /* Uzun metinlerde üç nokta göster */
     z-index: 1;
+    font-size: 0.75rem; /* text-sm */
+    color: #1f2937;
+    text-transform: uppercase;
+    text-align: left;
+    position: relative; /* İçerik için pozisyon ayarı */
+}
+table span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+}
+table span:hover {
+
+}
+.resizer {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 5px;
+    cursor: col-resize;
+    user-select: none;
+    height: 100%;
 }
 
+.resizer:hover,
+.resizing {
+    border-right: 2px solid blue;
+}
+
+.resizing {
+    background-color: #f0f0f0;
+}
 tbody tr:hover {
     background-color: #edf2f7; /* Üzerine gelindiğinde satır rengi değişimi */
 }
@@ -31,6 +74,11 @@ tbody tr:hover {
 tbody tr:nth-child(even) {
     background-color: #f7fafc; /* Alternatif satır rengi */
 }
+table th:nth-child(19), table td:nth-child(19) {
+    width: 1%; /* 3. sütun genişliği */
+}
+
+
 
 /* Responsive tablo ayarları */
 @media (max-width: 768px) {
@@ -82,3 +130,7 @@ tbody tr:nth-child(even) {
         background-color: #f7fafc; /* Alternatif satır rengi */
     }
 }
+.status-scrap { color: gray; }
+.status-working { color: green; }
+.status-storage { color: red; }
+.status-warranty { color: orange; }

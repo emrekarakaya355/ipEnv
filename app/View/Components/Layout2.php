@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
 
-class Layout extends Component
+class Layout2 extends Component
 {
 
     /**
@@ -14,6 +14,6 @@ class Layout extends Component
      */
     public function render(): View
     {
-        return view('layouts.layoutnew');
+        return view('layouts.layout');
     }
 }

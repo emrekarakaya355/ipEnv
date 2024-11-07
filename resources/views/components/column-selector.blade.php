@@ -1,7 +1,7 @@
     <!-- Modal Tetikleyici -->
     <div class="flex justify-start ">
-        <button type="button" onclick="openColumnModal()" class="text-blue-500 p-2 rounded-full hover:bg-blue-100">
-            <i class="fas fa-filter-circle-xmark"></i> <!-- Dişli ikonu -->
+        <button type="button" onclick="openColumnModal()" class="bg-blue-500 text-white px-4 py-2 rounded">
+            <i class="fa-solid fa-gear"></i> <!-- Dişli ikonu -->
         </button>
     </div>
 
@@ -60,7 +60,10 @@
                 .filter(checkbox => checkbox.checked)
                 .map(checkbox => checkbox.value);
             const pageKey = window.location.pathname.replace(/\//g, '_'); // Replace slashes for valid key
-            localStorage.setItem('selectedColumns', JSON.stringify(`selectedColumns_${pageKey}`));
+            const storageKey = `selectedColumns_${pageKey}`; // Sayfaya özel anahtar
+
+            // Seçilen sütunları localStorage'a kaydet
+            localStorage.setItem(storageKey, JSON.stringify(selectedColumns));
             console.log(localStorage);
             closeColumnModal();
         }
@@ -100,7 +103,9 @@
 
             function filterTableColumns() {
                 const checkboxes = document.querySelectorAll('.column-checkbox');
-                const tableRows = document.querySelectorAll('#deviceTableBody tr'); // tbody'deki satırlar
+                const tableRows = document.querySelectorAll('table tbody tr');
+
+
                 const tableHeaders = document.querySelectorAll('thead tr th'); // Başlıklar
                 // Checkbox'ları kontrol et ve ilgili sütunları gizle/göster
                 checkboxes.forEach((checkbox, index) => {

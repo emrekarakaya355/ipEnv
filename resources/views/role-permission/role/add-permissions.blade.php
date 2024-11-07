@@ -1,24 +1,9 @@
 <x-layout>
-    <x-slot name="heading">Yetkileri Düzenle</x-slot>
+    @section('title','Yetki Ver')
 
-    <div class="w-full p-8">
-        <h1 class="text-2xl font-semibold text-gray-900 mb-6">
-            Yetkileri Düzenle
-        </h1>
-        <h4 class="text-2xl font-semibold">Role : {{ $role->name }}</h4>
 
-        {{-- Hata veya başarılı işlem mesajları --}}
-        @if(session('error'))
-            <div class="bg-red-500 text-white p-4 rounded-md mb-4">
-                {{ session('error') }}
-            </div>
-        @endif
+    <div class="w-full ">
 
-        @if(session('success'))
-            <div class="bg-green-500 text-white p-4 rounded-md mb-4">
-                {{ session('success') }}
-            </div>
-        @endif
 
         <div class="card">
             <div class="card-body">

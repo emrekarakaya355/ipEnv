@@ -13,6 +13,7 @@ export default defineConfig({
                 'resources/js/deviceCreate.js',
                 'resources/js/location.js',
                 'resources/js/deviceType.js',
+                'resources/js/table-resizer.js',
             ],
             refresh: true,
         }),

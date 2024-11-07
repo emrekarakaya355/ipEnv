@@ -15,7 +15,11 @@ class TableHeader extends Component
      */
     public function __construct($title, $filterName)
     {
-        $this->title = $title;
+        if($title==''){
+            $this->title=null;
+        }else
+            $this->title = $title;
+
         $this->filterName = $filterName;
     }
 

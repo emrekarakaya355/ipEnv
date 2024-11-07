@@ -51,7 +51,7 @@ class StoreDeviceRequest extends FormRequest
             'mac_address' => [
                 'required',
                 'string',
-                'max:255',
+                'regex:/^([0-9A-Fa-f]{2}([-:])?){5}[0-9A-Fa-f]{2}$/', // Ensures MAC address format
                 Rule::unique('devices', 'mac_address')->ignore($this->route('device')->id ?? null), // Ignore current device ID if editing
             ],
             'status' => ['nullable', 'string', 'in:' . implode(',', DeviceStatus::toArray())],

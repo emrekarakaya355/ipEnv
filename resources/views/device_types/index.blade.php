@@ -2,52 +2,39 @@
     @section('title','Cihaz Tipleri')
     @can('view deviceType')
 
-    <div class="flex-auto p-4">
-            <div class="flex items-center justify-between">
-                <span></span>
-                <header >
-                    <h2 class="text-2xl font-medium text-center text-gray-900 dark:text-gray-100">
-                        {{ __('Cihaz Tipleri') }}
-                    </h2>
-                </header>
-                <x-button-group
-                    route="device_types"
-                    addOnClick="openCreateModal()"
-                    viewName="deviceType"
-                />
-            </div>
+        <div  class="bg-white rounded-xl space-x-4 space-y-4">
+            <x-table-control
+                :columns="$columns"
+                route="device_types"
+                addOnClick="openCreateModal()"
 
-        @if (session('error'))
-            <div class="bg-red-500 text-white p-4 rounded">
-                {{ session('error') }}
-            </div>
-        @endif
-        @if (session('successful'))
-            <div class="bg-green-500 text-white p-4 rounded">
-                {{ session('successful') }}
-            </div>
-        @endif
-        <div class="overflow-x-auto bg-white shadow-md rounded-xl">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
+                viewName="deviceType">
+            </x-table-control>
+
+            <table id="resizeMe" class="resizable-table min-w-full">
+                <thead >
                 <tr>
-                    <x-table-header title="Cihaz Tipi" filterName="type" />
-                    <x-table-header title="Marka" filterName="brand" />
-                    <x-table-header title="Model" filterName="model" />
-                    <x-table-header title="Port Sayısı" filterName="port_number" />
-
-                    <th scope="col" class="border-l border-gray-300" style="width: 10px; height: 5px;"></th>
-
+                    @foreach ($columns as $header => $column)
+                        <th class="draggable-table" scope="col" data-column="{{ $loop->index }}" >
+                            <x-table-header title="{{$header}}" filterName="{{$column}}" />
+                        </th>
+                    @endforeach
+                    @canany(['update deviceType','delete deviceType'])
+                    <th style="border-left: none"> </th>
+                    @endcanany
                 </tr>
                 </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
+                <tbody >
                 @foreach($device_types as $device_type)
-                    <tr class="border-b border-gray-200">
-                        <td class="px-6 py-2 whitespace-nowrap border-l border-gray-300">{{ $device_type->type }}</td>
-                        <td class="px-6 py-2 whitespace-nowrap border-l border-gray-300">{{ $device_type->brand }}</td>
-                        <td class="px-6 py-2 whitespace-nowrap border-l border-gray-300">{{ $device_type->model }}</td>
-                        <td class="px-6 py-2 whitespace-nowrap border-l border-gray-300">{{ $device_type->port_number }}</td>
-                        <td class="px-6  whitespace-nowrap border-l border-gray-300">
+                    <tr >
+                        @foreach ($columns as $header => $column)
+
+                                <td >
+                                    <span>{{ $device_type[strtolower($column)] }}</span>
+
+                                </td>
+                        @endforeach
+                        <td class="flex space-x-2 justify-end" style="border-left: none">
                             @can('update deviceType')
                             <x-edit-button onclick="editDeviceType({{ $device_type->id }})"/>
                             @endcan
@@ -59,15 +46,12 @@
                 @endforeach
                 </tbody>
             </table>
-
         </div>
         <x-table-footer :footerData="$device_types"></x-table-footer>
 
         @if ($device_types->isEmpty())
             <p class="text-center py-4">No device types found.</p>
         @endif
-
-    </div>
     @canany(['create deviceType','update deviceType'])
     <!-- Add/Edit Device Type Modal -->
     <div id="deviceTypeModal" class="fixed z-10 inset-0 overflow-y-auto hidden" aria-labelledby="deviceTypeModalLabel" role="dialog" aria-modal="true">
@@ -123,7 +107,10 @@
 
     @endcanany
     @vite('resources/css/table.css')
+    @vite('resources/js/table-resizer.js')
     @vite('resources/js/deviceType.js')
 
     @endcan
+
+
 </x-layout>

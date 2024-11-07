@@ -20,7 +20,7 @@
                 <i class="fa-solid fa-server mr-4"></i>
                 <a href="/devices" class="flex-grow">Cihazlar</a>
                 <span class="submenu-arrow" id="arrow">
-                    <i class="bi bi-chevron-down"></i>
+                    <i class="fa-solid fa-arrow-down"></i>
                 </span>
             </div>
 
