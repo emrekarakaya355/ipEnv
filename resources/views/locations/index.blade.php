@@ -19,6 +19,7 @@
         @endcanany
         @vite('resources/js/location.js')
         @vite('resources/js/table-resizer.js')
+        @vite('resources/js/entityActions.js')
         @vite('resources/css/table.css')
     @endcan
 </x-layout>

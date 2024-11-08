@@ -1,30 +1,14 @@
 <x-layout>
     @can('create device')
-    <x-slot name="heading">Cihaz Ekle</x-slot>
+    @section('title', 'Cihaz Ekle')
 
-    <div class="w-full p-8">
-        <h1 class="text-2xl font-semibold text-gray-900 mb-6">
-            Cihaz Ekle
-        </h1>
-        {{-- Hata veya başarılı işlem mesajları --}}
-        @if(session('error'))
-            <div class="bg-red-500 text-white p-4 rounded-md mb-4">
-                {{ session('error') }}
-
-            </div>
-        @endif
-
-        @if(session('success'))
-            <div class="bg-green-500 text-white p-4 rounded-md mb-4">
-                {{ session('success') }}
-            </div>
-        @endif
+    <div class="w-full ">
         {{-- Form başlangıcı --}}
         <form id="deviceCreateForm" method="POST" action="{{ route('devices.store') }}" class="bg-white shadow-lg rounded-2xl p-8 form-container">
             @csrf
             <div class="messages"></div>
 
-            <div class="flex gap-x-48">
+            <div class="flex">
 
                 <div class="bg-white shadow-md rounded-xl p-6 mb-6 flex-auto">
 
@@ -270,6 +254,6 @@
     </div>
     {{-- Modal --}}
     <x-modal/>
-    @vite(['resources/js/deviceCreate.js'])
+    @vite(['resources/js/devices/deviceCreate.js'])
     @endcan
 </x-layout>

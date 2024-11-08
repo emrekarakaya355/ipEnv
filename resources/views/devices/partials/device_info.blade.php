@@ -1,3 +1,4 @@
+<section>
 <div class="bg-white shadow-md rounded-xl p-6 mb-6">
     <h2 class="text-lg font-semibold text-gray-900 mb-4">Cihaz Bilgileri</h2>
     <form id="device-info-form" action="{{ route('devices.update', $device) }}" method="POST" class="form-container">
@@ -151,7 +152,7 @@
             </button>
             @endcan
             @can('delete device')
-            <button type="button" id="delete-btn" class="bg-red-500 text-white px-4 py-2 rounded">Delete</button>
+            <button type="button" id="delete-btn" class="bg-red-500 text-white px-4 py-2 rounded" onclick="handleDelete(`/devices/{{$device->id}}`,redirectUrl='/devices')">Delete</button>
             @endcan
         </div>
         <input type="hidden" name="parent_device_id" id="parent_device_id"
@@ -410,34 +411,8 @@
 
             }
         });
-
-        deleteButton.addEventListener('click', function () {
-            if (confirm('Bu cihazı silmek istediğinizden emin misiniz?')) {
-                const deviceId = {{ $device->id }};
-                fetch(`/devices/${deviceId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        'Accept': 'application/json'
-                    }
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            toastr.success(data.message);
-                            setTimeout(() => {
-                                window.location.href = '/devices';
-                            }, 2000);
-                        } else {
-                            toastr.error(data.message);
-                        }
-                    })
-                    .catch(error => {
-                        toastr.error('Silme işlemi sırasında bir hata oluştu.');
-                    });
-            }
-        });
     });
 
 
 </script>
+</section>

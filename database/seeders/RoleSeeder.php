@@ -103,18 +103,6 @@ class RoleSeeder extends Seeder
         ]);
 
         $superAdminUser->assignRole($superAdminRole);
-        $adminUser = User::firstOrCreate([
-            'email' => 'admin@gmail.com'
-        ], [
-            'name' => 'Admin',
-            'email' => 'admin@gmail.com',
-            'username' => 'cem',
-            'password' => Hash::make ('12345678'),
-        ]);
-
-        $adminUser->assignRole($adminRole);
-
-
 
     }
 }

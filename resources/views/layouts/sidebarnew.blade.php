@@ -56,14 +56,14 @@
             <a class="flex items-center px-6 py-2 mt-4 text-gray-500 hover:bg-gray-700 hover:bg-opacity-25 hover:text-gray-100"
                href="/roles">
                 <i class="fa-solid fa-lock w-6 h-6 text-gray-500"></i>
-                <span class="mx-3">Roles</span>
+                <span class="mx-3">Roller</span>
             </a>
         @endcan
         @can('view permission')
         <a class="flex items-center px-6 py-2 mt-4 text-gray-500 hover:bg-gray-700 hover:bg-opacity-25 hover:text-gray-100"
            href="/permissions">
             <i class="fa-solid fa-lock w-6 h-6 text-gray-500"></i>
-            <span class="mx-3">Permissions</span>
+            <span class="mx-3">Yetkiler</span>
         </a>
         @endcan
 
@@ -92,11 +92,11 @@
                 <input class="w-32 pl-10 pr-4 rounded-md form-input sm:w-64 focus:border-indigo-600" type="text" id="searchInput" name="search"
                        placeholder="Search">
                 </form>
-
             </div>
         </div>
 
         <div class="flex items-center">
+            <div>{{auth()->user()->roles()->first()->name ?? 'Rol Bulunamadı'}}</div>
             <div x-data="{ notificationOpen: false }" class="relative">
                 <button @click="notificationOpen = ! notificationOpen"
                         class="flex mx-4 text-gray-600 focus:outline-none">

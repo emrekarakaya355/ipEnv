@@ -1,8 +1,7 @@
 <x-layout>
-    @section('title','Cihaz Tipleri')
     @can('view deviceType')
-
-        <div  class="bg-white rounded-xl space-x-4 space-y-4">
+        @section('title','Cihaz Tipleri')
+        <div class="bg-white rounded-xl space-x-4 space-y-4">
             <x-table-control
                 :columns="$columns"
                 route="device_types"
@@ -10,106 +9,17 @@
 
                 viewName="deviceType">
             </x-table-control>
-
-            <table id="resizeMe" class="resizable-table min-w-full">
-                <thead >
-                <tr>
-                    @foreach ($columns as $header => $column)
-                        <th class="draggable-table" scope="col" data-column="{{ $loop->index }}" >
-                            <x-table-header title="{{$header}}" filterName="{{$column}}" />
-                        </th>
-                    @endforeach
-                    @canany(['update deviceType','delete deviceType'])
-                    <th style="border-left: none"> </th>
-                    @endcanany
-                </tr>
-                </thead>
-                <tbody >
-                @foreach($device_types as $device_type)
-                    <tr >
-                        @foreach ($columns as $header => $column)
-
-                                <td >
-                                    <span>{{ $device_type[strtolower($column)] }}</span>
-
-                                </td>
-                        @endforeach
-                        <td class="flex space-x-2 justify-end" style="border-left: none">
-                            @can('update deviceType')
-                            <x-edit-button onclick="editDeviceType({{ $device_type->id }})"/>
-                            @endcan
-                            @can('delete deviceType')
-                            <x-delete-button onclick="deleteDeviceType({{ $device_type->id }})"/>
-                            @endcan
-                        </td>
-                    </tr>
-                @endforeach
-                </tbody>
-            </table>
+            @include('device_types.partials.device_type-table')
         </div>
         <x-table-footer :footerData="$device_types"></x-table-footer>
 
-        @if ($device_types->isEmpty())
-            <p class="text-center py-4">No device types found.</p>
-        @endif
-    @canany(['create deviceType','update deviceType'])
-    <!-- Add/Edit Device Type Modal -->
-    <div id="deviceTypeModal" class="fixed z-10 inset-0 overflow-y-auto hidden" aria-labelledby="deviceTypeModalLabel" role="dialog" aria-modal="true">
-        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
-            <!-- Background overlay -->
-            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
-
-            <!-- Modal content -->
-            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                    <h3 class="text-lg font-medium text-gray-900" id="deviceTypeModalLabel">Device Type</h3>
-                    <div class="mt-4">
-                        <!-- Form goes here -->
-                        <form id="deviceTypeForm" method="POST" action="{{ route('device_types.store') }}">
-                            @csrf
-                            <input type="hidden" name="_method" id="method" value="{{ csrf_token() }}">
-                            <div>
-                                <label for="type" class="block text-sm font-medium text-gray-700">Type</label>
-                                <div class="mt-1 flex space-x-8">
-                                    <div class="flex items-center">
-                                        <input id="switch" name="type" type="radio" value="switch" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300" onclick="togglePortNumber(true)">
-                                        <label for="switch" class="ml-3 block text-sm font-medium text-gray-700">Switch</label>
-                                    </div>
-                                    <div class="flex items-center">
-                                        <input id="access_point" name="type" type="radio" value="access_point" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300" onclick="togglePortNumber(false)">
-                                        <label for="access_point" class="ml-3 block text-sm font-medium text-gray-700">Access Point</label>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="mt-4">
-                                <label for="brand" class="block text-sm font-medium text-gray-700">Brand</label>
-                                <input required type="text" id="brand" name="brand" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                            </div>
-                            <div class="mt-4">
-                                <label for="model" class="block text-sm font-medium text-gray-700">Model</label>
-                                <input  required type="text" id="model" name="model" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                            </div>
-                            <div class="mt-4" id="portNumberContainer" style="display: none;">
-                                <label for="port_number" class="block text-sm font-medium text-gray-700">Port Sayısı</label>
-                                <input  type="number" id="port_number" name="port_number" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                            </div>
-                        </form>
-                    </div>
-                </div>
-                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                    <button type="button" id="saveDeviceTypeButton" onclick="saveDeviceType()" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm">Save</button>
-                    <button type="button" id="closeDeviceTypeModalButton" onclick="closeDeviceTypeModal()" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm">Cancel</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-    @endcanany
-    @vite('resources/css/table.css')
-    @vite('resources/js/table-resizer.js')
-    @vite('resources/js/deviceType.js')
-
+        @canany(['create deviceType','update deviceType'])
+            @include('device_types.partials.update-create-device_type-form')
+        @endcanany
+        @vite('resources/css/table.css')
+        @vite('resources/js/table-resizer.js')
+        @vite('resources/js/deviceType.js')
+        @vite('resources/js/entityActions.js')
     @endcan
 
 

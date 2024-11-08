@@ -37,7 +37,7 @@ class LocationController extends Controller
     public function index(Request $request)
     {
         $columns = Location::getColumnMapping();
-        $perPage = $request->get('perPage', 50);
+        $perPage = $request->get('perPage', 10);
         $locations = Location::query()
             ->when(request('building'), function ($query) {
                 return $query->where('building', 'like', '%' . request('building') . '%');
@@ -74,7 +74,11 @@ class LocationController extends Controller
             throw new ConflictException("Yer Bilgisi Zaten Var");
         }
         try {
-            Location::create($validator->validated());
+            //küçük harfe çevir
+            $validatedData = array_map(function ($value) {
+                return is_string($value) ? ucfirst(strtolower($value)) : $value;
+            }, $validator->validated());
+            Location::create($validatedData);
         } catch (Exception $e) {
            return new ErrorResponse($e);
         }
@@ -116,12 +120,14 @@ class LocationController extends Controller
         }
         try{
             $location = Location::findOrFail($id);
+
+
             $location->fill($validator->validated());
             //eğer değişiklik var ise update yapılıyor.!
             if($location->isDirty()){
                 $location->update([
-                    'building' => ucfirst($request->building),
-                    'unit' => ucfirst($request->unit),
+                    'building' => ucfirst(strtolower($request->building)),
+                    'unit' => ucfirst(strtolower($request->unit)),
                 ]);
                 return new SuccessResponse('Yer Bilgisi Başarı İle Kaydedildi.');
             }

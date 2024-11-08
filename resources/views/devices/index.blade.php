@@ -1,13 +1,24 @@
 <x-layout >
         @section('title', 'Cihazlar')
         @section('infobox')
+
             <x-info-box
-                :number1="$infobox['number1']"
-                :label1="$infobox['label1']"
-                :number2="$infobox['number2']"
-                :label2="$infobox['label2']"
-                :number3="$infobox['number3']"
-                :label3="$infobox['label3']"
+                :number="$infobox['number1']"
+                :label="$infobox['label1']"
+                icon="fas fa-wifi"
+                color="bg-blue-600"
+            />
+         <x-info-box
+                :number="$infobox['number2']"
+                :label="$infobox['label2']"
+                icon="fas fa-wifi"
+                color="bg-green-600"
+            ></x-info-box>
+            <x-info-box
+                :number="$infobox['number3']"
+                :label="$infobox['label3']"
+                icon="fa fa-wifi"
+                color="bg-orange-600"
             ></x-info-box>
         @endsection
         @can('view device')

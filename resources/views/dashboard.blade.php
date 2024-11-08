@@ -1,74 +1,108 @@
 <x-layout>
-    @section('title','Ana Sayfa')
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Dashboard') }}
-        </h2>
-    </x-slot>
-    <div class="flex-auto space-y-2">
-        <div class="flex justify-center space-x-8">
-            <x-chart
-                id="unit"
-                type="pie"
-                :chartData="$unitData"
-                title="Birim Başına Cihaz Sayısı"
-                total="{{$groupedByUnit->values()->sum()}}"
-                :options="['responsive' => true, 'maintainAspectRatio' => false]"
-            />
-            <x-chart
-                id="building"
-                type="pie"
-                :chartData="$buildingData"
-                title="Bina Başına Cihaz Sayısı"
-                total="{{$groupedByBuilding->values()->sum()}}"
-                :options="['responsive' => true, 'maintainAspectRatio' => false]"
-            />
+
+    @section('title', 'Dashboard')
+    @section('infobox')
+        <x-info-box :number="$infobox['number1']" :label="$infobox['label1']" color="bg-teal-600" icon="fas fa-chart-pie"/>
+        <x-info-box :number="$infobox['number2']" :label="$infobox['label2']" color="bg-teal-600" icon="fas fa-chart-pie"/>
+        <x-info-box :number="$infobox['number3']" :label="$infobox['label3']" color="bg-purple-600" icon="fas fa-wrench"/>
+        <x-info-box :number="$infobox['number4']" :label="$infobox['label4']" color="bg-purple-600" icon="fa-solid fas fa-boxes-stacked"/>
+        <x-info-box :number="$infobox['number5']" :label="$infobox['label5']" color="bg-green-600" icon="fas fa-person-running"/>
+    @endsection
+
+    <div class="chart-container flex">
+        <div class="chart-item w-full">
             <x-chart
                 id="brand"
-                type="pie"
-                :chartData="$brandData"
-                title="Marka Başına Cihaz Sayısı"
-                total="{{$groupedByBrand->values()->sum()}}"
-                :options="['responsive' => true, 'maintainAspectRatio' => false]"
-            />
-            <x-chart
-                id="brand2"
                 type="bar"
                 :chartData="$brandData"
                 title="Marka Başına Cihaz Sayısı"
                 total="{{$groupedByBrand->values()->sum()}}"
-                :options="['responsive' => true, 'maintainAspectRatio' => false,'indexAxis'=> 'y']"
+                :options="['responsive' => true, 'maintainAspectRatio' => true ]"
             />
-
-
         </div>
-        <div class="flex justify-center">
+        <div class="chart-item w-full">
             <x-chart
-                id="brand3"
-                type="line"
-                :chartData="$brandData"
+                id="a"
+                type="bar"
+                :chartData="$groupedByBrandAndTypeData"
                 title="Marka Başına Cihaz Sayısı"
                 total="{{$groupedByBrand->values()->sum()}}"
-                :options="['responsive' => true, 'maintainAspectRatio' => true]"
+                :options="['responsive' => true, 'maintainAspectRatio' => true,
+                          'scales' => [
+                            'x' => ['stacked' => true], // Gruplandırılmış barlar
+                            'y' => ['stacked' => true]
+                            ],
+                            'plugins' => [
+                                'legend' => ['display' => true]
+                            ]]"
             />
-
+        </div>
+        <div class="chart-item w-full">
             <x-chart
-                id="model"
-                type="line"
-                :chartData="$modelData"
-                title="Model Başına Cihaz Sayısı"
-                total="{{$groupedByModel->values()->sum()}}"
-                :options="['responsive' => true, 'maintainAspectRatio' => true]"
+                id="building"
+                type="bar"
+                :chartData="$buildingData"
+                title="Bina Başına Cihaz Sayısı"
+                total="{{$groupedByBuilding->values()->sum()}}"
+                :options="['responsive' => true, 'maintainAspectRatio' => true,'indexAxis'=>'y']"
             />
-            <x-chart
-                id="status"
-                type="pie"
-                :chartData="$statusData"
-                title="Model Başına Cihaz Sayısı"
-                total="{{$groupedByModel->values()->sum()}}"
-                :options="['responsive' => true, 'maintainAspectRatio' => true]"
-            />
-
         </div>
     </div>
+    <div class="tables-container grid grid-cols-2 gap-6 px-6">
+        <div class="table-container bg-white p-6 shadow rounded-lg">
+            <h2 class="text-lg font-semibold mb-4">Son 5 Hareket</h2>
+            <table class="w-full text-left">
+                <thead>
+                <tr class="border-b">
+                    <th>ID #</th>
+                    <th>Cihaz Adı</th>
+                    <th>IP Adresi</th>
+                    <th>Kullanıcı</th>
+                    <th>Yapılan İşlem</th>
+                    <th>Durum</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>105 Nolu Derslik</td>
+                    <td>10.10.24.32</td>
+                    <td>CEM</td>
+                    <td>Konum değişti</td>
+                    <td>aktif</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="table-container bg-white p-6 shadow rounded-lg">
+            <h2 class="text-lg font-semibold mb-4">Son Eklenen 5 Cihaz</h2>
+            <table class="w-full text-left">
+                <thead>
+                <tr class="border-b">
+                    <th>Cihaz Adı</th>
+                    <th>Model</th>
+                    <th>Durum</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>test2</td>
+                    <td>test3</td>
+                    <td>test4</td>
+                    <td class="text-end"> <!-- Yalnızca buton sütunu -->
+                        <button
+                            class="bg-blue-500 text-white  rounded">
+                            <i class="fa-solid fa-arrow-right px-4 py-2"></i>
+                        </button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+
 </x-layout>

@@ -92,33 +92,6 @@ window.saveDeviceType = function saveDeviceType() {
         });
 }
 
-window.deleteDeviceType = function deleteDeviceType(deviceTypeId) {
-    if (confirm('Bu Cihazı Silmek İstediğinizden Emin misiniz?')) {
-        fetch(`/device_types/${deviceTypeId}`, {
-        method: 'DELETE',
-            headers: {
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-            'Accept': 'application/json'
-        }
-    })
-        .then(response => {
-        if (!response.ok) {
-            return response.json().then(errorData => {
-                throw new Error(errorData.message || 'Network response was not ok');
-            });
-        }
-    return response.json();
-    })
-        .then(data => {
-            toastr.success(data.message || 'Cihaz Tipi Başarı ile Silindi.');
-            setTimeout(() => location.reload(), 1000);
-        })
-        .catch(error => {
-            toastr.error(error.message || 'Beklenmedik bir hata oluştu.');
-        });
-    }
-}
-
 window.closeDeviceTypeModal = function closeDeviceTypeModal() {
     document.getElementById('deviceTypeModal').classList.add('hidden');
 }

@@ -1,7 +1,7 @@
-<div class="lg:w-6/12 xl:w-3/12 px-4">
+<div class="lg:w-6/12 xl:w-full p-4">
     <div class="relative flex flex-col min-w-0 break-words bg-white rounded-lg mb-6 xl:mb-0 shadow-lg">
         <div class="p-4">
-            <h5 class="text-blueGray-400 uppercase font-bold  text-center">{{$title}} </h5>
+            <h5 class="text-blueGray-400 uppercase font-bold  text-center">  </h5>
             <div style="width: 100%; height: 300px;">
                 <canvas id="{{ $id }}" style="width: 100%; height: 100%;"></canvas>
             </div>
@@ -27,6 +27,7 @@
             const options = {!! json_encode($options) !!}; // Use JSON to pass options
 
             const dynamicChart = new Chart(ctx, {
+                legend:{ position: 'bottom'},
                 type: '{{ $type }}', // Dynamic chart type
                 data: chartData,
                 options: options // Include options if provided

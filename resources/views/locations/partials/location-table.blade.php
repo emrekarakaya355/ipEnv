@@ -1,4 +1,5 @@
 <section>
+
     <table id="resizeMe" class="resizable-table min-w-full"  >
         <thead >
         <tr>
@@ -17,6 +18,7 @@
         </thead>
         <tbody >
         @foreach($locations as $location)
+
             <tr>
                 <td >
                     {{ $location->building }}
@@ -31,7 +33,7 @@
                         @endcan
                         @can('delete location')
 
-                            <x-delete-button onclick="deleteLocation({{ $location->id }})"></x-delete-button>
+                <x-delete-button onclick="handleDelete(`/locations/{{$location->id}}`)"></x-delete-button>
 
                         @endcan
                     </td>

@@ -33,7 +33,21 @@
                             {{ session('successful') }}
                         </div>
                     @endif
-                    @yield('infobox')
+                    @if(View::hasSection('infobox'))
+
+                        <div class="mt-4">
+
+                            <div class="flex flex-wrap -mx-6">
+
+                                @yield('infobox')
+                            </div>
+                        </div>
+
+                        <div class="mt-8">
+
+                        </div>
+                    @endif
+
 
                     <div class="flex flex-col mt-8">
                         <div class="py-2 -my-2 overflow-x-auto sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
