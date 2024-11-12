@@ -75,3 +75,19 @@
     width: 150px; /* Sidebar açılırken fareyi yakalamak için */
     height: 100%;
 }
+
+#searchResults {
+    max-height: 200px;
+    overflow-y: auto;
+    display: none;
+}
+
+#searchResults div {
+    padding: 8px;
+    border-bottom: 1px solid #e2e8f0;
+    cursor: pointer;
+}
+
+#searchResults div:hover {
+    background-color: #f7fafc;
+}

@@ -54,7 +54,6 @@
             <table class="w-full text-left">
                 <thead>
                 <tr class="border-b">
-                    <th>ID #</th>
                     <th>Cihaz Adı</th>
                     <th>IP Adresi</th>
                     <th>Kullanıcı</th>
@@ -63,14 +62,18 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr>
-                    <td>1</td>
-                    <td>105 Nolu Derslik</td>
-                    <td>10.10.24.32</td>
-                    <td>CEM</td>
-                    <td>Konum değişti</td>
-                    <td>aktif</td>
-                </tr>
+
+                    @foreach ($lastFiveMovement as $movement )
+                        <tr>
+                            <td>{{$movement->device->device_name}}</td>
+                            <td>{{$movement->ip_address}}</td>
+                            <td>{{$movement->createdBy->username}}</td>
+                            <td>{{$movement->update_reason}}</td>
+                            <td>{{$movement->device->status}}</td>
+                        </tr>
+                    @endforeach
+
+
                 </tbody>
             </table>
         </div>
@@ -82,22 +85,30 @@
                 <tr class="border-b">
                     <th>Cihaz Adı</th>
                     <th>Model</th>
+                    <th>İp Adresi</th>
+                    <th>İp Adresi</th>
                     <th>Durum</th>
                     <th></th>
                 </tr>
                 </thead>
                 <tbody>
-                <tr>
-                    <td>test2</td>
-                    <td>test3</td>
-                    <td>test4</td>
-                    <td class="text-end"> <!-- Yalnızca buton sütunu -->
-                        <button
-                            class="bg-blue-500 text-white  rounded">
-                            <i class="fa-solid fa-arrow-right px-4 py-2"></i>
-                        </button>
-                    </td>
-                </tr>
+                @foreach ($lastFiveDevice as $device )
+                    <tr>
+                        <td>{{$device->device_name}}</td>
+                        <td>{{$device->deviceType->brand}}</td>
+                        <td>{{$device->ip_address}}</td>
+                        <td>{{$device->createdBy->username}}</td>
+                        <td>{{$device->status}}</td>
+
+                        <td class="text-end"> <!-- Yalnızca buton sütunu -->
+                            <button
+                                class="bg-blue-500 text-white  rounded">
+                                <i class="fa-solid fa-arrow-right px-4 py-2"></i>
+                            </button>
+                        </td>
+                    </tr>
+                @endforeach
+
                 </tbody>
             </table>
         </div>

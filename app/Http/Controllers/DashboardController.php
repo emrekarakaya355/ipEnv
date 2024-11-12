@@ -190,6 +190,10 @@ class DashboardController extends Controller
 
         ];
 
+        /*Son 5 hareket*/
+        $lastFiveMovement = DeviceInfo::query()->orderBy('created_at','DESC')->take(5)->get();
+        $lastFiveDevice   = Device::query()->orderBy('created_at','DESC')->take(5)->get();
+
         return view('dashboard', [
             'groupedByBuilding' => $groupedByBuilding,
             'groupedByUnit' => $groupedByUnit,
@@ -204,6 +208,8 @@ class DashboardController extends Controller
             'statusData' => $statusData,
             'groupedByBrandAndTypeData' => $groupedByBrandAndTypeData,
             'infobox' => $infobox,
+            'lastFiveMovement' => $lastFiveMovement,
+            'lastFiveDevice' => $lastFiveDevice,
         ]);
     }
 }

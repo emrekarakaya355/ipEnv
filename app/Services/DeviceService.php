@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\DB;
 
 class DeviceService
 {
-    public function createDeviceWithInfo($deviceValidated)
+    public function createDeviceWithInfo($deviceValidated): ErrorResponse|SuccessResponse
     {
         $device = null;
 
@@ -235,6 +235,18 @@ class DeviceService
                     $firstConditionAdded
                         ? $query->orWhere('serial_number', 'like', '%' . $search . '%')
                         : $query->where('serial_number', 'like', '%' . $search . '%');
+                    $firstConditionAdded = true;
+                }
+                if (canView('view-registry_number')) {
+                    $firstConditionAdded
+                        ? $query->orWhere('registry_number', 'like', '%' . $search . '%')
+                        : $query->where('registry_number', 'like', '%' . $search . '%');
+                    $firstConditionAdded = true;
+                }
+                if (canView('view-mac_address')) {
+                    $firstConditionAdded
+                        ? $query->orWhere('mac_address', 'like', '%' . $search . '%')
+                        : $query->where('mac_address', 'like', '%' . $search . '%');
                     $firstConditionAdded = true;
                 }
                 if (canView('view-building') || canView('view-ip_address') || canView('view-description')|| canView('view-unit')) {

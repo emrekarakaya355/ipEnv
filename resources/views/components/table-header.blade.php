@@ -1,9 +1,9 @@
-    <div class="flex space-x-4">
+<div class="flex space-x-4 justify-center">
         <a href="{{ request()->fullUrlWithQuery(['sort' => strtolower($filterName), 'direction' => request('direction') === 'asc' ? 'desc' : 'asc']) }}">
             <div >{{ $title }}</div>
         </a>
         @isset($title)
-        <button type="button" onclick="toggleFilter('{{ $filterName }}_header')">
+        <button type="button" onclick="toggleFilter(`{{ $filterName }}_header`)">
             <img src="{{ Vite::asset('resources/images/filter.svg') }}" alt="Filtrele" class="h-4 w-4 hover:bg-amber-400">
         </button>
         @endisset
@@ -19,53 +19,10 @@
 
             <input type="text" id="{{ $filterName }}_headerInput" name="{{ $filterName }}" value="{{ request($filterName) }}" placeholder="Filtrele..."
                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm "
-                   onkeydown="submitAllForms(event)">
-            <button type="button" onclick="clearFilter('{{ $filterName }}_headerInput')" class="flex items-center text-gray-500 hover:bg-amber-400">
+                   onkeydown="submitAllForms(event,`{{request()->url()}}`)">
+            <button type="button" onclick="clearFilter('{{ $filterName }}_headerInput',`{{request()->url()}}`)" class="flex items-center text-gray-500 hover:bg-amber-400">
                 <img src="{{ Vite::asset('resources/images/reload.svg') }}" alt="reload" class="h-8 w-8">
             </button>
         </div>
     </div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const filterInputs = document.querySelectorAll('.filter-input-container');
-
-        filterInputs.forEach(container => {
-            const input = container.querySelector('input');
-            if (input && input.value) {
-                container.classList.remove('hidden'); // Eğer inputta değer varsa 'hidden' sınıfını kaldır
-            }
-        });
-    });
-    function toggleFilter(filterId) {
-        const filterInputContainer = document.getElementById(filterId);
-        if (filterInputContainer.classList.contains('hidden')) {
-            filterInputContainer.classList.remove('hidden');
-        } else {
-            filterInputContainer.classList.add('hidden');
-        }
-    }
-    function clearFilter(filterId) {
-        const filterInput = document.getElementById(filterId);
-        if (filterInput) {
-            filterInput.value = ''; // Input değerini sıfırla
-            submitAllForms({key: 'Enter'}); // Tüm formları gönder
-        }
-    }
-
-    function submitAllForms(event) {
-        if (event && event.key === 'Enter') {
-            const filters = {}; // Filtre değerlerini tutacak bir nesne
-            const inputs = document.querySelectorAll('.filter-input-container input'); // Tüm filtre inputlarını seç
-            inputs.forEach(input => {
-                if (input.value.trim() !== '') { // Boş olmayan inputları ekle
-                    filters[input.name] = input.value; // Her inputun değerini nesneye ekle
-                }
-            });
-            // Tüm filtre değerlerini bir query string'e dönüştür
-            const queryString = new URLSearchParams(filters).toString();
-            // Sayfayı yeni query string ile güncelle
-            window.location.href = `{{ request()->url() }}?${queryString}`; // Sayfayı güncelle
-        }
-    }
-</script>

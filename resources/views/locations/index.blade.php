@@ -15,11 +15,17 @@
         <x-table-footer :footerData="$locations"></x-table-footer>
 
         @canany(['create location','update location'])
-            @include('locations.partials.update-create-location-form')
+        @include('locations.partials.update-create-location-form')
         @endcanany
-        @vite('resources/js/location.js')
-        @vite('resources/js/table-resizer.js')
-        @vite('resources/js/entityActions.js')
-        @vite('resources/css/table.css')
+
+
+
     @endcan
 </x-layout>
+
+
+@vite('resources/js/location.js')
+@vite('resources/js/table-resizer.js')
+@vite('resources/js/entityActions.js')
+@vite('resources/css/table.css')
+@vite('resources/js/tableHeader.js')

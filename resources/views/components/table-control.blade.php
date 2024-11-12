@@ -18,24 +18,3 @@
 
 </div>
 <x-bulk-add-modal title="Toplu Ekle" actionClass="{{$route}}"></x-bulk-add-modal>
-
-<script>
-    function exportData() {
-        const selectedColumnsInputElement = document.getElementById('selectedColumnsInput');
-
-        let selectedColumnsInput = '';
-
-        if (selectedColumnsInputElement) {
-            selectedColumnsInputElement.value = localStorage.getItem('selectedColumns');
-            selectedColumnsInput = selectedColumnsInputElement.value;
-        }
-
-        const queryParams = new URLSearchParams(window.location.search);
-
-        // Seçilen sütunları sorgu parametrelerine ekle
-        queryParams.append('selected_columns', selectedColumnsInput || '');
-
-        // Yeni URL ile dışa aktarma işlemi
-        window.location.href = `{{ url($route . '/export') }}?${queryParams.toString()}`;
-    }
-</script>

@@ -10,13 +10,16 @@
     <thead>
             @foreach ($columns as $header => $column)
                 @if (canView('view-' . strtolower($column)))
-                    <th class="draggable-table" scope="col" data-column="{{ $loop->index }}" >
-                        <x-table-header title="{{$header}}" filterName="{{$column}}" />
-                    </th>
-
+                    @switch(strtolower($header))
+                        @case('type')
+                            @break
+                        @default
+                            <th class="draggable-table" scope="col" data-column="{{ $loop->index }}" >
+                            <x-table-header title="{{$header}}" filterName="{{$column}}" />
+                            </th>
+                    @endswitch
                 @endcan
             @endforeach
-            <th></th>
     </thead>
     <tbody id="deviceTableBody" >
         @foreach ($devices as $row)

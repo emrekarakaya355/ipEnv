@@ -357,10 +357,9 @@ class Device extends Model implements Auditable
     }
 
 
-    public static function getColumnMapping()
+    public static function getColumnMapping(): array
     {
         return [
-            '' => 'type',
             'Cihaz İsmi' => 'device_name',
             'IP Adresi' => 'ip_address',
             'Seri No' => 'serial_number',
@@ -372,6 +371,7 @@ class Device extends Model implements Auditable
             'Model' => 'model',
             'Port' => 'port_number',
             'Durum' => 'status',
+            'type' => 'type',
 
 
         ];

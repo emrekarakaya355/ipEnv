@@ -46,11 +46,9 @@
                                 </tbody>
                             </table>
                         </div>
-
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
 </div>
@@ -118,7 +116,7 @@
         document.getElementById('parent_device_port').value = null;
     }
 
-        // Bu fonksiyon modal kapatıldığında seçilen cihazın bilgisini günceller
+    // Bu fonksiyon modal kapatıldığında seçilen cihazın bilgisini günceller
     function updateParentDeviceInfo(selectedSwitch) {
         const parentDeviceName = document.getElementById('parent_device_name');
         const parentDeviceBuilding = document.getElementById('parent_device_building');

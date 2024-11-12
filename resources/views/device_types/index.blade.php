@@ -20,6 +20,8 @@
         @vite('resources/js/table-resizer.js')
         @vite('resources/js/deviceType.js')
         @vite('resources/js/entityActions.js')
+        @vite('resources/js/tableHeader.js')
+
     @endcan
 
 

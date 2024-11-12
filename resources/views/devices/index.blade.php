@@ -39,8 +39,10 @@
 --}}
         @include('devices.partials.device_table')
         @vite('resources/css/table.css')
-        @vite(['resources/js/search.js'])
+        @vite(['resources/js/devices/deviceTableSearch.js'])
         @vite(['resources/js/table-resizer.js'])
+        @vite(['resources/js/tableHeader.js'])
+
     @endcan
 </x-layout>
 

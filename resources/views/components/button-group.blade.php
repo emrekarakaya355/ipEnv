@@ -17,9 +17,8 @@
                 <a href="javascript:void(0);" onclick="openBulkAddModal()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-amber-400 hover:text-white" role="menuitem">
                     <i class="fas fa-upload"></i> Toplu Ekle
                 </a>
-
                 <!-- Toplu İndir Butonu -->
-                <a href="javascript:void(0);" onclick="exportData()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-amber-400 hover:text-white" role="menuitem">
+                <a href="javascript:void(0);" onclick="exportData(`{{$route}}/export`)" class="block px-4 py-2 text-sm text-gray-700 hover:bg-amber-400 hover:text-white" role="menuitem">
                     <i class="fas fa-download"></i> Toplu İndir
                 </a>
 
@@ -33,54 +32,5 @@
 
     <x-bulk-add-modal title="Toplu Ekle" actionClass="{{$route}}"></x-bulk-add-modal>
 </div>
-
-
-
-<script>
-    let isDropdownOpen = false;
-
-    function toggleDropdown(event) {
-        const dropdownMenu = document.getElementById('dropdownMenu');
-        isDropdownOpen = !isDropdownOpen;
-
-        if (isDropdownOpen) {
-            dropdownMenu.classList.remove('hidden');
-
-            // Dışarıya tıklama olayını dinle
-            document.addEventListener('click', handleClickOutside);
-        } else {
-            dropdownMenu.classList.add('hidden');
-            document.removeEventListener('click', handleClickOutside);
-        }
-    }
-    function handleClickOutside(event) {
-        const dropdownMenu = document.getElementById('dropdownMenu');
-        const toggleButton = document.querySelector('.btn-primary');
-
-        if (!dropdownMenu.contains(event.target) && !toggleButton.contains(event.target)) {
-            dropdownMenu.classList.add('hidden');
-            isDropdownOpen = false; // Durumu güncelle
-            document.removeEventListener('click', handleClickOutside);
-        }
-    }
-    function exportData() {
-
-        // selectedColumnsInput öğesini kontrol et, yoksa boş bir string kullan
-        const selectedColumnsInputElement = document.getElementById('selectedColumnsInput');
-
-        let selectedColumnsInput = '';
-
-        if (selectedColumnsInputElement) {
-            selectedColumnsInputElement.value = localStorage.getItem('selectedColumns');
-            selectedColumnsInput = selectedColumnsInputElement.value;
-        }
-
-        const queryParams = new URLSearchParams(window.location.search);
-
-        // Seçilen sütunları sorgu parametrelerine ekle
-        queryParams.append('selected_columns', selectedColumnsInput || '');
-
-        // Yeni URL ile dışa aktarma işlemi
-        window.location.href = `{{ url($route . '/export') }}?${queryParams.toString()}`;
-    }
-</script>
+@vite('resources/js/button-group.js')
+@vite('resources/js/importExportHandlers.js')

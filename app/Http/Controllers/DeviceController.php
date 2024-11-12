@@ -54,7 +54,6 @@ class DeviceController extends Controller
             ->with('latestDeviceInfo')
             ->paginate($perPage)
             ->withQueryString();  // Tüm parametreleri URL'e ekle
-
         $total  = Device::query()->count();
         $active = Device::where('status','Çalışıyor')->count();
         $passive = Device::where('status','Depo')->count();

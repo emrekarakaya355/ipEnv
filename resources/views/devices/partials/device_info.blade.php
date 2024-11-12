@@ -232,7 +232,7 @@
 </div>
 @endcan
 {{-- Modal --}}
-<x-modal/>
+@include('devices.partials.parent-modal')
 
 <script>
     const saveButton = document.getElementById('save-btn');

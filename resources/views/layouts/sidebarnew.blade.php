@@ -88,10 +88,12 @@
                             </path>
                         </svg>
                     </span>
-                <form id="searchForm">
-                <input class="w-32 pl-10 pr-4 rounded-md form-input sm:w-64 focus:border-indigo-600" type="text" id="searchInput" name="search"
-                       placeholder="Search">
+                <form id="mainSearchForm">
+                    <input class="w-32 pl-10 pr-4 rounded-md form-input sm:w-64 focus:border-indigo-600" type="text" id="mainSearchInput" name="search"
+                           placeholder="Search" autocomplete="off">
                 </form>
+                <div id="searchResults" class="mt-2 p-2 bg-white border border-gray-300 rounded-md shadow-md hidden  absolute z-10" >
+                </div>
             </div>
         </div>
 

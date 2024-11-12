@@ -252,8 +252,8 @@
         </form>
         {{-- Form sonu --}}
     </div>
-    {{-- Modal --}}
-    <x-modal/>
+
+    @include('devices.partials.parent-modal')
     @vite(['resources/js/devices/deviceCreate.js'])
     @endcan
 </x-layout>
