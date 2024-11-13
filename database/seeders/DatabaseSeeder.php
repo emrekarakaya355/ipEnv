@@ -19,26 +19,8 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
-
-        User::factory(5)->create();
-        Location::factory(10)->create();
-        DeviceType::factory(15)->create();
-        Device::factory(1)->create();
-        Device::factory(3)->create();
-        Device::factory(5)->create();
-        Device::factory(10)->create();
-        DeviceInfo::factory(10)->create();
-        DeviceInfo::factory(10)->create();
-        DeviceInfo::factory(10)->create();
-        DeviceInfo::factory(10)->create();
-        DeviceInfo::factory(10)->create();
-        DeviceInfo::factory(10)->create();
+        (new RoleSeeder)->run();
 
     }
 }

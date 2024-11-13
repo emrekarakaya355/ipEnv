@@ -16,12 +16,13 @@ class SearchController extends Controller
         $this->deviceService = $deviceService;
     }
 
+
     public function searchResults(Request $request)
     {
         $query = Device::query();
-        $this->deviceService->search($request,$query);
-
-        $results = $query->orderBy("created_at","desc")->get(['id','device_name','type'])->take(3);
-        return new SuccessResponse("Arama Sonucu:",$results);
+        $this->deviceService->search($request, $query);
+        $devices = $query->orderBy('created_at', 'desc')->with('latestDeviceInfo')->get();
+        $html = view('components.search-results-dropdown', compact('devices'))->render();
+        return new SuccessResponse('İşlem Başarı İle Tamamlandı.', $html);
     }
 }

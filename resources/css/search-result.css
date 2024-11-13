@@ -1,0 +1,79 @@
+.search-box {
+    position: relative; /* .result-box'ı konumlandırırken bunu baz alacak */
+}
+.result-box {
+    position: absolute; /* Burada absolute kalacak */
+    width: 100%; /* Input kadar geniş olması için %100 genişlik veriyoruz */
+    background-color: white; /* Arka plan rengini beyaz yapıyoruz */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Hafif gölge ekleyebilirsiniz */
+    display: none;
+    max-height: 280px; /* Sonuçların fazla olmasını engellemek için max height ekleyebilirsiniz */
+    overflow-y: auto; /* Fazla sonuç olursa scroll ekler */
+    overflow-x: hidden;
+}
+.device-item {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    border-bottom: 1px solid #e0e0e0;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    text-decoration: none;
+    color: inherit;
+}
+
+.device-item:hover {
+    background-color: #e9f3ff;
+}
+
+.device-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.device-name-building {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.device-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: #333;
+}
+
+.device-building {
+    font-size: 0.9rem;
+    color: #555;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.device-ip-port {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    color: #777;
+}
+
+.device-icon {
+    margin-left: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.icon {
+    font-size: 1.5rem;
+}
+.device-item.selected {
+    background-color: #cce7ff; /* Seçilen öğe için arka plan rengi */
+}

@@ -84,9 +84,10 @@
                 <thead>
                 <tr class="border-b">
                     <th>Cihaz Adı</th>
+                    <th>Marka</th>
                     <th>Model</th>
                     <th>İp Adresi</th>
-                    <th>İp Adresi</th>
+                    <th>Kullanıcı</th>
                     <th>Durum</th>
                     <th></th>
                 </tr>
@@ -96,13 +97,14 @@
                     <tr>
                         <td>{{$device->device_name}}</td>
                         <td>{{$device->deviceType->brand}}</td>
+                        <td>{{$device->deviceType->model}}</td>
                         <td>{{$device->ip_address}}</td>
                         <td>{{$device->createdBy->username}}</td>
                         <td>{{$device->status}}</td>
 
                         <td class="text-end"> <!-- Yalnızca buton sütunu -->
-                            <button
-                                class="bg-blue-500 text-white  rounded">
+                            <button onclick="window.location.href='/devices/{{ $device->id }}'"
+                                    class="bg-blue-500 text-white  rounded">
                                 <i class="fa-solid fa-arrow-right px-4 py-2"></i>
                             </button>
                         </td>

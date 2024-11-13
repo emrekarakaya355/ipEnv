@@ -98,6 +98,7 @@ class DeviceImport extends  BaseImport
     protected function processRow(array $row)
     {
 
+
             $deviceType = DeviceType::where('type', $row['type'])
                 ->where('brand', $row['brand'])
                 ->where('model', $row['model'])
@@ -123,10 +124,10 @@ class DeviceImport extends  BaseImport
             // Satırı model olarak kaydedelim
             $device = Device::create([
                 'device_type_id' => $deviceType->id,
-                'type' => strtolower($row['type']),
-                'serial_number' => strtolower($row['serial_number']),
-                'registry_number' => strtolower($row['registry_number']),
-                'mac_address' => strtolower($row['mac_address']),
+                'type' => strtolower(trim($row['type'])),
+                'serial_number' => strtolower(trim($row['serial_number'])),
+                'registry_number' => strtolower(trim($row['registry_number'])),
+                'mac_address' => strtolower(trim($row['mac_address'])),
                 'device_name' => $row['device_name'],
                 'status' => 'Depo',
             ]);
@@ -134,7 +135,7 @@ class DeviceImport extends  BaseImport
             DeviceInfo::create([
                 'device_id' => $device->id,
                 'location_id' => $location->id,
-                'ip_address' => $row['ip_address'],
+                'ip_address' => trim($row['ip_address']),
                 'description' => 'Toplu Kayıt',
                 'block' => $row['block'],
                 'floor' => $row['floor'],

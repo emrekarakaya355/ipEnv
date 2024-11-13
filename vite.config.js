@@ -9,6 +9,8 @@ export default defineConfig({
                 'resources/css/table.css',
                 'resources/css/dashboard.css',
                 'resources/css/sidebar.css',
+                'resources/css/icon-color.css',
+                'resources/css/search-result.css',
                 'resources/js/app.js',
                 'resources/js/devices/deviceTableSearch.js',
                 'resources/js/devices/device-info.js',

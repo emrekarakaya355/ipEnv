@@ -40,7 +40,9 @@ class DeviceTypeImport extends BaseImport
     }
     protected function processRow(array $row)
     {
+
         try {
+
             if($this->isUnique($row['type'], $row['brand'], $row['model'], $row['port_number'])){
                 $this->fail($row, (array)'Aynı Kayıt Var.');
                 return;
@@ -51,7 +53,7 @@ class DeviceTypeImport extends BaseImport
                 'type' =>ucfirst(strtolower( $row['type'])),
                 'brand' => ucfirst(strtolower( $row['brand'])),
                 'model' =>ucfirst(strtolower( $row['model'])),
-                'port_number' =>ucfirst(strtolower( $row['port_number'])),
+                'port_number' =>$row['port_number'],
             ]);
 
         } catch (\Exception $e) {

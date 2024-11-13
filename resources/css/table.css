@@ -126,7 +126,3 @@ table th:nth-child(19), table td:nth-child(19) {
         background-color: #f7fafc; /* Alternatif satır rengi */
     }
 }
-.status-scrap { color: gray; }
-.status-working { color: green; }
-.status-storage { color: red; }
-.status-warranty { color: orange; }
