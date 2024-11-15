@@ -3,12 +3,14 @@
             <div class="device-info">
                 <!-- Device Name and Building -->
                 <div class="device-name-building flex justify-between">
-                    <div class="device-name font-bold">{{strtolower( $device->device_name) }}</div>
-                    <div class="device-building">{{strtolower( $device->building )}}</div>
+                    <div class="device-name font-bold">{{mb_strtolower( $device->device_name,'UTF-8') }}</div>
+                    <div class="device-ip">{{ strtolower($device->ip_address )}}</div>
+
                 </div>
                 <!-- IP and Port -->
                 <div class="device-ip-port">
-                    <div class="device-ip">{{ strtolower($device->ip_address )}}</div>
+                    <div class="device-building">{{mb_strtolower( $device->building,'UTF-8' )}}</div>
+
                     <div class="device-port">{{strtolower( $device->parent_device_port )}}</div>
                 </div>
             </div>
@@ -20,6 +22,9 @@
                         @break
                     @case('access_point')
                         <i class="fas fa-wifi icon status-{{ strtolower(str_replace(' ', '-', $device->status->name)) }}"></i>
+                        @break
+                    @case('kgs')
+                        <i class="fas fa-microchip icon status-{{ strtolower(str_replace(' ', '-', $device->status->name)) }}"></i>
                         @break
                 @endswitch
             </div>

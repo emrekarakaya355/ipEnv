@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\DeviceStatus;
 use App\Exceptions\ConflictException;
+use App\Exceptions\CustomInternalException;
 use App\Exceptions\DeviceCreationException;
 use App\Exceptions\PortConflictException;
 use App\Http\Responses\ErrorResponse;
@@ -112,6 +113,7 @@ class Device extends Model implements Auditable
         $types = [
             'switch' => NetworkSwitch::class,
             'access_point' => AccessPoint::class,
+            'kgs' => Kgs::class,
         ];
 
         return $types[ strtolower($type)] ?? self::class;
@@ -120,7 +122,7 @@ class Device extends Model implements Auditable
     {
         return $this->hasMany(DeviceInfo::class)
             ->withTrashed()
-            ->orderBy('created_at', 'desc');
+            ->orderBy('deleted_at', 'desc');
     }
     public function latestDeviceInfo()
     {
@@ -174,20 +176,26 @@ class Device extends Model implements Auditable
 
     public function getStatusAttribute($value): DeviceStatus
     {
-        return DeviceStatus::from($value);
+        return DeviceStatus::fromName($value);
     }
 
+    /**
+     * @throws CustomInternalException
+     */
     public function setStatusAttribute($value): void
     {
-        if ($value instanceof DeviceStatus) {
-            $this->attributes['status'] = $value->value;
-        } elseif (is_string($value)) {
-            $this->attributes['status'] = DeviceStatus::from($value)->value;
-        } else {
-            throw new \InvalidArgumentException("Invalid status value.");
+        try{
+            if ($value instanceof DeviceStatus) {
+
+                $this->attributes['status'] = $value->value;
+            } elseif (is_string($value)) {
+                $this->attributes['status'] =  DeviceStatus::fromName($value)->name;
+            }
+            }
+            catch (\Exception $exception) {
+                throw new CustomInternalException("Invalid status value.");
         }
     }
-
     protected function getBuildingAttribute()
     {
         return $this->latestDeviceInfo ? $this->latestDeviceInfo->location->building : null;

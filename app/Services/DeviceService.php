@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\DeviceStatus;
 use App\Exceptions\ModelNotFoundException;
 use App\Http\Responses\ErrorResponse;
 use App\Http\Responses\SuccessResponse;
@@ -343,8 +344,9 @@ class DeviceService
             'mac_address' => strtolower($deviceValidated['mac_address'])?? null,
             'parent_device_id' => $deviceValidated['parent_device_id'] ?? null,
             'parent_device_port' => $deviceValidated['parent_device_port'] ?? null,
-            'status' => $deviceValidated['status'] ?? "Depo",
+            'status' => $deviceValidated['ip_address'] ? DeviceStatus::WORKING->name : DeviceStatus::STORAGE->name,
         ];
+
         return Device::create($attributes);
     }
 
@@ -357,7 +359,6 @@ class DeviceService
         if($deviceType === null){
             throw new ModelNotFoundException('Cihaz Tipi Bulunamadı!');
         }
-
         // Device verilerinde değişiklik kontrolü
         $deviceData = ([
             'type' => $deviceType->type,
@@ -368,7 +369,7 @@ class DeviceService
             'mac_address' => $deviceValidated['mac_address'],
             'parent_device_id' => $deviceValidated['parent_device_id']?? null,
             'parent_device_port' => $deviceValidated['parent_device_port']?? null,
-            'status' => $deviceValidated['status'] ?? "Depo",
+            'status' => $deviceValidated['status'] ?? DeviceStatus::STORAGE->name,
         ]);
         $device->fill($deviceData);
     }

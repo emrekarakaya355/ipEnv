@@ -59,16 +59,24 @@ window.openBulkAddModal = function openBulkAddModal() {
 }
 
 window.exportData = function exportData(url) {
-    const selectedColumnsInputElement = document.getElementById('selectedColumnsInput');
-    let selectedColumnsInput = '';
-    if (selectedColumnsInputElement) {
-        selectedColumnsInputElement.value = localStorage.getItem('selectedColumns');
-        selectedColumnsInput = selectedColumnsInputElement.value;
-    }
+    const pageKey = window.location.pathname.replace(/\//g, '_');
+    const storageKey = `selectedColumns_${pageKey}`; // Sayfaya özel key
+
+    const selectedColumns = JSON.parse(localStorage.getItem(storageKey)) || [];
+
+
+    const hiddenInput = document.createElement('input');
+    hiddenInput.type = 'hidden';
+    hiddenInput.name = 'selected_columns';
+    hiddenInput.value = JSON.stringify(selectedColumns);
+
+    document.body.appendChild(hiddenInput);
+
+
     const queryParams = new URLSearchParams(window.location.search);
 
     // Seçilen sütunları sorgu parametrelerine ekle
-    queryParams.append('selected_columns', selectedColumnsInput || '');
+    queryParams.append('selected_columns', JSON.stringify(selectedColumns) || '');
 
 
     // Yeni URL ile dışa aktarma işlemi

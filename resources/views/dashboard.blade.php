@@ -57,8 +57,6 @@
                     <th>Cihaz Adı</th>
                     <th>IP Adresi</th>
                     <th>Kullanıcı</th>
-                    <th>Yapılan İşlem</th>
-                    <th>Durum</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -68,8 +66,6 @@
                             <td>{{$movement->device->device_name}}</td>
                             <td>{{$movement->ip_address}}</td>
                             <td>{{$movement->createdBy->username}}</td>
-                            <td>{{$movement->update_reason}}</td>
-                            <td>{{$movement->device->status}}</td>
                         </tr>
                     @endforeach
 
@@ -84,11 +80,8 @@
                 <thead>
                 <tr class="border-b">
                     <th>Cihaz Adı</th>
-                    <th>Marka</th>
                     <th>Model</th>
                     <th>İp Adresi</th>
-                    <th>Kullanıcı</th>
-                    <th>Durum</th>
                     <th></th>
                 </tr>
                 </thead>
@@ -96,16 +89,13 @@
                 @foreach ($lastFiveDevice as $device )
                     <tr>
                         <td>{{$device->device_name}}</td>
-                        <td>{{$device->deviceType->brand}}</td>
                         <td>{{$device->deviceType->model}}</td>
                         <td>{{$device->ip_address}}</td>
-                        <td>{{$device->createdBy->username}}</td>
-                        <td>{{$device->status}}</td>
 
                         <td class="text-end"> <!-- Yalnızca buton sütunu -->
                             <button onclick="window.location.href='/devices/{{ $device->id }}'"
                                     class="bg-blue-500 text-white  rounded">
-                                <i class="fa-solid fa-arrow-right px-4 py-2"></i>
+                                <i class="fa-solid fa-arrow-right px-4 py-1"></i>
                             </button>
                         </td>
                     </tr>
@@ -116,6 +106,6 @@
         </div>
 
     </div>
-
+@vite('resources/css/dashboard.css')
 
 </x-layout>

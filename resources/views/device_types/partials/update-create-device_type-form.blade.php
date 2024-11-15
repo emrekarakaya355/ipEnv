@@ -15,7 +15,7 @@
                             @csrf
                             <input type="hidden" name="_method" id="method" value="{{ csrf_token() }}">
                             <div>
-                                <label for="type" class="block text-sm font-medium text-gray-700">Type</label>
+                                <label for="type" class="block text-sm font-medium text-gray-700">Cihaz Türü</label>
                                 <div class="mt-1 flex space-x-8">
                                     <div class="flex items-center">
                                         <input id="switch" name="type" type="radio" value="switch" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300" onclick="togglePortNumber(true)">
@@ -25,10 +25,14 @@
                                         <input id="access_point" name="type" type="radio" value="access_point" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300" onclick="togglePortNumber(false)">
                                         <label for="access_point" class="ml-3 block text-sm font-medium text-gray-700">Access Point</label>
                                     </div>
+                                    <div class="flex items-center">
+                                        <input id="kgs" name="type" type="radio" value="kgs" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300" onclick="togglePortNumber(false)">
+                                        <label for="kgs" class="ml-3 block text-sm font-medium text-gray-700">Kgs</label>
+                                    </div>
                                 </div>
                             </div>
                             <div class="mt-4">
-                                <label for="brand" class="block text-sm font-medium text-gray-700">Brand</label>
+                                <label for="brand" class="block text-sm font-medium text-gray-700">Marka</label>
                                 <input required type="text" id="brand" name="brand" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                             </div>
                             <div class="mt-4">

@@ -5,9 +5,10 @@ namespace App\Exports;
 use App\Models\Device;
 use Maatwebsite\Excel\Concerns\FromArray;
 use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 
-class DeviceTemplateExport implements withHeadings, FromArray
+class DeviceTemplateExport implements withHeadings, FromArray,ShouldAutoSize
 {   /**
  * Başlıkları döndür.
  */
@@ -29,6 +30,8 @@ class DeviceTemplateExport implements withHeadings, FromArray
             'Block',
             'Floor',
             'Room Number',
+            'Parent Ip Address',
+            'Parent Port Number',
         ];
     }
 
@@ -71,6 +74,8 @@ class DeviceTemplateExport implements withHeadings, FromArray
                 'A',              // Block
                 '1',                    // Floor
                 '101',                  // Room Number
+                '10.10.10.10',                  // Room Number
+                '10',                  // Room Number
             ],
         ];
     }

@@ -54,7 +54,7 @@ class StoreDeviceRequest extends FormRequest
                 'regex:/^([0-9A-Fa-f]{2}([-:])?){5}[0-9A-Fa-f]{2}$/', // Ensures MAC address format
                 Rule::unique('devices', 'mac_address')->ignore($this->route('device')->id ?? null), // Ignore current device ID if editing
             ],
-            'status' => ['nullable', 'string', 'in:' . implode(',', DeviceStatus::toArray())],
+            'status' => ['nullable', 'string', 'in:' . implode(',', array_keys(DeviceStatus::toArray() ))],
             'parent_device_id' =>[
                 'nullable',
                 'exists:devices,id',function ($attribute, $value, $fail) {
@@ -66,7 +66,6 @@ class StoreDeviceRequest extends FormRequest
                         // Döngüsel referans kontrolü yap
                         if ((int) $value == $deviceId ) {
                              $fail('Cihazın Kendini Parent olarak seçemezsiniz.');
-                             return false;
                         }
                          if($this->hasCircularReference($deviceId, $parentDevice)){
                              $fail('hata oluştu');

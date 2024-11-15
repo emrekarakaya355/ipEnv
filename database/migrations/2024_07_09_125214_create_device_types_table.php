@@ -16,7 +16,7 @@ return new class extends Migration
     {
         Schema::create('device_types', function (Blueprint $table) {
             $table->id();
-            $table->enum('type', ['switch', 'access_point']);
+            $table->enum('type', ['switch', 'access_point','kgs']);
             $table->string('brand');
             $table->string('model');
             $table->unsignedInteger('port_number')->nullable();

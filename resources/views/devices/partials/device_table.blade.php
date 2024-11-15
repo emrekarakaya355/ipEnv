@@ -35,6 +35,9 @@
                                 @case('access_point')
                                     <i class="fas fa-wifi px-4 status-{{ strtolower(str_replace(' ', '-', $row->status->name)) }}"></i>
                                     @break
+                                @case('kgs')
+                                    <i class="fas fa-microchip px-4 status-{{ strtolower(str_replace(' ', '-', $row->status->name)) }}"></i>
+                                    @break
                                 @default
                                     <span data-tooltip="{{$row[strtolower($column)]}}">{{ $row[strtolower($column)] }}</span>
                             @endswitch
@@ -42,12 +45,33 @@
 
                         @endif
                 @endforeach
+                @if($row->trashed())
+                            <td class="text-end flex space-x-2"> <!-- Only the button column -->
+
+                        <form action="{{ route('devices.restore', $row->id) }}" method="POST" onsubmit="return confirm('Bu cihazı geri getirmek istediğinizden emin misiniz?');">
+                            @csrf
+                            @method('PUT')
+                            <button type="submit" class="bg-green-500 text-white rounded">
+                                <i class="fa-solid fa-trash-restore px-4 py-2"></i>
+                            </button>
+                        </form>
+                            <form action="{{ route('devices.forceDestroy', $row->id) }}" method="POST" onsubmit="return confirm('Bu cihazı kalıcı olarak silmek istediğinizden emin misiniz?');">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="bg-red-500 text-white rounded">
+                                    <i class="fa-solid fa-trash px-4 py-2"></i>
+                                </button>
+                            </form>
+                        </td>
+                        @else
                         <td class="text-end"> <!-- Yalnızca buton sütunu -->
                             <button onclick="window.location.href='/devices/{{ $row->id }}'"
-                                    class="bg-blue-500 text-white  rounded">
+                                    class="bg-blue-500 text-white rounded">
                                 <i class="fa-solid fa-arrow-right px-4 py-2"></i>
                             </button>
                         </td>
+                        @endif
+
             </tr>
         @endforeach
     </tbody>

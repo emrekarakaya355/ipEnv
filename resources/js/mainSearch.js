@@ -77,7 +77,6 @@ function addSelectionEventListeners() {
         }
     }
 }
-
 // Enter tuşuna basıldığında seçili öğeye yönlendirme
 document.getElementById('mainSearchInput').addEventListener('keydown', function(event) {
     if (event.key === 'Enter') {

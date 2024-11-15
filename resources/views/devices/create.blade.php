@@ -37,6 +37,14 @@
                                        class="form-radio border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
                                 <span class="ml-2">Access Point</span>
                             </label>
+                            <label class="inline-flex items-center ml-4">
+                                <input type="radio" name="type" value="kgs"
+                                       {{ old('type') == 'kgs' ? 'checked' : '' }}
+                                       required
+                                       onchange="handleTypeChange(this.value, this.closest('.form-container'))"
+                                       class="form-radio border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                                <span class="ml-2">Kgs</span>
+                            </label>
                             @error('type')
                             <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
                             @enderror
@@ -154,7 +162,7 @@
                                     onchange="handleBuildingChange(this.value,this.closest('.form-container'))"
                                     class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
                                 <option value="">-- Bina Seçin --</option>
-                                @foreach ($locations as $location)
+                                @foreach ($locations->unique('building') as $location)
                                     <option
                                         value="{{ $location->building }}" {{ old('$location->building') == $location->building ? 'selected' : '' }}>
                                         {{ $location->building }}

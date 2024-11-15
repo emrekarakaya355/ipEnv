@@ -11,6 +11,48 @@ use Illuminate\Support\Facades\DB;
 
 class DeviceImport extends  BaseImport
 {
+    private bool $hasParent =false;
+
+    /* işe yaramıyor
+    // Başlıklar için bir eşleme (mapping) dizisi
+    protected $headerMapping = [
+        'type' => ['type', 'cihaz tipi', 'device type'],
+        'model' => ['model', 'model adı'],
+        'brand' => ['brand', 'marka'],
+        'port_number' => ['port_number', 'port sayısı', 'port numarası'],
+        'building' => ['building', 'bina', 'yerleşke','fakülte'],
+        'unit' => ['unit', 'birim'],
+        'serial_number' => ['serial_number', 'seri numarası'],
+        'registry_number' => ['registry_number', 'sicil numarası','sicil no'],
+        'mac_address' => ['mac_address', 'mac', 'mac adresi','mac no'],
+        'device_name' => ['device_name', 'cihaz adı', 'ad','isim'],
+        'ip_address' => ['ip_address', 'ip adresi','ip'],
+        'description' => ['description', 'açıklama'],
+        'block' => ['block', 'blok'],
+        'floor' => ['floor', 'kat'],
+        'room_number' => ['room_number', 'oda numarası','oda no'],
+        'parent_ip_address' => ['parent_ip_address', 'remote ip adresi','remote ip','remote adres'],
+        'parent_port_number' => ['parent_port_number', 'remote port numarası','remote port no'],
+    ];
+
+    protected function mapHeaders(array $row): array
+    {
+        $mappedRow = [];
+
+        foreach ($row as $header => $value) {
+            $normalizedHeader = strtolower(trim($header));
+
+            foreach ($this->headerMapping as $standardHeader => $aliases) {
+                if (in_array($normalizedHeader, $aliases)) {
+                    $mappedRow[$standardHeader] = $value;
+                    break;
+                }
+            }
+        }
+
+        return $mappedRow;
+    }
+*/
     public function rules(): array
     {
         return [
@@ -48,8 +90,6 @@ class DeviceImport extends  BaseImport
                 'required',
                 'string',
             ],
-
-
             /*
              * device bilgileri
              * */
@@ -92,12 +132,28 @@ class DeviceImport extends  BaseImport
             'room_number' => [
                 'nullable',
             ],
+
+            /*  Parent bilgileri*/
+            'parent_ip_address' => [
+                'nullable',
+                'ipv4',
+            ],
+            'parent_port_number' => [
+                'nullable',
+                'integer',
+            ],
         ];
     }
 
     protected function processRow(array $row)
     {
 
+        //$row = $this->mapHeaders($row); // Başlıkları eşle
+
+        //eğer herhangi bir satırda parent device id var ise hasParent true olsun
+            if($row['parent_ip_address']){
+                $this->hasParent = true;
+            }
 
             $deviceType = DeviceType::where('type', $row['type'])
                 ->where('brand', $row['brand'])
@@ -148,5 +204,11 @@ class DeviceImport extends  BaseImport
             DB::rollBack(); // Hata olursa rollback yap
             $this->fail($row, (array)$e->getMessage());
         }
+    }
+
+
+    public function hasParent(): bool
+    {
+        return $this->hasParent;
     }
 }

@@ -25,8 +25,6 @@
                     </div>
                     @endif
                 @endforeach
-                    <!-- Gizli inputlar burada oluşturulacak -->
-                    <input type="hidden" name="selected_columns" id="selectedColumnsInput" value="">
 
             </form>
             <div class="flex justify-end mt-4">

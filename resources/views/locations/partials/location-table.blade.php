@@ -25,6 +25,7 @@
                 </td>
                 <td >
                     {{ $location->unit }}
+
                 </td>
                 @canany(['update location','delete location'])
                     <td class="flex space-x-2 justify-end ">

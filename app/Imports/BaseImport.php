@@ -88,10 +88,9 @@ abstract class BaseImport implements ToCollection, WithHeadingRow, SkipsOnError,
     /**
      * Başarısız satırları export et
     */
-    public function exportFailures()
+    public function exportFailures($failures = null)
     {
-        // Export için yeni bir Excel export sınıfı oluşturulabilir
-        return \Maatwebsite\Excel\Facades\Excel::download(new FailuresExport($this->failures), 'failed_imports.xlsx');
+        return \Maatwebsite\Excel\Facades\Excel::download(new FailuresExport($failures ?? $this->failures), 'Hatalı Kayıtlar.xlsx');
     }
 
     public function getFailures()
@@ -104,17 +103,4 @@ abstract class BaseImport implements ToCollection, WithHeadingRow, SkipsOnError,
     {
         return $e->getCode() === '23000'; // Hata kodunu kontrol et
     }
-
-
-
-
-    protected function getDeviceType(){
-
-    }
-
-    protected function getLocation(){
-
-    }
-
-
 }

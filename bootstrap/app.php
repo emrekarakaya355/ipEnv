@@ -32,6 +32,7 @@ return Application::configure(basePath: dirname(__DIR__))
             }
 
             if($exception instanceof \Illuminate\Validation\ValidationException){
+
                 return new \App\Http\Responses\ValidatorResponse($exception->validator);
             }
             if ($exception instanceof \App\Exceptions\CustomException) {

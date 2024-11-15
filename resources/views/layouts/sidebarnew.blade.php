@@ -171,8 +171,15 @@
                      style="display: none;">
                     <a href="/profile"
                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-600 hover:text-white">Profile</a>
+                    @can('view deleted devices')
+                    <a href="/devices/deleted-devices"
+                       class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-600 hover:text-white">Silinen Cihazlar</a>
+                    @endcan
+                    @can('view orphans')
+                        <a href="/devices/orphans"
+                           class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-600 hover:text-white">Öksüz Cihazlar</a>
+                    @endcan
                     @can('view user')
-
                     <a href="/users"
                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-600 hover:text-white">Kullanıcılar</a>
                     @endcan

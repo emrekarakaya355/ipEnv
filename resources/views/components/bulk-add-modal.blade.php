@@ -7,12 +7,10 @@
                     <h3 class="text-lg" id="bulkAddModalLabel">{{ $title }}</h3>
                     <x-primary-button onclick="window.location.href='{{ url($actionClass . '/template/download') }}'">Şablonu İndir</x-primary-button>
                 </div>
-                {{$actionClass}}
                 <div class="mt-4">
                     <form id="bulkAddForm" action="{{ url('/'.$actionClass . '/import') }}" method="post" enctype="multipart/form-data">
                         @csrf
                         <div class="form-group">
-                            <label for="file">Dosya Seç</label>
                             <input type="file" name="file" class="form-control mt-2" required />
                         </div>
                     </form>

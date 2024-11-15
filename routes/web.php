@@ -8,7 +8,7 @@ use \App\Http\Controllers\DeviceTypeController;
 use Illuminate\Support\Facades\Route;
 
 
-Route::get('/', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/', [DashboardController::class, 'index'])->middleware(['auth', 'verified']);
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 
@@ -44,12 +44,14 @@ Route::middleware('auth')->group(function () {
     Route::post('/devices/import', [DeviceController::class, 'import'])->name('devices.import');
     Route::get('/devices/export', [DeviceController::class, 'export'])->name('devices.export');
 
+    Route::delete('/devices/{device}/force-destroy', [DeviceController::class, 'forceDestroy'])->name('devices.forceDestroy');
+    Route::put('/devices/{device}/restore', [DeviceController::class, 'restore'])->name('devices.restore');
     Route::get('/devices/orphans', [DeviceController::class, 'orphans']);
+    Route::get('/devices/deleted-devices', [DeviceController::class, 'deletedDevices'])->name('devices.deletedDevices');
 
     Route::resource('devices', DeviceController::class);
     Route::get('/devices/type/{type}', [DeviceController::class, 'index'])->name('devices.index.type');
 
-    Route::post('/devices/{device}/archive', [DeviceController::class, 'archive'])->name('devices.archive');
 
     Route::apiResource('locations', LocationController::class);
     Route::get('/get-units/{building}', [LocationController::class, 'getUnitsByBuilding']);

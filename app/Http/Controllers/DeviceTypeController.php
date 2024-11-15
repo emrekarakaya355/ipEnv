@@ -57,7 +57,7 @@ class DeviceTypeController extends Controller
     {
         //$request validate ediliyor
         $validator = Validator::make($request->all(), [
-            'type' => 'required|in:switch,access_point',
+            'type' => 'required|in:switch,access_point,kgs',
             'brand' => 'required|string',
             'model' => 'required|string',
             'port_number' => 'nullable|integer'

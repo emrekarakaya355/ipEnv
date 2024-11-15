@@ -18,4 +18,14 @@ enum DeviceStatus: string
             self::SCRAP->name => self::SCRAP->value,
         ];
     }
+    public static function fromName(string $name): self
+    {
+        foreach (self::cases() as $case) {
+            if ($case->name === $name) {
+                return $case;
+            }
+        }
+
+        throw new \InvalidArgumentException("Invalid status name: $name");
+    }
 }

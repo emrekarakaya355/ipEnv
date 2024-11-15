@@ -58,33 +58,42 @@ class LocationController extends Controller
      */
     public function store(Request $request)
     {
+
         //validate ediliyor
         $validator = Validator::make($request->all(), [
             'building' => 'required|string|max:255',
-            'unit' => 'required|string|max:255',
+            'units' => 'required|array',
+            'units.*' => 'required|string|max:255',
         ]);
+
         // Validasyon hatalarını kontrol et
         if ($validator->fails()) {
             return new ValidatorResponse($validator);
         }
+        $validated = $validator->validated();
+        $isExist = true;
 
-        // Önce kaydın mevcut olup olmadığını kontrol et
-        $existingModel = Location::where($validator->validated())->first();
-        if ($existingModel) {
-            throw new ConflictException("Yer Bilgisi Zaten Var");
+        foreach ($validated['units'] as $unit) {
+            $existingModel = Location::where('building', $validated['building'])->where('unit', $unit)->first();
+            if ($existingModel) {
+                continue;
+            }
+            $isExist = false;
+
+            try {
+
+                Location::create(['building' => $validated['building'],'unit' => $unit]);
+            } catch (Exception $e) {
+                return new ErrorResponse($e);
+            }
+
         }
-        try {
-            //küçük harfe çevir
-            $validatedData = array_map(function ($value) {
-                return is_string($value) ? ucfirst(strtolower($value)) : $value;
-            }, $validator->validated());
-            Location::create($validatedData);
-        } catch (Exception $e) {
-           return new ErrorResponse($e);
+
+        if ($isExist) {
+            throw new ConflictException("Yer Bilgisi Zaten Var");
         }
         return new SuccessResponse("Yer Bilgisi Başarı İle Kaydedildi.");
     }
-
     /**
      * Display the specified resource.
      */
@@ -111,24 +120,26 @@ class LocationController extends Controller
         //gelen veriler validate ediliyor.
         $validator = Validator::make($request->all(), [
             'building' => 'required|string|max:255',
-            'unit' => 'required|string|max:255',
+            'units' => ['required', 'array', 'min:1'],
+            'units.*' => ['string', 'max:255'],
         ]);
 
         // Validasyon hatalarını kontrol et
         if ($validator->fails()) {
             return new ValidatorResponse($validator);
         }
+
         try{
             $location = Location::findOrFail($id);
+            $location->fill([
+                'building' => ucfirst(strtolower($validator->validated()['building'])),
+                'unit' => ucfirst(strtolower($validator->validated()['units'][0]))
+                ]
+            );
 
-
-            $location->fill($validator->validated());
             //eğer değişiklik var ise update yapılıyor.!
             if($location->isDirty()){
-                $location->update([
-                    'building' => ucfirst(strtolower($request->building)),
-                    'unit' => ucfirst(strtolower($request->unit)),
-                ]);
+                $location->update();
                 return new SuccessResponse('Yer Bilgisi Başarı İle Kaydedildi.');
             }
             return new ErrorResponse(null,'Herhangi Bir Değişiklik yapılmadı.');
@@ -181,11 +192,7 @@ class LocationController extends Controller
 
             // Hatalı kayıtlar var mı kontrol et
             if (!empty($import->getFailures())) {
-                // Hatalı kayıtları al
-                $failures = $import->getFailures();
-
-                // Hatalı kayıtları içeren Excel dosyasını oluştur ve kullanıcıya sun
-                return \Maatwebsite\Excel\Facades\Excel::download(new FailuresExport($failures), 'failed_imports.xlsx');
+                return $import->exportFailures();
             }
             return new SuccessResponse('Yer Bilgileri Başarı ile aktarıldı.');
         } catch (\Exception $e) {

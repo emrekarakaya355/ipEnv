@@ -71,8 +71,8 @@
                     id="status"
                     name="status"
                     class="bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 mt-2 w-full">
-                    @foreach (\App\Enums\DeviceStatus::toArray() as $key => $value)
-                        <option value="{{ $value }}" {{ $device->status->value === $value ? 'selected' : '' }}>
+                    @foreach (\App\Enums\DeviceStatus::toArray() as $name => $value)
+                        <option value="{{ $name }}" {{ $device->status->name === $name ? 'selected' : '' }}>
                             {{ $value}}
                         </option>
                     @endforeach

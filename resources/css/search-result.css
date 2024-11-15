@@ -2,13 +2,13 @@
     position: relative; /* .result-box'ı konumlandırırken bunu baz alacak */
 }
 .result-box {
-    position: absolute; /* Burada absolute kalacak */
-    width: 100%; /* Input kadar geniş olması için %100 genişlik veriyoruz */
-    background-color: white; /* Arka plan rengini beyaz yapıyoruz */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Hafif gölge ekleyebilirsiniz */
+    position: absolute;
+    width: 100%;
+    background-color: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     display: none;
-    max-height: 280px; /* Sonuçların fazla olmasını engellemek için max height ekleyebilirsiniz */
-    overflow-y: auto; /* Fazla sonuç olursa scroll ekler */
+    max-height: 280px;
+    overflow-y: auto;
     overflow-x: hidden;
 }
 .device-item {
@@ -45,12 +45,13 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     font-weight: bold;
-    font-size: 1.1rem;
+    font-size: 0.80rem;
     color: #333;
 }
 
 .device-building {
-    font-size: 0.9rem;
+    margin-left: 10px;
+    font-size: 0.8rem;
     color: #555;
     overflow: hidden;
     text-overflow: ellipsis;

@@ -4,20 +4,18 @@ namespace App\Http\Controllers;
 
 use App\Exports\DeviceExport;
 use App\Exports\DeviceTemplateExport;
-use App\Exports\LocationTemplateExport;
 use App\Http\Requests\StoreDeviceRequest;
 use App\Http\Responses\ErrorResponse;
 use App\Http\Responses\SuccessResponse;
 use App\Imports\DeviceImport;
+use App\Imports\DeviceParentImport;
 use App\Models\AccessPoint;
 use App\Models\Device;
-use App\Models\DeviceInfo;
 use App\Models\Location;
 use App\Models\NetworkSwitch;
 use App\Services\DeviceService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 
 class DeviceController extends Controller
@@ -72,6 +70,7 @@ class DeviceController extends Controller
     }
 
     public function index(Request $request, $type = null){
+
         $modelClass = $this->getModelClass($type);
         $query = $modelClass::query();
         return($this->applyFiltersAndSorting($request, $query));
@@ -82,14 +81,22 @@ class DeviceController extends Controller
         $query = Device::whereNull('parent_device_id');
         return($this->applyFiltersAndSorting($request, $query));
     }
+    public function deletedDevices(Request $request)
+    {
+
+        $query = Device::query();
+        $query->onlyTrashed();
+        return($this->applyFiltersAndSorting($request, $query));
+    }
     public function create()
     {
-        $locations = Location::all()->sortBy(['faculty']);
+        $locations = Location::all()->sortBy(['building']);
         return view('devices.create', compact('locations'));
     }
 
     public function store(StoreDeviceRequest $request)
     {
+
         // Doğrulama başarılı, veriler kullanılabilir
         //StoreDeviceRequest sınıfındaki kurallara göre doğrulama yapıyor.
         $deviceValidated = $request->validated();
@@ -122,27 +129,12 @@ class DeviceController extends Controller
      */
     public function update(StoreDeviceRequest $request, Device $device)
     {
+
             // Doğrulama başarılı, veriler kullanılabilir
             $deviceValidated = $request->validated();
             return $this->deviceService->updateDeviceWithInfo($deviceValidated, $device);
     }
 
-    public function archive(Device $device): JsonResponse
-    {
-
-        DB::transaction(function () use ($device) {
-            DeviceInfo::createDefault($device->id);
-
-            // Cihazın durumunu güncelle
-            $device->update(['status' => 'Archived']); // veya başka uygun bir durum
-        });
-
-        // Başarılı yanıt döndür
-        return response()->json([
-            'success' => true,
-            'message' => 'Cihaz başarıyla depoya çekildi.'
-        ]);
-    }
 
     public function destroy(Device $device): JsonResponse
     {
@@ -160,9 +152,35 @@ class DeviceController extends Controller
             ]);
         }
     }
+    public function forceDestroy($deviceId)
+    {
+        $device = Device::query();
+        $device = $device->withTrashed()->findOrFail($deviceId);
+        if(!$device){
+            return new ErrorResponse(null,'Model Bulunamadı');
+        }
+        if ($device->trashed()) {
+            $device->deviceInfos()->forceDelete();
+            $device->forceDelete();
+            return new SuccessResponse('Cihaz Kalıcı Olarak Silindi.');
+        }
+        return new ErrorResponse(null,'Cihazı Kalıcı olarak silmek için önce normal silmeniz gerekiyor.');
+    }
 
-
-
+    public function restore($deviceId)
+    {
+        $device = Device::query();
+        $device = $device->withTrashed()->findOrFail($deviceId);
+        if(!$device){
+            return new ErrorResponse(null,'Model Bulunamadı');
+        }
+        if ($device->trashed()) {
+            $device->latestDeviceInfo()->restore();
+            $device->restore();
+            return new SuccessResponse('Cihaz Kalıcı Olarak Silindi.');
+        }
+        return new ErrorResponse(null,'Cihazı Kalıcı olarak silmek için önce normal silmeniz gerekiyor.');
+    }
     public function getSwitches(): JsonResponse
     {
 
@@ -188,33 +206,41 @@ class DeviceController extends Controller
 
     public function import(Request $request)
     {
-        // Validate the uploaded file
         $request->validate([
-            'file' => 'required|file|mimes:xlsx,xls,csv|max:2048', // Adjust max size as needed
+            'file' => 'required|file|mimes:xlsx,xls,csv|max:2048',
         ]);
         $file = $request->file('file');
-
+        $import = new DeviceImport();
+        $parentFailures =[];
         try {
-            $import = new DeviceImport();
+
             $import->import($file);
 
-            if (!empty($import->getFailures())) {
-                return $import->exportFailures(); // Ensure this is returned
-            }
-            return new SuccessResponse('Kayıtlar Başarı ile aktarıldı.');
         } catch (\Exception $e) {
-            // Hata durumunda kullanıcıya bildirim yap
+
             return new ErrorResponse($e);
         }
 
+        // eğer device_parent_id alanı dolu ise
+        if($import->hasParent()){
+            $parentImport = new DeviceParentImport();
+            $parentImport->import($file);
+            if(!empty($parentImport->getFailures()))
+                  $parentFailures =$parentImport->getFailures();
+        }
+
+        $allFailures = array_merge($import->getFailures(), $parentFailures);
+
+        if (!empty($allFailures)) {
+            return $import->exportFailures($allFailures);
+        }
+        return new SuccessResponse('Kayıtlar Başarı ile aktarıldı.');
     }
     public function export(Request $request)
     {
-
         // Filtre kriterlerini al
-        //$filterCriteria = $request->only(['serial_number']);
         $filterCriteria = $request->only(['type', 'model', 'brand', 'port_number', 'building', 'unit', 'serial_number', 'registry_number', 'device_name', 'ip_address', 'description', 'block', 'floor', 'room_number']);
-        $selectedColumns = $request->get('columns', Device::getColumnMapping() );
+        $selectedColumns = json_decode(request('selected_columns'), true) ?? Device::getColumnMapping() ;
         try {
             return Excel::download(
                 new DeviceExport(Device::class, $filterCriteria,[],$selectedColumns),
@@ -231,5 +257,6 @@ class DeviceController extends Controller
     {
         return \Maatwebsite\Excel\Facades\Excel::download(new DeviceTemplateExport(), 'device_import_template.xlsx');
     }
+
 
 }

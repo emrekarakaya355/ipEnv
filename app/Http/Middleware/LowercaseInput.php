@@ -21,7 +21,7 @@ class LowercaseInput
             $csrfToken = $input['_token'];
             unset($input['_token']);
             $input = array_map('strtolower', $input);
-            $input['_token'] = $csrfToken; // CSRF tokeni geri ekle
+            $input['_token'] = $csrfToken;
         } else {
             $input = array_map('strtolower', $input);
         }

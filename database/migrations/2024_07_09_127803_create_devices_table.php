@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\DeviceStatus;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -19,7 +20,7 @@ return new class extends Migration
             $table->string('serial_number')->unique();
             $table->string('registry_number')->unique()->nullable();
             $table->string('mac_address')->unique();
-            $table->enum('status', ['Çalışıyor', 'Depo', 'Garanti', 'Hurda'])->default('Çalışıyor');
+            $table->enum('status', array_keys(DeviceStatus::toArray()))->default(DeviceStatus::STORAGE->name);
             $table->unsignedBigInteger('parent_device_id')->nullable();
             $table->foreign('parent_device_id')->references('id')->on('devices');
             $table->unsignedInteger('parent_device_port')->nullable();
