@@ -11,12 +11,14 @@
         <x-info-box
             :number="$infobox['number2']"
             :label="$infobox['label2']"
+            :status="$infobox['link2']"
             icon="fas fa-wifi"
             color="bg-green-600"
         ></x-info-box>
         <x-info-box
             :number="$infobox['number3']"
             :label="$infobox['label3']"
+            :status="$infobox['link3']"
             icon="fa fa-wifi"
             color="bg-orange-600"
         ></x-info-box>

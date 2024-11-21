@@ -28,9 +28,9 @@
                             {{ session('error') }}
                         </div>
                     @endif
-                    @if (session('successful'))
+                    @if (session('success'))
                         <div class="bg-green-500 text-white p-4 rounded">
-                            {{ session('successful') }}
+                            {{ session('success') }}
                         </div>
                     @endif
                     @if(View::hasSection('infobox'))

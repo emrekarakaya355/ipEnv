@@ -31,6 +31,7 @@ class LocationController extends Controller
         $this->middleware('permission:update location', ['only' => ['update','edit']]);
         $this->middleware('permission:delete location', ['only' => ['destroy']]);
     }
+
     /**
      * Display a listing of the resource.
      */
@@ -94,6 +95,7 @@ class LocationController extends Controller
         }
         return new SuccessResponse("Yer Bilgisi Başarı İle Kaydedildi.");
     }
+
     /**
      * Display the specified resource.
      */
@@ -104,13 +106,6 @@ class LocationController extends Controller
         return response()->json($location);
     }
 
-    /*
-    public function edit(Location $location)
-    {
-
-        return view('locations.edit', ['location' => $location]);
-    }
-    */
     /**
      * Update the specified resource in storage.
      */

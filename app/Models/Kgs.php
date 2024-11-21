@@ -31,5 +31,7 @@ class Kgs extends Device
     {
         return $this->hasOne(DeviceInfo::class,'device_id')->latest();
     }
+
+
 }
 

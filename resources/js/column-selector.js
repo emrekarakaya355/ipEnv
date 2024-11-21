@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const pageKey = window.location.pathname.replace(/\//g, '_'); // Replace slashes for valid key
     const selectedColumns = JSON.parse(localStorage.getItem(`selectedColumns_${pageKey}`)) || [];
     const columnCheckboxes = document.querySelectorAll('.column-checkbox');
@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Eğer var ise, seçili olanları işaretle
         columnCheckboxes.forEach(checkbox => {
             checkbox.checked = selectedColumns.includes(checkbox.value);
-            checkbox.addEventListener('change', function() {
+            checkbox.addEventListener('change', function () {
                 filterTableColumns();
             });
         });
@@ -27,7 +27,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });*/
 
-    // Sayfa yüklendiğinde tabloyu mevcut seçimlere göre filtrele
     filterTableColumns();
 
 });
@@ -39,11 +38,6 @@ window.filterTableColumns = function filterTableColumns() {
     const tableHeaders = document.querySelectorAll('thead tr th'); // Başlıklar
     // Checkbox'ları kontrol et ve ilgili sütunları gizle/göster
     checkboxes.forEach((checkbox, index) => {
-        /*
-        tableHeaders[index].style.display = checkbox.checked ? '' : 'none';
-        tableRows.forEach(row => {
-            row.children[index].style.display = checkbox.checked ? '' : 'none';
-        });*/
 
         const isChecked = checkbox.checked;
 

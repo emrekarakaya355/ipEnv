@@ -6,6 +6,7 @@ use App\Enums\DeviceStatus;
 use App\Exceptions\ConflictException;
 use App\Exceptions\ModelNotFoundException;
 use App\Models\Device;
+use Exception;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -35,17 +36,20 @@ class StoreDeviceRequest extends FormRequest
             'device_name' => 'nullable|string|max:255',
 
             'serial_number' => [
-            'required',
-            'string',
-            'max:255',
-            Rule::unique('devices', 'serial_number')->ignore($this->route('device')->id ?? null), // Ignore current device ID if editing
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('devices', 'serial_number')->ignore($this->route('device')->id ?? null),
             ],
 
             'registry_number' => [
                 'nullable',
                 'string',
                 'max:255',
-                Rule::unique('devices', 'registry_number')->ignore($this->route('device')->id ?? null), // Ignore current device ID if editing
+                Rule::when(
+                    fn($value) => !is_null($value),
+                    Rule::unique('devices', 'registry_number')->ignore($this->route('device')->id ?? null),
+                )
             ],
 
             'mac_address' => [
@@ -54,23 +58,23 @@ class StoreDeviceRequest extends FormRequest
                 'regex:/^([0-9A-Fa-f]{2}([-:])?){5}[0-9A-Fa-f]{2}$/', // Ensures MAC address format
                 Rule::unique('devices', 'mac_address')->ignore($this->route('device')->id ?? null), // Ignore current device ID if editing
             ],
-            'status' => ['nullable', 'string', 'in:' . implode(',', array_keys(DeviceStatus::toArray() ))],
-            'parent_device_id' =>[
+            'status' => ['nullable', 'string', 'in:' . implode(',', array_keys(DeviceStatus::toArray()))],
+            'parent_device_id' => [
                 'nullable',
-                'exists:devices,id',function ($attribute, $value, $fail) {
+                'exists:devices,id', function ($attribute, $value, $fail) {
                     $deviceId = $this->route('device')->id ?? null;
                     $parentDevice = Device::find($value);
                     $oldParentDeviceId = $this->route('device')->parent_device_id ?? null;
 
-                    if ((int) $value !== $oldParentDeviceId) {
+                    if ((int)$value !== $oldParentDeviceId) {
                         // Döngüsel referans kontrolü yap
-                        if ((int) $value == $deviceId ) {
-                             $fail('Cihazın Kendini Parent olarak seçemezsiniz.');
+                        if ((int)$value == $deviceId) {
+                            $fail('Cihazın Kendini Parent olarak seçemezsiniz.');
                         }
-                         if($this->hasCircularReference($deviceId, $parentDevice)){
-                             $fail('hata oluştu');
-                             return false;
-                         }
+                        if ($this->hasCircularReference($deviceId, $parentDevice)) {
+                            $fail('hata oluştu');
+                            return false;
+                        }
                     }
                     return false;
                 },
@@ -82,17 +86,7 @@ class StoreDeviceRequest extends FormRequest
     }
 
     /**
-     * Get the validation rules for the device info.
-     *
-     * @return array
-     */
-    protected function deviceInfoRules(): array
-    {
-        return (new StoreDeviceInfoRequest())->rules();
-    }
-
-    /**
-     * @throws \Exception
+     * @throws Exception
      */
     protected function hasCircularReference($deviceId, $parentDevice): bool
     {
@@ -110,5 +104,15 @@ class StoreDeviceRequest extends FormRequest
         }
 
         return false;
+    }
+
+    /**
+     * Get the validation rules for the device info.
+     *
+     * @return array
+     */
+    protected function deviceInfoRules(): array
+    {
+        return (new StoreDeviceInfoRequest())->rules();
     }
 }

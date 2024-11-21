@@ -28,16 +28,17 @@ class DeviceController extends Controller
 
         $this->middleware('permission:view device', ['only' => ['index']]);
         $this->middleware('permission:view deviceInfo', ['only' => ['orphans']]);
-        $this->middleware('permission:create device', ['only' => ['create','store']]);
-        $this->middleware('permission:update device', ['only' => ['update','edit']]);
+        $this->middleware('permission:create device', ['only' => ['create', 'store']]);
+        $this->middleware('permission:update device', ['only' => ['update', 'edit']]);
         $this->middleware('permission:delete device', ['only' => ['destroy']]);
     }
 
-    private function applyFiltersAndSorting(Request $request, $query){
+    private function applyFiltersAndSorting(Request $request, $query)
+    {
 
         $columns = Device::getColumnMapping();
         $perPage = $request->get('perPage', 10);
-        $this->deviceService->filter($request,$query);
+        $this->deviceService->filter($request, $query);
         if ($request->ajax()) {
             $this->deviceService->search($request, $query);
             $devices = $query
@@ -45,49 +46,54 @@ class DeviceController extends Controller
                 ->sorted(request('sort', 'created_at'), request('direction', 'desc'))
                 ->paginate($perPage)
                 ->withQueryString();
-            return view('devices.partials.device_table', compact('devices','columns'))->render();
+            return view('devices.partials.device_table', compact('devices', 'columns'))->render();
         }
         $devices = $query
             ->sorted(request('sort', 'created_at'), request('direction', 'desc'))
             ->with('latestDeviceInfo')
             ->paginate($perPage)
             ->withQueryString();  // Tüm parametreleri URL'e ekle
-        $total  = Device::query()->count();
-        $active = Device::where('status','Çalışıyor')->count();
-        $passive = Device::where('status','Depo')->count();
+        $total = Device::query()->count();
+        $active = Device::where('status', 'working')->count();
+        $passive = Device::where('status', 'storage')->count();
         $infobox = [
             'number1' => $total,
             'number2' => $active,
             'number3' => $passive,
-            'label1' =>'Toplam Cihaz Sayısı',
+            'label1' => 'Toplam Cihaz Sayısı',
             'label2' => 'Aktif Cihaz Sayısı',
             'label3' => 'Pasif Cihaz Sayısı',
-
+            'link2' => 'working',
+            'link3' => 'storage',
         ];
 
-        return view('devices.index', compact('devices','columns','infobox'));
+        return view('devices.index', compact('devices', 'columns', 'infobox'));
 
     }
 
-    public function index(Request $request, $type = null){
+    public function index(Request $request, $type = null)
+    {
 
         $modelClass = $this->getModelClass($type);
         $query = $modelClass::query();
-        return($this->applyFiltersAndSorting($request, $query));
+        return ($this->applyFiltersAndSorting($request, $query));
 
     }
+
     public function orphans(Request $request)
     {
         $query = Device::whereNull('parent_device_id');
-        return($this->applyFiltersAndSorting($request, $query));
+        return ($this->applyFiltersAndSorting($request, $query));
     }
+
     public function deletedDevices(Request $request)
     {
 
         $query = Device::query();
         $query->onlyTrashed();
-        return($this->applyFiltersAndSorting($request, $query));
+        return ($this->applyFiltersAndSorting($request, $query));
     }
+
     public function create()
     {
         $locations = Location::all()->sortBy(['building']);
@@ -96,7 +102,6 @@ class DeviceController extends Controller
 
     public function store(StoreDeviceRequest $request)
     {
-
         // Doğrulama başarılı, veriler kullanılabilir
         //StoreDeviceRequest sınıfındaki kurallara göre doğrulama yapıyor.
         $deviceValidated = $request->validated();
@@ -105,11 +110,11 @@ class DeviceController extends Controller
         return $this->deviceService->createDeviceWithInfo($deviceValidated);
 
 
-
     }
+
     public function show($id)
     {
-        $device = Device::with(['latestDeviceInfo', 'parentDevice.latestDeviceInfo', 'connectedDevices.latestDeviceInfo','connectedDevices.deviceType', 'deviceInfos'])->findOrFail($id);
+        $device = Device::with(['latestDeviceInfo', 'parentDevice.latestDeviceInfo', 'connectedDevices.latestDeviceInfo', 'connectedDevices.deviceType', 'deviceInfos'])->findOrFail($id);
         $locations = Location::all()->sortBy(['building']);
         return view('devices.show', compact('device', 'locations'));
     }
@@ -130,57 +135,66 @@ class DeviceController extends Controller
     public function update(StoreDeviceRequest $request, Device $device)
     {
 
-            // Doğrulama başarılı, veriler kullanılabilir
-            $deviceValidated = $request->validated();
-            return $this->deviceService->updateDeviceWithInfo($deviceValidated, $device);
+        // Doğrulama başarılı, veriler kullanılabilir
+        $deviceValidated = $request->validated();
+        return $this->deviceService->updateDeviceWithInfo($deviceValidated, $device);
     }
 
 
-    public function destroy(Device $device): JsonResponse
+    public function destroy(Device $device)
     {
         try {
             $device->delete();
-            return response()->json([
-                'success' => true,
-                'message' => 'Cihaz başarıyla silindi.'
-            ]);
+            return new SuccessResponse('Cihaz başarı ile silindi.');
         } catch (\Exception $e) {
             // Hata mesajını döndür
-            return response()->json([
-                'success' => false,
-                'message' => 'Silme işlemi sırasında bir hata oluştu: ' . $e->getMessage()
-            ]);
+            return new ErrorResponse($e);
         }
     }
+
+    public function bulkDelete(Request $request)
+    {
+        $deviceIds = $request->input('selectedDevices', []);
+        if (empty($deviceIds)) {
+            return redirect()->back()->with('error', 'Hiçbir cihaz seçilmedi.');
+        }
+        $devices = Device::whereIn('id', $deviceIds)->get();
+        foreach ($devices as $device) {
+            $device->delete(); // Bu çağrı model olaylarını tetikler
+        }
+        return new SuccessResponse('Toplam ' . count($deviceIds) . ' adet cihaz silindi.');
+    }
+
     public function forceDestroy($deviceId)
     {
         $device = Device::query();
         $device = $device->withTrashed()->findOrFail($deviceId);
-        if(!$device){
-            return new ErrorResponse(null,'Model Bulunamadı');
+        if (!$device) {
+            return new ErrorResponse(null, 'Model Bulunamadı');
         }
         if ($device->trashed()) {
             $device->deviceInfos()->forceDelete();
             $device->forceDelete();
             return new SuccessResponse('Cihaz Kalıcı Olarak Silindi.');
         }
-        return new ErrorResponse(null,'Cihazı Kalıcı olarak silmek için önce normal silmeniz gerekiyor.');
+        return new ErrorResponse(null, 'Cihazı Kalıcı olarak silmek için önce normal silmeniz gerekiyor.');
     }
 
     public function restore($deviceId)
     {
         $device = Device::query();
         $device = $device->withTrashed()->findOrFail($deviceId);
-        if(!$device){
-            return new ErrorResponse(null,'Model Bulunamadı');
+        if (!$device) {
+            return new ErrorResponse(null, 'Model Bulunamadı');
         }
         if ($device->trashed()) {
             $device->latestDeviceInfo()->restore();
             $device->restore();
             return new SuccessResponse('Cihaz Kalıcı Olarak Silindi.');
         }
-        return new ErrorResponse(null,'Cihazı Kalıcı olarak silmek için önce normal silmeniz gerekiyor.');
+        return new ErrorResponse(null, 'Cihazı Kalıcı olarak silmek için önce normal silmeniz gerekiyor.');
     }
+
     public function getSwitches(): JsonResponse
     {
 
@@ -188,7 +202,7 @@ class DeviceController extends Controller
             ->whereHas('latestDeviceInfo', function ($query) {
                 $query->whereNotNull('ip_address');
             })
-            ->with('latestDeviceInfo.location','deviceType')->get();
+            ->with('latestDeviceInfo.location', 'deviceType')->get();
         return response()->json(['switches' => $switches]);
     }
 
@@ -203,7 +217,6 @@ class DeviceController extends Controller
     }
 
 
-
     public function import(Request $request)
     {
         $request->validate([
@@ -211,7 +224,7 @@ class DeviceController extends Controller
         ]);
         $file = $request->file('file');
         $import = new DeviceImport();
-        $parentFailures =[];
+        $parentFailures = [];
         try {
 
             $import->import($file);
@@ -220,13 +233,14 @@ class DeviceController extends Controller
 
             return new ErrorResponse($e);
         }
-
         // eğer device_parent_id alanı dolu ise
-        if($import->hasParent()){
+        if ($import->hasParent()) {
+
             $parentImport = new DeviceParentImport();
             $parentImport->import($file);
-            if(!empty($parentImport->getFailures()))
-                  $parentFailures =$parentImport->getFailures();
+
+            if (!empty($parentImport->getFailures()))
+                $parentFailures = $parentImport->getFailures();
         }
 
         $allFailures = array_merge($import->getFailures(), $parentFailures);
@@ -236,17 +250,18 @@ class DeviceController extends Controller
         }
         return new SuccessResponse('Kayıtlar Başarı ile aktarıldı.');
     }
+
     public function export(Request $request)
     {
         // Filtre kriterlerini al
         $filterCriteria = $request->only(['type', 'model', 'brand', 'port_number', 'building', 'unit', 'serial_number', 'registry_number', 'device_name', 'ip_address', 'description', 'block', 'floor', 'room_number']);
-        $selectedColumns = json_decode(request('selected_columns'), true) ?? Device::getColumnMapping() ;
+        $selectedColumns = json_decode(request('selected_columns'), true) ?? Device::getColumnMapping();
         try {
             return Excel::download(
-                new DeviceExport(Device::class, $filterCriteria,[],$selectedColumns),
+                new DeviceExport(Device::class, $filterCriteria, [], $selectedColumns),
                 'devices.xlsx'
             );
-        }catch (\Exception $e){
+        } catch (\Exception $e) {
             return new ErrorResponse($e);
         }
         // BaseExport sınıfını kullanarak export işlemi yap

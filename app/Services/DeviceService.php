@@ -10,7 +10,6 @@ use App\Models\Device;
 use App\Models\DeviceInfo;
 use App\Models\DeviceType;
 use App\Models\Location;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -340,13 +339,12 @@ class DeviceService
             'device_type_id' => $deviceType->id,
             'device_name' => $deviceValidated['device_name']?? null,
             'serial_number' => strtolower($deviceValidated['serial_number']),
-            'registry_number' => strtolower($deviceValidated['registry_number']??null),
+            'registry_number' => $deviceValidated['registry_number']??null,
             'mac_address' => strtolower($deviceValidated['mac_address'])?? null,
             'parent_device_id' => $deviceValidated['parent_device_id'] ?? null,
             'parent_device_port' => $deviceValidated['parent_device_port'] ?? null,
             'status' => $deviceValidated['ip_address'] ? DeviceStatus::WORKING->name : DeviceStatus::STORAGE->name,
         ];
-
         return Device::create($attributes);
     }
 

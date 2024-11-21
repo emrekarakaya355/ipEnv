@@ -182,10 +182,10 @@ class DeviceImport extends  BaseImport
                 'device_type_id' => $deviceType->id,
                 'type' => strtolower(trim($row['type'])),
                 'serial_number' => strtolower(trim($row['serial_number'])),
-                'registry_number' => strtolower(trim($row['registry_number'])),
+                'registry_number' => trim($row['registry_number']),
                 'mac_address' => strtolower(trim($row['mac_address'])),
                 'device_name' => $row['device_name'],
-                'status' => 'Depo',
+                'status' => "STORAGE",
             ]);
 
             DeviceInfo::create([

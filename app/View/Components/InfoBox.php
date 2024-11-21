@@ -13,15 +13,17 @@ class InfoBox extends Component
     public $label;
     public $color;
     public $icon;
+    public $status;
     /**
      * Create a new component instance.
      */
-    public function __construct($number = 0, $label ="#", $color="teal", $icon ="fa-key")
+    public function __construct($number = 0, $label ="#", $color="teal", $icon ="fa-key",$status = "")
     {
         $this->number = $number;
         $this->label = $label;
         $this->color = $color;
         $this->icon = $icon;
+        $this->status = $status;
     }
 /*
     public function shouldRender()

@@ -39,3 +39,31 @@ window.submitAllForms = function submitAllForms(event,url) {
         window.location.href = `${url}?${queryString}`; // Sayfayı güncelle
     }
 }
+
+
+document.getElementById('bulkDeleteForm').addEventListener('submit', function (e) {
+    const selectedDevices = document.querySelectorAll('input[name="selectedDevices[]"]:checked');
+    if (selectedDevices.length === 0) {
+        e.preventDefault();
+        alert('Lütfen silmek için cihazları seçin.');
+    } else {
+        const form =e.target;
+
+        selectedDevices.forEach(function (checkbox) {
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'selectedDevices[]';
+            hiddenInput.value = checkbox.value;
+            form.appendChild(hiddenInput);
+        })
+    }
+});
+document.getElementById('selectAll').addEventListener('change', function () {
+    const isChecked = this.checked;
+    const checkboxes = document.querySelectorAll('input[name="selectedDevices[]"]');
+
+    checkboxes.forEach(function (checkbox) {
+        checkbox.checked = isChecked;
+    });
+
+});

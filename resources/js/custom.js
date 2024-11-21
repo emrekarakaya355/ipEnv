@@ -22,6 +22,7 @@ window.handleBrandChange = function handleBrandChange(brand, container) {
     fetch(`/get-models?type=${type}&brand=${brand}`)
         .then(response => response.json())
         .then(data => {
+
             // Clear previous options
             modelSelect.innerHTML = '<option value="">-- Model Seçin --</option>';
 
@@ -54,7 +55,7 @@ window.handleBuildingChange = function handleBuildingChange(building, container,
             defaultOption.textContent = oldUnit === null ? '-- Birim Seçin --' : oldUnit;
 
             data.unit.forEach(unit => {
-                unitSelect.innerHTML += `<option value="${unit}">${unit}</option>`;
+                unitSelect.innerHTML += `<option value="${unit}">${unit.toLocaleLowerCase('tr')}</option>`;
             });
 
         })
@@ -63,5 +64,4 @@ window.handleBuildingChange = function handleBuildingChange(building, container,
             alert('Birimler yüklenirken bir hata oluştu.');
         });
 }
-/* device Type ile ilgili script*/
 

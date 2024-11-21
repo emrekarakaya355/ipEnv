@@ -19,19 +19,22 @@
                             <div>
                                 <label for="building" class="block text-sm font-medium text-gray-700">Fakülte
                                     Adı</label>
-                                <input type="text" id="building" name="building" required
-                                       class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                    <input type="text" id="building" name="building" required
+                                           class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+
                             </div>
                             <div id="unitsContainer">
                                 <label for="unit" class="block text-sm font-medium text-gray-700">Birim Adı</label>
+
                                 <div class="flex items-center">
-                                    <input type="text" id="unit" name="units[]" required
+
+                                <input type="text" id="unit" name="units[]" required
                                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                                        <button id="addUnitButton"  type="button" onclick="addUnitField()"
-                                                class="addUnitButton ml-2 bg-green-500 text-white px-2 py-1 rounded">
-                                            +
-                                        </button>
-                                </div>
+                                <button id="addUnitButton"  type="button" onclick="addUnitField()"
+                                        class="addUnitButton ml-2 bg-green-500 text-white px-2 py-1 rounded">
+                                    <i class="fa-solid fa-plus"></i>
+                                </button>
+                            </div>
                             </div>
                             <div class="px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse mt-4">
                                 <button type="button" id="saveLocationButton" onclick="window.handleSave('locationForm')"

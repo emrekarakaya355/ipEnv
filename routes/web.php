@@ -19,11 +19,6 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::get('/error', function () {
-    $message = 'Beklenmedik bir hata oluştu. Lütfen daha sonra tekrar deneyin.';
-    return view('errors.error', compact('message'));
-})->name('error.page');
-
 // Cihaz ve diğer resource route'ları oturum açmış kullanıcılar için
 Route::middleware('auth')->group(function () {
 
@@ -44,6 +39,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/devices/import', [DeviceController::class, 'import'])->name('devices.import');
     Route::get('/devices/export', [DeviceController::class, 'export'])->name('devices.export');
 
+    Route::post('/devices/bulk-delete', [DeviceController::class, 'bulkDelete'])->name('devices.bulkDelete');
     Route::delete('/devices/{device}/force-destroy', [DeviceController::class, 'forceDestroy'])->name('devices.forceDestroy');
     Route::put('/devices/{device}/restore', [DeviceController::class, 'restore'])->name('devices.restore');
     Route::get('/devices/orphans', [DeviceController::class, 'orphans']);

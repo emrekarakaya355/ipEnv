@@ -16,6 +16,17 @@
             <input type="text" placeholder="Ara..." class="border border-gray-300 rounded-md w-full" name="search" id="searchInput">
         </form>
         <x-column-selector :columns="$columns" />
+        @isset($route)
+            @if(request()->routeIs('devices.index'))
+
+                <form id="bulkDeleteForm" action="{{ route('devices.bulkDelete') }}" method="POST" onsubmit="return confirm('Seçilen cihazları silmek istediğinizden emin misiniz?');">
+                    @csrf
+                    <button type="submit" class="bg-red-500 text-white rounded px-2 py-2">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </form>
+            @endif
+        @endisset
     </div>
 </div>
 <x-bulk-add-modal title="Toplu Ekle" actionClass="{{$route}}"></x-bulk-add-modal>

@@ -5,6 +5,8 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use \App\Http\Middleware\LowercaseInput;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
@@ -30,6 +32,13 @@ return Application::configure(basePath: dirname(__DIR__))
             if ($exception instanceof \Illuminate\Auth\Access\AuthorizationException) {
                 return response()->view('errors.403', [], 403);
             }
+            if ($exception instanceof NotFoundHttpException) {
+                return response()->view('errors.404', [], 404);
+            }
+            if ($exception instanceof \Symfony\Component\HttpKernel\Exception\HttpException) {
+                return response()->view('errors.500', [], 500);
+            }
+
 
             if($exception instanceof \Illuminate\Validation\ValidationException){
 
@@ -38,7 +47,7 @@ return Application::configure(basePath: dirname(__DIR__))
             if ($exception instanceof \App\Exceptions\CustomException) {
                 return new ErrorResponse($exception);
             }
-            return response()->view('errors.error', ['exception' => $exception]);
+            //return response()->view('errors.error', ['exception' => $exception], 500);
         });
 
     })->create();

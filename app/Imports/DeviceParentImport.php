@@ -37,12 +37,15 @@ class DeviceParentImport extends  BaseImport
         if(!$device){
             $this->fail($row,(array)'Bu mac adresine ait Cihaz bulunamadı');
         }
-        $deviceInfo = $device->latestDeviceInfo();
+        $deviceInfo = $device->latestDeviceInfo;
 
+        $parentDevice = Device::whereHas('latestDeviceInfo', function ($query) use ($row) {
+            $query->where('ip_address', $row['parent_ip_address']);
+        })->first();
         try {
             DB::beginTransaction();
             $deviceData = ([
-                'parent_device_id' => trim($row['parent_device_id'])?? null,
+                'parent_device_id' => $parentDevice->id?? null,
                 'parent_device_port' => trim($row['parent_device_port'])?? null,
             ]);
             $deviceInfoData =([

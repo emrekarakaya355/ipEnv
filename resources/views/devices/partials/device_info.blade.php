@@ -97,10 +97,10 @@
                     id="building"
                     onchange="handleBuildingChange(this.value,this.closest('.form-container'), '{{$device->unit}}')"
                     class="bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 mt-2 w-full">
-                    @foreach ($locations as $location)
+                    @foreach ($locations->unique('building') as $location)
                         <option
                             value="{{ $location->building }}" {{  $location->building ==  $device->building   ? 'selected' : '' }}>
-                            {{  $location->building }}
+                            {{ mb_strtolower( $location->building,'UTF-8') }}
                         </option>
                     @endforeach
                 </select>

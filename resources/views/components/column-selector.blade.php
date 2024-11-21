@@ -14,7 +14,7 @@
                     @if (canView('view-' . strtolower($column)))
                     <div class="mb-2 flex justify-between">
                         <label>
-                            <input type="checkbox" class="column-checkbox" name="columns[]" value="{{ $column }}" checked>
+                            <input type="checkbox" class="column-checkbox" name="columns[]" value="{{ $column }}" checked >
                             {{ $header }}
                         </label>
                         <!-- Yukarı ve aşağı butonları -->

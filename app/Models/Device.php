@@ -7,12 +7,10 @@ use App\Exceptions\ConflictException;
 use App\Exceptions\CustomInternalException;
 use App\Exceptions\DeviceCreationException;
 use App\Exceptions\PortConflictException;
-use App\Http\Responses\ErrorResponse;
-use App\Http\Responses\SuccessResponse;
 use Exception;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Contracts\Auditable;
@@ -35,6 +33,52 @@ class Device extends Model implements Auditable
         'status',
         'parent_device_port',
     ];
+
+    /**
+     * @throws Exception
+     */
+    public static function create(array $attributes)
+    {
+
+        //Try catch device service de düşüyor
+        // Silinmiş bir kaydı kontrol et
+        $existingModel = static::withTrashed()
+            ->where('type', $attributes['type'])
+            ->where('device_type_id', $attributes['device_type_id'])
+            ->where('serial_number', $attributes['serial_number'])
+            ->where('registry_number', $attributes['registry_number'])->first();
+
+        if ($existingModel) {
+            if ($existingModel->trashed()) {
+                // Kayıt silinmişse, restore et ve güncelle
+                $existingModel->restore();
+                $existingModel->update($attributes);
+                return $existingModel;
+            }
+        }
+        return static::query()->create($attributes);
+    }
+
+    public static function getColumnMapping(): array
+    {
+        return [
+            'Cihaz İsmi' => 'device_name',
+            'IP Adresi' => 'ip_address',
+            'Seri No' => 'serial_number',
+            'Sicil No' => 'registry_number',
+            'Mac Adresi' => 'mac_address',
+            'Bina' => 'building',
+            'Birim' => 'unit',
+            'Marka' => 'brand',
+            'Model' => 'model',
+            'Port' => 'port_number',
+            'Durum' => 'status',
+            'type' => 'type',
+
+
+        ];
+    }
+
     protected static function boot()
     {
         parent::boot();
@@ -54,9 +98,10 @@ class Device extends Model implements Auditable
         });
 
         static::deleted(function ($model) {
-            if($model->latestDeviceInfo){
+            if ($model->latestDeviceInfo) {
                 $model->latestDeviceInfo->delete();
             }
+            $model->save();
         });
 
         static::restoring(function ($model) {
@@ -77,23 +122,22 @@ class Device extends Model implements Auditable
                 }*/
                 $parentDevice = self::find($model->parent_device_id);
 
-                if($parentDevice === null) return;
+                if ($parentDevice === null) return;
 
-                if ( $parentDevice->deviceType->type == 'access_point') {
+                if ($parentDevice->deviceType->type == 'access_point') {
                     throw new DeviceCreationException('Access Point parent olarak seçilemez');
                 }
-                if ( $model->parent_device_port > $parentDevice->deviceType->port_number) {
-                    throw new ConflictException('Seçtiğiniz cihaz '.$parentDevice->deviceType->port_number.' adet porta sahiptir. Lütfen bu sayıdan küçük bir değer giriniz.');
+                if ($model->parent_device_port > $parentDevice->deviceType->port_number) {
+                    throw new ConflictException('Seçtiğiniz cihaz ' . $parentDevice->deviceType->port_number . ' adet porta sahiptir. Lütfen bu sayıdan küçük bir değer giriniz.');
                 }
                 foreach ($parentDevice->connectedDevices as $connectedDevice) {
-                   if ($connectedDevice->parent_device_port == $model->parent_device_port && $connectedDevice->id != $model->id ) {
-                       throw new PortConflictException('Bu port '.$connectedDevice->latestDeviceInfo?->ip_address.' ip adresine sahip cihaz tarafından kullanılıyor' );
-                   }
+                    if ($connectedDevice->parent_device_port == $model->parent_device_port && $connectedDevice->id != $model->id) {
+                        throw new PortConflictException('Bu port ' . $connectedDevice->latestDeviceInfo?->ip_address . ' ip adresine sahip cihaz tarafından kullanılıyor');
+                    }
                 }
             }
         });
     }
-
 
     public function newFromBuilder($attributes = [], $connection = null): Device
     {
@@ -102,7 +146,7 @@ class Device extends Model implements Auditable
         if ($instance->type) {
             $class = self::resolveChildClass($instance->type);
             $instance = (new $class)->newInstance([], true);
-            $instance->setRawAttributes((array) $attributes, true);
+            $instance->setRawAttributes((array)$attributes, true);
         }
 
         return $instance;
@@ -116,14 +160,16 @@ class Device extends Model implements Auditable
             'kgs' => Kgs::class,
         ];
 
-        return $types[ strtolower($type)] ?? self::class;
+        return $types[strtolower($type)] ?? self::class;
     }
+
     public function deviceInfos(): HasMany
     {
         return $this->hasMany(DeviceInfo::class)
             ->withTrashed()
             ->orderBy('deleted_at', 'desc');
     }
+
     public function latestDeviceInfo()
     {
         return $this->hasOne(DeviceInfo::class)->latest();
@@ -137,26 +183,25 @@ class Device extends Model implements Auditable
             return $query->where('status', '!=', DeviceStatus::STORAGE);
         }
 
-        // Yetkisi varsa tüm cihazları göster
         return $query;
     }
-    // Device oluşturan kullanıcı
+
+
     public function createdBy()
     {
         return $this->belongsTo(User::class, 'created_by');
     }
 
-    // Device güncelleyen kullanıcı
     public function updatedBy()
     {
         return $this->belongsTo(User::class, 'updated_by');
     }
 
-    // DeviceInfo silen kullanıcı
     public function deletedBy()
     {
         return $this->belongsTo(User::class, 'deleted_by');
     }
+
     public function latestDeviceLocation()
     {
         return $this->hasOneThrough(
@@ -169,7 +214,7 @@ class Device extends Model implements Auditable
         )->latest(); // En güncel DeviceInfo'yu alır
     }
 
-    public function deviceType(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function deviceType(): BelongsTo
     {
         return $this->belongsTo(DeviceType::class);
     }
@@ -184,73 +229,22 @@ class Device extends Model implements Auditable
      */
     public function setStatusAttribute($value): void
     {
-        try{
+        try {
             if ($value instanceof DeviceStatus) {
 
                 $this->attributes['status'] = $value->value;
             } elseif (is_string($value)) {
-                $this->attributes['status'] =  DeviceStatus::fromName($value)->name;
+                $this->attributes['status'] = DeviceStatus::fromName($value)->name;
             }
-            }
-            catch (\Exception $exception) {
-                throw new CustomInternalException("Invalid status value.");
+        } catch (Exception $exception) {
+            throw new CustomInternalException("Invalid status value.");
         }
-    }
-    protected function getBuildingAttribute()
-    {
-        return $this->latestDeviceInfo ? $this->latestDeviceInfo->location->building : null;
-
-    }
-    protected function getUnitAttribute()
-    {
-        return $this->latestDeviceInfo ? $this->latestDeviceInfo->location->unit : null;
-
-    }
-
-    protected function getBlockAttribute()
-    {
-        return  $this->latestDeviceInfo ? $this->latestDeviceInfo->block : null;
-    }
-
-    protected function getFloorAttribute()
-    {
-        return  $this->latestDeviceInfo ? $this->latestDeviceInfo->floor : null;
-    }
-    protected function getDescriptionAttribute()
-    {
-        return  $this->latestDeviceInfo ? $this->latestDeviceInfo->description : null;
-    }
-    protected function getRoomNumberAttribute()
-    {
-        return  $this->latestDeviceInfo ? $this->latestDeviceInfo->room_number : null;
-    }
-    protected function getIpAddressAttribute()
-    {
-
-        return $this->latestDeviceInfo ? $this->latestDeviceInfo->ip_address : null;
-    }
-    protected function getBrandAttribute()
-    {
-        return $this->deviceType->brand;
-    }
-    protected function getModelAttribute()
-    {
-        return $this->deviceType->model;
-    }
-    protected function getPortNumberAttribute()
-    {
-        return $this->deviceType->port_number;
-    }
-    public function parentDevice()
-    {
-        return $this->belongsTo(Device::class, 'parent_device_id');
     }
 
     public function connectedDevices()
     {
         return $this->hasMany(Device::class, 'parent_device_id');
     }
-
 
     public function scopeSorted($query, $sortColumn = 'created_at', $sortOrder = 'desc')
     {
@@ -280,30 +274,30 @@ class Device extends Model implements Auditable
                     ->has('latestDeviceInfo')  // latestDeviceInfo ilişkisini kullanarak sorgulama yapar
                     ->orderBy(
                         DeviceInfo::select('locations.' . $column)  // locations tablosundaki dinamik bir sütuna göre sıralama yapar
-                        ->join('locations', 'locations.id', '=', 'device_infos.location_id')  // latestDeviceInfo ile locations'u birleştirir
-                        ->whereColumn('device_infos.device_id', 'devices.id')  // device_id ile devices.id eşleşmesini sağlar
-                        ->orderBy('locations.' . $column, $sortOrder)  // İstediğiniz sıralama düzeni (asc/desc)
-                        ->limit(1)  // Her cihaz için en yeni veriyi al
-                        , $sortOrder  // Dış sıralama yönü
+                        ->join('locations', 'locations.id', '=', 'device_infos.location_id')
+                            ->whereColumn('device_infos.device_id', 'devices.id')
+                            ->orderBy('locations.' . $column, $sortOrder)
+                            ->limit(1)
+                        , $sortOrder
                     );
             } elseif ($table === 'device_infos') {
-                return($query
-                    ->has('latestDeviceInfo')  // latestDeviceInfo ilişkisini kullanarak sorgulama yapar
+                return ($query
+                    ->has('latestDeviceInfo')
                     ->orderBy(
-                        DeviceInfo::select($column)  // latestDeviceInfo'daki 'building' sütununa göre sıralama
-                        ->whereColumn('device_infos.device_id', 'devices.id')  // device_id ile devices.id eşleşmesini sağla
-                        ->orderBy($column, $sortOrder)  // İstediğiniz sıralama düzeni
-                        ->limit(1)  // Her cihaz için bir tane en yeni veriyi al
-                        ,$sortOrder
+                        DeviceInfo::select($column)
+                            ->whereColumn('device_infos.device_id', 'devices.id')
+                            ->orderBy($column, $sortOrder)
+                            ->limit(1)
+                        , $sortOrder
                     ));
             } elseif ($table === 'device_types') {
 
                 return $query
                     ->orderBy(
-                        DeviceType::select( $column)  // locations tablosundaki dinamik bir sütuna göre sıralama yapar
-                        ->whereColumn('device_types.id', 'device_type_id')  // device_id ile devices.id eşleşmesini sağlar
-                        ->orderBy($column, $sortOrder)  // İstediğiniz sıralama düzeni (asc/desc)
-                        ->limit(1)  // Her cihaz için en yeni veriyi al
+                        DeviceType::select($column)
+                            ->whereColumn('device_types.id', 'device_type_id')
+                            ->orderBy($column, $sortOrder)
+                            ->limit(1)
                         , $sortOrder  // Dış sıralama yönü
                     );
             }
@@ -311,78 +305,90 @@ class Device extends Model implements Auditable
 
         // Diğer sütunlar için doğrudan sıralama
         return $query->orderBy($column, $sortOrder);
-    }/*
-    public function scopeSorted($query, $sortColumn = 'created_at', $sortOrder = 'desc')
-    {
-        // Sıralama yapılacak sütunlar
-        $validColumns = [
-            'building' => 'locations.building',
-            'unit' => 'locations.unit',
-            'block' => 'device_infos.block',
-            'floor' => 'device_infos.floor',
-            'description' => 'device_infos.description',
-            'room_number' => 'device_infos.room_number',
-            'ip_address' => 'device_infos.ip_address',
-            'brand' => 'device_types.brand',
-            'model' => 'device_types.model',
-        ];
-
-        // İlgili tabloları bir defada join yapıyoruz
-        $query->join('device_infos', 'device_infos.device_id', '=', 'devices.id')
-            ->join('locations', 'locations.id', '=', 'device_infos.location_id')
-            ->join('device_types', 'device_types.id', '=', 'devices.device_type_id');
-
-        // Eğer sıralama yapılacak sütun geçerli değilse 'created_at' kullan
-        $column = $validColumns[$sortColumn] ?? 'created_at';
-
-        // Sıralama işlemi
-        return $query->orderBy($column, $sortOrder);
     }
-*/
-    /**
-     * @throws Exception
-     */
-    public static function create(array $attributes)
+
+    protected function getBuildingAttribute()
+    {
+        return $this->latestDeviceInfo ? $this->latestDeviceInfo->location->building : null;
+
+    }
+
+    protected function getUnitAttribute()
+    {
+        return $this->latestDeviceInfo ? $this->latestDeviceInfo->location->unit : null;
+
+    }
+
+    protected function getBlockAttribute()
+    {
+        return $this->latestDeviceInfo ? $this->latestDeviceInfo->block : null;
+    }
+
+    protected function getFloorAttribute()
+    {
+        return $this->latestDeviceInfo ? $this->latestDeviceInfo->floor : null;
+    }
+
+
+    protected function getDescriptionAttribute()
+    {
+        return $this->latestDeviceInfo ? $this->latestDeviceInfo->description : null;
+    }
+
+    protected function getRoomNumberAttribute()
+    {
+        return $this->latestDeviceInfo ? $this->latestDeviceInfo->room_number : null;
+    }
+
+    protected function getIpAddressAttribute()
     {
 
-    //Try catch device servicede düşüyor
-            // Silinmiş bir kaydı kontrol et
-        $existingModel = static::withTrashed()
-            ->where('type', $attributes['type'])
-            ->where('device_type_id', $attributes['device_type_id'])
-            ->where('serial_number', $attributes['serial_number'])
-            ->where('registry_number',$attributes['registry_number'])->first();
+        return $this->latestDeviceInfo ? $this->latestDeviceInfo->ip_address : null;
+    }
 
-        if ($existingModel ) {
-            if( $existingModel->trashed()){
-                // Kayıt silinmişse, restore et ve güncelle
-                   $existingModel->restore();
-                   $existingModel->update($attributes);
-                   return $existingModel;
+    protected function getBrandAttribute()
+    {
+        return $this->deviceType->brand;
+    }
+
+    protected function getModelAttribute()
+    {
+        return $this->deviceType->model;
+    }
+
+    protected function getMacAddressAttribute($value)
+    {
+        $value = preg_replace('/[^0-9a-fA-F]/', '', $value);
+        $temp = "";
+        $length = strlen($value);
+        $separator = ":";
+        $step=2;
+        if ($this->hasParentDevice()) {
+            if (strtolower($this->parentDevice->brand) === 'hp') {
+                $separator = "-";
+                $step=4;
             }
         }
-        return static::query()->create($attributes);
+        for ($i = 0; $i < $length; $i += $step) {
+            $temp .= substr($value, $i, $step) . $separator;
+        }
+
+        return rtrim($temp, $separator);
     }
 
-
-    public static function getColumnMapping(): array
+    private function hasParentDevice()
     {
-        return [
-            'Cihaz İsmi' => 'device_name',
-            'IP Adresi' => 'ip_address',
-            'Seri No' => 'serial_number',
-            'Sicil No' => 'registry_number',
-            'Mac Adresi' => 'mac_address',
-            'Bina' => 'building',
-            'Birim' => 'unit',
-            'Marka' => 'brand',
-            'Model' => 'model',
-            'Port' => 'port_number',
-            'Durum' => 'status',
-            'type' => 'type',
+        return $this->parentDevice()->exists();
+    }
 
+    public function parentDevice()
+    {
+        return $this->belongsTo(Device::class, 'parent_device_id');
+    }
 
-        ];
+    protected function getPortNumberAttribute()
+    {
+        return $this->deviceType->port_number;
     }
 
 }

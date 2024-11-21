@@ -2,10 +2,10 @@
 
     @section('title', 'Dashboard')
     @section('infobox')
-        <x-info-box :number="$infobox['number1']" :label="$infobox['label1']" color="bg-teal-600" icon="fas fa-chart-pie"/>
-        <x-info-box :number="$infobox['number2']" :label="$infobox['label2']" color="bg-teal-600" icon="fas fa-chart-pie"/>
-        <x-info-box :number="$infobox['number3']" :label="$infobox['label3']" color="bg-purple-600" icon="fas fa-wrench"/>
-        <x-info-box :number="$infobox['number4']" :label="$infobox['label4']" color="bg-purple-600" icon="fa-solid fas fa-boxes-stacked"/>
+        <x-info-box :number="$infobox['number1']" :label="$infobox['label1']" :status="$infobox['link1']" color="bg-teal-600" icon="fas fa-chart-pie"/>
+        <x-info-box :number="$infobox['number2']" :label="$infobox['label2']" :status="$infobox['link2']" color="bg-teal-600" icon="fas fa-chart-pie"/>
+        <x-info-box :number="$infobox['number3']" :label="$infobox['label3']" :status="$infobox['link3']" color="bg-purple-600" icon="fas fa-wrench"/>
+        <x-info-box :number="$infobox['number4']" :label="$infobox['label4']" :status="$infobox['link4']" color="bg-purple-600" icon="fa-solid fas fa-boxes-stacked"/>
         <x-info-box :number="$infobox['number5']" :label="$infobox['label5']" color="bg-green-600" icon="fas fa-person-running"/>
     @endsection
 
@@ -63,7 +63,7 @@
 
                     @foreach ($lastFiveMovement as $movement )
                         <tr>
-                            <td>{{$movement->device->device_name}}</td>
+                            <td>{{$movement->device->device_name ?? null}}</td>
                             <td>{{$movement->ip_address}}</td>
                             <td>{{$movement->createdBy->username}}</td>
                         </tr>

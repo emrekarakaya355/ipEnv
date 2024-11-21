@@ -172,9 +172,9 @@ class DashboardController extends Controller
             ]]
         ];
         $total  = Device::query()->count();
-        $active = Device::where('status','Çalışıyor')->count();
-        $passive = Device::where('status','Depo')->count();
-        $warranty = Device::where('status','Garanty')->count();
+        $active = Device::where('status','working')->count();
+        $passive = Device::where('status','storage')->count();
+        $warranty = Device::where('status','warranty')->count();
         $movement = DeviceInfo::query()->count();
         $infobox = [
             'number1' => $total,
@@ -187,13 +187,16 @@ class DashboardController extends Controller
             'label3' => 'Depodaki Cihaz Sayısı',
             'label4' => 'Servise Gönderilen Cihaz',
             'label5' => 'Toplam Yapılan Hareket Sayısı',
+            'link1' => '',
+            'link2' => 'working',
+            'link3' => 'storage',
+            'link4' => 'warranty',
 
         ];
 
         /*Son 5 hareket*/
         $lastFiveMovement = DeviceInfo::query()->orderBy('created_at','DESC')->take(5)->get();
         $lastFiveDevice   = Device::query()->orderBy('created_at','DESC')->take(5)->get();
-
         return view('dashboard', [
             'groupedByBuilding' => $groupedByBuilding,
             'groupedByUnit' => $groupedByUnit,

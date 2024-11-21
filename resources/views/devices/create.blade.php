@@ -110,6 +110,7 @@
                                    value="{{ old('mac_address') }}"
                                    id="mac_address"
                                    required
+                                   maxlength="17"
                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
                             @error('mac_address')
                             <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
@@ -136,6 +137,7 @@
                             <input type="text"
                                    name="ip_address"
                                    id="ip_address"
+                                   maxlength="15"
                                    value="{{ old('ip_address') }}"
                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
                             @error('ip_address')
@@ -164,8 +166,8 @@
                                 <option value="">-- Bina Seçin --</option>
                                 @foreach ($locations->unique('building') as $location)
                                     <option
-                                        value="{{ $location->building }}" {{ old('$location->building') == $location->building ? 'selected' : '' }}>
-                                        {{ $location->building }}
+                                        value="{{ $location->building }}" {{ old('$location->building') ==  $location->building ? 'selected' : '' }}>
+                                        {{ mb_strtolower( $location->building,'UTF-8') }}
                                     </option>
                                 @endforeach
                             </select>

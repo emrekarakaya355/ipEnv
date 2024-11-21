@@ -3,17 +3,44 @@
 namespace App\Models;
 
 use App\Exceptions\ConflictException;
-use App\Http\Responses\ErrorResponse;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\Auth;
 use OwenIt\Auditing\Contracts\Auditable;
 
 class DeviceInfo extends Model implements Auditable
 {
     use HasFactory, SoftDeletes;
     use \OwenIt\Auditing\Auditable;
+
+    protected $fillable = [
+        'device_id',
+        'location_id',
+        'ip_address',
+        'update_reason',
+        'status',
+        'block',
+        'floor',
+        'description',
+        'room_number',
+    ];
+
+    public static function createDefault($deviceId)
+    {
+        $locationId = Location::getLocationIdFromBuildingAndUnit(
+            'Rektörlük',
+            'Depo'
+        );
+        $defaultDeviceInfo = [
+            'ip_address' => null,
+            'location_id' => $locationId,
+            'block' => null,
+            'floor' => null,
+            'room_number' => null,
+            'description' => 'Default Kayıt'
+        ];
+        return self::create(array_merge(['device_id' => $deviceId], $defaultDeviceInfo));
+    }
 
     protected static function boot()
     {
@@ -37,17 +64,22 @@ class DeviceInfo extends Model implements Auditable
         });
 
         static::deleting(function ($model) {
-                $model->deleted_by = auth()->id();
-                $model->isDeleted = true;
-                $model->save();
+            $model->deleted_by = auth()->id();
+            $model->isDeleted = true;
+            $model->save();
         });
+        static::restoring(function ($model) {
+            $model->deleted_by = null;
+            $model->isDeleted = false;
+            $model->updated_by = auth()->id();
 
+        });
 
 
         static::saving(function ($model) {
             // Aynı IP adresine sahip silinmemiş (soft deleted olmayan) bir kayıt olup olmadığını kontrol et
             $existingDevice = static::where('ip_address', $model->ip_address)
-                ->where('ip_address','!=',null)
+                ->where('ip_address', '!=', null)
                 ->whereNull('deleted_at')
                 ->where('device_id', '!=', $model->device_id) // device_id eşit değil
                 ->exists();
@@ -58,63 +90,40 @@ class DeviceInfo extends Model implements Auditable
             return true;
         });
     }
-    protected $fillable = [
-        'device_id',
-        'location_id',
-        'ip_address',
-        'update_reason',
-        'status',
-        'block',
-        'floor',
-        'description',
-        'room_number',
-    ];
 
     public function device()
     {
         return $this->belongsTo(Device::class);
     }
 
+    // DeviceInfo'yu oluşturan kullanıcı
+
     public function location()
     {
         return $this->belongsTo(Location::class);
     }
 
-    // DeviceInfo'yu oluşturan kullanıcı
+    // DeviceInfo'yu güncelleyen kullanıcı
+
     public function createdBy()
     {
         return $this->belongsTo(User::class, 'created_by');
     }
 
-    // DeviceInfo'yu güncelleyen kullanıcı
+    // DeviceInfo'yu silen kullanıcı
+
     public function updatedBy()
     {
         return $this->belongsTo(User::class, 'updated_by');
     }
 
-    // DeviceInfo'yu silen kullanıcı
+    // Varsayılan değerlerle oluşturma metodu
+
     public function deletedBy()
     {
         return $this->belongsTo(User::class, 'deleted_by');
     }
 
-    // Varsayılan değerlerle oluşturma metodu
-    public static function createDefault($deviceId)
-    {
-        $locationId = Location::getLocationIdFromBuildingAndUnit(
-            'Rektörlük',
-            'Depo'
-        ) ;
-        $defaultDeviceInfo = [
-            'ip_address' => null,
-            'location_id' => $locationId,
-            'block' => null,
-            'floor' => null,
-            'room_number' => null,
-            'description' => 'Default Kayıt'
-        ];
-        return self::create(array_merge(['device_id' => $deviceId], $defaultDeviceInfo));
-    }
 
     public function scopeSorted($query)
     {

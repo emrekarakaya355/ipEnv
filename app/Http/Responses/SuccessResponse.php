@@ -38,7 +38,6 @@ class SuccessResponse implements Responsable
 
         // Eğer AJAX isteği ise JSON döndür
         if ($request->expectsJson()) {
-
             return response()->json(
                 [
                     'success' => true,

@@ -27,11 +27,11 @@ window.closeLocationModal = function closeLocationModal() {
     document.getElementById('locationModal').classList.add('hidden');
 }
 window.addUnitField =function addUnitField() {
-
-    const addButtons = document.getElementsByClassName('addUnitButton');
-    for (let button of addButtons) {
-        button.classList.add('hidden');
-    }
+    /*
+        const addButtons = document.getElementsByClassName('addUnitButton');
+        for (let button of addButtons) {
+            button.classList.add('hidden');
+        }*/
     // Yeni bir div oluştur
     const newUnitDiv = document.createElement('div');
     newUnitDiv.classList.add('flex', 'items-center', 'mt-2');
@@ -43,19 +43,25 @@ window.addUnitField =function addUnitField() {
     newInput.required = true;
     newInput.classList.add('block', 'w-full', 'border-gray-300', 'rounded-md', 'shadow-sm', 'focus:ring-indigo-500', 'focus:border-indigo-500', 'sm:text-sm');
 
-    // Ekle butonu
+
     const addButton = document.createElement('button');
     addButton.type = 'button';
-    addButton.textContent = '+';
-    addButton.classList.add('addUnitButton','ml-2', 'bg-green-500', 'text-white', 'px-4', 'py-1', 'rounded');
+    addButton.classList.add('addUnitButton', 'ml-2', 'bg-green-500', 'text-white', 'px-2', 'py-1', 'rounded');
+
+    const icon = document.createElement('i');
+    icon.classList.add('fa-solid', 'fa-plus');
+    addButton.appendChild(icon);
     addButton.onclick = function () {
         addUnitField();
     };
-    // Silme butonu
+
     const removeButton = document.createElement('button');
     removeButton.type = 'button';
-    removeButton.textContent = '-';
-    removeButton.classList.add('ml-2', 'bg-red-500', 'text-white', 'px-4', 'py-1', 'rounded');
+    removeButton.classList.add('ml-2', 'bg-red-500', 'text-white', 'px-2', 'py-1', 'rounded');
+    const minusIcon = document.createElement('i');
+    minusIcon.classList.add('fa-solid', 'fa-minus');
+
+    removeButton.appendChild(minusIcon);
     removeButton.onclick = function () {
         newUnitDiv.remove();
     };
@@ -65,7 +71,5 @@ window.addUnitField =function addUnitField() {
     newUnitDiv.appendChild(addButton);
     newUnitDiv.appendChild(removeButton);
 
-
-    // Yeni div'i unitsContainer'a ekle
     document.getElementById('unitsContainer').appendChild(newUnitDiv);
 }
