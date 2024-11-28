@@ -20,7 +20,7 @@ class DeviceTypeTemplateExport implements WithHeadings,FromArray
             'Type',
             'Brand',
             'Model',
-            'Port_Number',
+            'Port Number',
         ];
     }
 

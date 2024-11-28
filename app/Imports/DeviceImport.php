@@ -3,11 +3,13 @@
 namespace App\Imports;
 
 
+use App\Enums\DeviceStatus;
 use App\Models\Device;
 use App\Models\DeviceInfo;
 use App\Models\DeviceType;
 use App\Models\Location;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class DeviceImport extends  BaseImport
 {
@@ -53,6 +55,11 @@ class DeviceImport extends  BaseImport
         return $mappedRow;
     }
 */
+    public function prepareForValidation($row){
+        $row['status'] = mb_strtolower($row['status'],'UTF-8');
+        return $row;
+    }
+
     public function rules(): array
     {
         return [
@@ -111,6 +118,11 @@ class DeviceImport extends  BaseImport
                 'nullable',
                 'string',
             ],
+            'status' => [
+                'nullable',
+                'string',
+                'in:aktif,pasif,garanti,hurda'
+            ],
 
             /*
              * device_Info bilgileri
@@ -148,8 +160,6 @@ class DeviceImport extends  BaseImport
     protected function processRow(array $row)
     {
 
-        //$row = $this->mapHeaders($row); // Başlıkları eşle
-
         //eğer herhangi bir satırda parent device id var ise hasParent true olsun
             if($row['parent_ip_address']){
                 $this->hasParent = true;
@@ -181,18 +191,18 @@ class DeviceImport extends  BaseImport
             $device = Device::create([
                 'device_type_id' => $deviceType->id,
                 'type' => strtolower(trim($row['type'])),
-                'serial_number' => strtolower(trim($row['serial_number'])),
-                'registry_number' => trim($row['registry_number']),
-                'mac_address' => strtolower(trim($row['mac_address'])),
+                'serial_number' => trim($row['serial_number']),
+                'registry_number' => $row['registry_number'],
+                'mac_address' => trim($row['mac_address']),
                 'device_name' => $row['device_name'],
-                'status' => "STORAGE",
+                'status' => $this->setStatus($row),
             ]);
 
             DeviceInfo::create([
                 'device_id' => $device->id,
                 'location_id' => $location->id,
                 'ip_address' => trim($row['ip_address']),
-                'description' => 'Toplu Kayıt',
+                'description' => $row['description'] ?? 'Toplu Kayıt',
                 'block' => $row['block'],
                 'floor' => $row['floor'],
                 'room_number' => $row['room_number'],
@@ -206,7 +216,19 @@ class DeviceImport extends  BaseImport
         }
     }
 
+    private function setStatus($row)
+    {
+        $statuses = [
+            'aktif' => DeviceStatus::WORKING->name,
+            'pasif' => DeviceStatus::STORAGE->name,
+            'garanti' => DeviceStatus::WARRANTY->name,
+            'hurda' => DeviceStatus::SCRAP->name,
+        ];
 
+        // Status değeri küçük harfe dönüştürülüyor ve eşleştirme yapılıyor
+        $status = mb_strtolower($row['status'],'UTF-8');
+        return $statuses[$status] ?? DeviceStatus::STORAGE->name;
+    }
     public function hasParent(): bool
     {
         return $this->hasParent;

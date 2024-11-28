@@ -6,6 +6,7 @@ use App\Exports\FailuresExport;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\Importable;
 use Maatwebsite\Excel\Concerns\RegistersEventListeners;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\SkipsErrors;
 use Maatwebsite\Excel\Concerns\SkipsFailures;
 use Maatwebsite\Excel\Concerns\SkipsOnError;
@@ -21,7 +22,7 @@ use Maatwebsite\Excel\Events\AfterSheet;
 use Maatwebsite\Excel\Validators\Failure;
 use PhpOffice\PhpSpreadsheet\Exception;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-abstract class BaseImport implements ToCollection, WithHeadingRow, SkipsOnError, SkipsOnFailure, WithValidation, WithSkipDuplicates, WithEvents
+abstract class BaseImport implements ToCollection, WithHeadingRow, SkipsOnError, SkipsOnFailure, WithValidation, WithSkipDuplicates, WithEvents,ShouldAutoSize
 {
 
     use Importable, RegistersEventListeners, SkipsErrors, SkipsFailures;

@@ -46,10 +46,11 @@ class StoreDeviceRequest extends FormRequest
                 'nullable',
                 'string',
                 'max:255',
-                Rule::when(
+                /* Şimdilik uniqe kaldırıldı.
+                 * Rule::when(
                     fn($value) => !is_null($value),
                     Rule::unique('devices', 'registry_number')->ignore($this->route('device')->id ?? null),
-                )
+                )*/
             ],
 
             'mac_address' => [

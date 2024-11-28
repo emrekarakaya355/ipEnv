@@ -66,7 +66,7 @@ class DeviceController extends Controller
             'link2' => 'working',
             'link3' => 'storage',
         ];
-
+        
         return view('devices.index', compact('devices', 'columns', 'infobox'));
 
     }
@@ -190,9 +190,10 @@ class DeviceController extends Controller
         if ($device->trashed()) {
             $device->latestDeviceInfo()->restore();
             $device->restore();
-            return new SuccessResponse('Cihaz Kalıcı Olarak Silindi.');
-        }
-        return new ErrorResponse(null, 'Cihazı Kalıcı olarak silmek için önce normal silmeniz gerekiyor.');
+            return new SuccessResponse('Cihaz hayata döndü.');
+        } else
+            return new ErrorResponse(null, 'Hayata dönmeden önce silinmesi gerekiyor!');
+
     }
 
     public function getSwitches(): JsonResponse

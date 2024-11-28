@@ -26,6 +26,15 @@
                     </button>
                 </form>
             @endif
+                @if(request()->routeIs('devices.deletedDevices'))
+
+                    <form id="bulkDeleteForm" action="{{ route('devices.bulkDelete') }}" method="POST" onsubmit="return confirm('Seçilen cihazları silmek istediğinizden emin misiniz?');">
+                        @csrf
+                        <button type="submit" class="bg-red-500 text-white rounded px-2 py-2">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </form>
+                @endif
         @endisset
     </div>
 </div>

@@ -30,6 +30,7 @@ class DeviceTemplateExport implements withHeadings, FromArray,ShouldAutoSize
             'Block',
             'Floor',
             'Room Number',
+            'Status',
             'Parent Ip Address',
             'Parent Port Number',
         ];
@@ -49,14 +50,15 @@ class DeviceTemplateExport implements withHeadings, FromArray,ShouldAutoSize
                 'Rektörlük',           // Building
                 'Bilgi İşlem',               // Unit
                 'SN123456',             // Serial Number
-                'REG123',               // Registry Number
-                'aa:aa:aa:aa',               // Registry Number
-                'REK',     // Device Name
+                '',               // Registry Number
+                'aa:aa:aa:aa:bb:cc',               // mac address
+                'Cihaz Adı',     // Device Name
                 '192.168.1.1',          // IP Address
                 'aciklama',      // Description
                 'A',              // Block
                 '1',                    // Floor
                 '101',                  // Room Number
+                'Pasif,Garanti'
             ],
             [
                 'Access_point',                // Type
@@ -66,14 +68,15 @@ class DeviceTemplateExport implements withHeadings, FromArray,ShouldAutoSize
                 'Rektörlük',           // Building
                 'Bilgi İşlem',               // Unit
                 'SN1234567',             // Serial Number
-                'REG1234',               // Registry Number
-                'aa:aa:aa:aa',               // Registry Number
-                'Device Adı',     // Device Name
+                '',               // Registry Number
+                'aa:aa:aa:aa:bb:dd',               // Registry Number
+                'Cihaz Adı',     // Device Name
                 '192.168.1.2',          // IP Address
                 'Açıklama buraya',      // Description
                 'A',              // Block
                 '1',                    // Floor
                 '101',                  // Room Number
+                'Aktif,Hurda',
                 '10.10.10.10',                  // Room Number
                 '10',                  // Room Number
             ],

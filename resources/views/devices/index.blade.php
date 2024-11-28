@@ -6,7 +6,7 @@
             :number="$infobox['number1']"
             :label="$infobox['label1']"
             icon="fas fa-wifi"
-            color="bg-blue-600"
+            color="bg-teal-600"
         />
         <x-info-box
             :number="$infobox['number2']"
@@ -20,7 +20,7 @@
             :label="$infobox['label3']"
             :status="$infobox['link3']"
             icon="fa fa-wifi"
-            color="bg-orange-600"
+            color="bg-red-500"
         ></x-info-box>
     @endsection
     @can('view device')

@@ -15,8 +15,18 @@ export default {
                 sans: ['Figtree', ...defaultTheme.fontFamily.sans],
             },
             fontSize: {
-                base: '0.875rem', // Set this to your desired base size (e.g., 14px)
+                base: '0.875rem',
             },
+            colors: {
+                red: {
+                    500: '#ff0000',
+
+                },
+                orange: {
+                    500: '#ff6200',
+                }
+            }
+
         },
     },
 

@@ -27,7 +27,7 @@ class LocationImport extends BaseImport
             // Satırı model olarak kaydedelim
             Location::create([
                 'building' =>ucfirst(strtolower($row['building'])) ,
-                'unit' => ucfirst(strtolower($row['unit'])),
+                'unit' => $row['unit'],
             ]);
         } catch (\Exception $e) {
             // Diğer hataları tekrar fırlatalım

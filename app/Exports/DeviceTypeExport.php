@@ -22,10 +22,11 @@ class DeviceTypeExport extends BaseExport
             'Marka' => $deviceType->brand,
             'Model' => $deviceType->model,
             'Port Sayısı' => $deviceType->port_number,
-            'Oluşturma Tarihi' => $deviceType->created_at->format('d-M-Y'), // Only day and year
+            'Oluşturma Tarihi' => $deviceType->created_at->locale('tr')->translatedFormat('d-M-Y'),
 
         ];
     }
+
     /**
      * Headings for the export.
      *

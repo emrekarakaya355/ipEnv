@@ -127,8 +127,8 @@ class LocationController extends Controller
         try{
             $location = Location::findOrFail($id);
             $location->fill([
-                'building' => ucfirst(strtolower($validator->validated()['building'])),
-                'unit' => ucfirst(strtolower($validator->validated()['units'][0]))
+                'building' => $validator->validated()['building'],
+                'unit' => $validator->validated()['units'][0]
                 ]
             );
 

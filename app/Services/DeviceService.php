@@ -335,12 +335,12 @@ class DeviceService
             throw new ModelNotFoundException('Cihaz Tipi Bulunamadı!');
         }
         $attributes = [
-            'type' => strtolower($deviceType->type),
+            'type' => $deviceType->type,
             'device_type_id' => $deviceType->id,
             'device_name' => $deviceValidated['device_name']?? null,
-            'serial_number' => strtolower($deviceValidated['serial_number']),
+            'serial_number' => $deviceValidated['serial_number'],
             'registry_number' => $deviceValidated['registry_number']??null,
-            'mac_address' => strtolower($deviceValidated['mac_address'])?? null,
+            'mac_address' => $deviceValidated['mac_address']?? null,
             'parent_device_id' => $deviceValidated['parent_device_id'] ?? null,
             'parent_device_port' => $deviceValidated['parent_device_port'] ?? null,
             'status' => $deviceValidated['ip_address'] ? DeviceStatus::WORKING->name : DeviceStatus::STORAGE->name,

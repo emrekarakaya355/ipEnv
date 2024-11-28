@@ -39,7 +39,6 @@ return Application::configure(basePath: dirname(__DIR__))
                 return response()->view('errors.500', [], 500);
             }
 
-
             if($exception instanceof \Illuminate\Validation\ValidationException){
 
                 return new \App\Http\Responses\ValidatorResponse($exception->validator);
@@ -47,7 +46,7 @@ return Application::configure(basePath: dirname(__DIR__))
             if ($exception instanceof \App\Exceptions\CustomException) {
                 return new ErrorResponse($exception);
             }
-            //return response()->view('errors.error', ['exception' => $exception], 500);
+            return response()->view('errors.error', ['exception' => $exception], 500);
         });
 
     })->create();

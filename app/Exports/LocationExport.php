@@ -14,11 +14,12 @@ class LocationExport extends BaseExport
      */
     public function map($location): array
     {
+
         // Format the date and fetch related 'created by' user
         return [
             'Building' => $location->building,
             'Unit' => $location->unit,
-            'Created Date' => $location->created_at->format('d-M-Y'), // Only day and year
+            'Created Date' => $location->created_at->locale('tr')->translatedFormat('d-M-Y'),
             'Created By' => optional($location->createdBy)->name, // Assuming Location has a relationship with User
         ];
     }

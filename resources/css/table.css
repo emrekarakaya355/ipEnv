@@ -20,7 +20,6 @@ table th {
     line-height: 1rem;
     text-align: center;
     color: #6b7280;
-    text-transform: uppercase;
     background-color: #f9fafb;
     white-space: nowrap;
     position: relative;
@@ -33,7 +32,6 @@ table td {
     padding: 3px;
     font-size: 0.75rem;
     color: #1f2937;
-    text-transform: uppercase;
     text-align: center;
     position: relative;
 }

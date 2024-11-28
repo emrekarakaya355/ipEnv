@@ -63,6 +63,7 @@ class Device extends Model implements Auditable
     {
         return [
             'Cihaz İsmi' => 'device_name',
+            'Açıklama' => 'description',
             'IP Adresi' => 'ip_address',
             'Seri No' => 'serial_number',
             'Sicil No' => 'registry_number',
@@ -74,8 +75,6 @@ class Device extends Model implements Auditable
             'Port' => 'port_number',
             'Durum' => 'status',
             'type' => 'type',
-
-
         ];
     }
 
@@ -100,8 +99,9 @@ class Device extends Model implements Auditable
         static::deleted(function ($model) {
             if ($model->latestDeviceInfo) {
                 $model->latestDeviceInfo->delete();
+                $model->save();
             }
-            $model->save();
+
         });
 
         static::restoring(function ($model) {
@@ -111,9 +111,7 @@ class Device extends Model implements Auditable
 
         });
 
-
         static::saving(function ($model) {
-
 
             if ($model->parent_device_id) {
 
@@ -333,6 +331,7 @@ class Device extends Model implements Auditable
     protected function getDescriptionAttribute()
     {
         return $this->latestDeviceInfo ? $this->latestDeviceInfo->description : null;
+
     }
 
     protected function getRoomNumberAttribute()
@@ -345,6 +344,7 @@ class Device extends Model implements Auditable
 
         return $this->latestDeviceInfo ? $this->latestDeviceInfo->ip_address : null;
     }
+
 
     protected function getBrandAttribute()
     {

@@ -51,8 +51,8 @@ class DeviceTypeImport extends BaseImport
             // Satırı model olarak kaydedelim
             DeviceType::create([
                 'type' =>ucfirst(strtolower( $row['type'])),
-                'brand' => ucfirst(strtolower( $row['brand'])),
-                'model' =>ucfirst(strtolower( $row['model'])),
+                'brand' => $row['brand'],
+                'model' =>$row['model'],
                 'port_number' =>$row['port_number'],
             ]);
 

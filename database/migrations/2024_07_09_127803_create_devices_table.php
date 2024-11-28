@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('type');
             $table->string('device_name')->nullable();
             $table->string('serial_number')->unique();
-            $table->string('registry_number')->unique()->nullable();
+            $table->string('registry_number')->nullable();
             $table->string('mac_address')->unique();
             $table->enum('status', array_keys(DeviceStatus::toArray()))->default(DeviceStatus::STORAGE->name);
             $table->unsignedBigInteger('parent_device_id')->nullable();

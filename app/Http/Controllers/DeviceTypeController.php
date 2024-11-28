@@ -69,12 +69,13 @@ class DeviceTypeController extends Controller
 
         try {
 
+            /*
             //küçük harfe çevir
             $validatedData = array_map(function ($value) {
                 return is_string($value) ? ucfirst(strtolower($value)) : $value;
             }, $validator->validated());
-
-            DeviceType::create($validatedData);
+            */
+            DeviceType::create($validator->validated());
         } catch (\Exception $exception) {
             return new ErrorResponse($exception);
         }
@@ -113,11 +114,13 @@ class DeviceTypeController extends Controller
             $deviceType->fill($validator->validated());
 
             if($deviceType->isDirty()){
+                /*
                 //küçük harfe çevir
                 $validatedData = array_map(function ($value) {
                     return is_string($value) ? ucfirst(strtolower($value)) : $value;
                 }, $validator->validated());
-                $deviceType->update($validatedData);
+                */
+                $deviceType->update($validator->validated());
                 return new SuccessResponse('Cihaz tipi başarı ile düzeltildi.',$deviceType);
             }
             return new ErrorResponse(null,'Herhangi Bir Değişiklik yapılmadı.');

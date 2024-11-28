@@ -8,6 +8,7 @@
     <table id="resizeMe" class="resizable-table min-w-full">
         <thead>
         <tr>
+            <th><input type="checkbox" id="selectAll"/></th>
 
             @foreach ($columns as $header => $column)
                 @if (canView('view-' . strtolower($column)))
@@ -23,14 +24,16 @@
             @endforeach
             <th></th>
             <th></th>
-            <th><input type="checkbox" id="selectAll"/></th>
 
         </tr>
         </thead>
         <tbody id="deviceTableBody">
         @foreach ($devices as $row)
-            <tr>
 
+            <tr>
+                <td>
+                    <input type="checkbox" name="selectedDevices[]" value="{{ $row->id }}" class="selectDevice"/>
+                </td>
                 @foreach ($columns as $header => $column)
                     @if (canView('view-' . strtolower($column)))
                         <td class="ellipsis">
@@ -91,9 +94,7 @@
                         @endif
                     </td>
                 @endif
-                    <td>
-                        <input type="checkbox" name="selectedDevices[]" value="{{ $row->id }}" class="selectDevice"/>
-                    </td>
+
             </tr>
         @endforeach
         </tbody>

@@ -120,32 +120,11 @@
                        class="flex items-center px-4 py-3 -mx-2 text-gray-600 hover:text-white hover:bg-indigo-600">
 
                         <p class="mx-2 text-sm">
-                            <span class="font-bold" href="#">Sara Salah</span> replied on the <span
-                                class="font-bold text-indigo-400" href="#">Upload Image</span> artical . 2m
+                            <span class="font-bold" href="#">Emre</span> Yeni Cihaz  <span
+                                class="font-bold text-indigo-400" href="#">cisco_5120</span> Ekledi
                         </p>
                     </a>
-                    <a href="#"
-                       class="flex items-center px-4 py-3 -mx-2 text-gray-600 hover:text-white hover:bg-indigo-600">
 
-                        <p class="mx-2 text-sm">
-                            <span class="font-bold" href="#">Slick Net</span> start following you . 45m
-                        </p>
-                    </a>
-                    <a href="#"
-                       class="flex items-center px-4 py-3 -mx-2 text-gray-600 hover:text-white hover:bg-indigo-600">
-
-                        <p class="mx-2 text-sm">
-                            <span class="font-bold" href="#">Jane Doe</span> Like Your reply on <span
-                                class="font-bold text-indigo-400" href="#">Test with TDD</span> artical . 1h
-                        </p>
-                    </a>
-                    <a href="#"
-                       class="flex items-center px-4 py-3 -mx-2 text-gray-600 hover:text-white hover:bg-indigo-600">
-
-                        <p class="mx-2 text-sm">
-                            <span class="font-bold" href="#">Abigail Bennett</span> start following you . 3h
-                        </p>
-                    </a>
                 </div>
             </div>
 
