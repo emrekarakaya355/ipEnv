@@ -63,7 +63,6 @@ bulkDeleteForms.forEach(function (form) {
 */
 
 document.getElementById('selectAll').addEventListener('change', function () {
-    alert(1);
     const isChecked = this.checked;
     const checkboxes = document.querySelectorAll('input[name="selectedDevices[]"]');
 
@@ -78,7 +77,7 @@ document.getElementById('bulkDeleteForm').addEventListener('submit', function (e
     const selectedDevices = document.querySelectorAll('input[name="selectedDevices[]"]:checked');
     if (selectedDevices.length === 0) {
         e.preventDefault();
-        alert('Lütfen silmek için cihazları seçin.22');
+        alert('Lütfen silmek için cihazları seçin.');
     } else {
         const form =e.target;
 
@@ -95,7 +94,7 @@ document.getElementById('bulkRestoreForm').addEventListener('submit', function (
     const selectedDevices = document.querySelectorAll('input[name="selectedDevices[]"]:checked');
     if (selectedDevices.length === 0) {
         e.preventDefault();
-        alert('Lütfen silmek için cihazları seçin.42423');
+        alert('Lütfen silmek için cihazları seçin.');
     } else {
         const form =e.target;
 
