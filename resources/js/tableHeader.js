@@ -39,13 +39,46 @@ window.submitAllForms = function submitAllForms(event,url) {
         window.location.href = `${url}?${queryString}`; // Sayfayı güncelle
     }
 }
+/*
+const bulkDeleteForms = document.querySelectorAll('.bulk-delete-form');
+
+bulkDeleteForms.forEach(function (form) {
+    alert(1);
+    form.addEventListener('submit', function (e) {
+        const selectedDevices = form.querySelectorAll('input[name="selectedDevices[]"]:checked'); // Sadece ilgili form içindeki seçili cihazları al
+        if (selectedDevices.length === 0) {
+            e.preventDefault();
+            alert('Lütfen silmek için cihazları seçin.');
+        } else {
+            selectedDevices.forEach(function (checkbox) {
+                const hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.name = 'selectedDevices[]';
+                hiddenInput.value = checkbox.value;
+                form.appendChild(hiddenInput);
+            });
+        }
+    });
+});
+*/
+
+document.getElementById('selectAll').addEventListener('change', function () {
+    alert(1);
+    const isChecked = this.checked;
+    const checkboxes = document.querySelectorAll('input[name="selectedDevices[]"]');
+
+    checkboxes.forEach(function (checkbox) {
+        checkbox.checked = isChecked;
+    });
+
+});
 
 
 document.getElementById('bulkDeleteForm').addEventListener('submit', function (e) {
     const selectedDevices = document.querySelectorAll('input[name="selectedDevices[]"]:checked');
     if (selectedDevices.length === 0) {
         e.preventDefault();
-        alert('Lütfen silmek için cihazları seçin.');
+        alert('Lütfen silmek için cihazları seçin.22');
     } else {
         const form =e.target;
 
@@ -58,12 +91,21 @@ document.getElementById('bulkDeleteForm').addEventListener('submit', function (e
         })
     }
 });
-document.getElementById('selectAll').addEventListener('change', function () {
-    const isChecked = this.checked;
-    const checkboxes = document.querySelectorAll('input[name="selectedDevices[]"]');
+document.getElementById('bulkRestoreForm').addEventListener('submit', function (e) {
+    const selectedDevices = document.querySelectorAll('input[name="selectedDevices[]"]:checked');
+    if (selectedDevices.length === 0) {
+        e.preventDefault();
+        alert('Lütfen silmek için cihazları seçin.42423');
+    } else {
+        const form =e.target;
 
-    checkboxes.forEach(function (checkbox) {
-        checkbox.checked = isChecked;
-    });
-
+        selectedDevices.forEach(function (checkbox) {
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'selectedDevices[]';
+            hiddenInput.value = checkbox.value;
+            form.appendChild(hiddenInput);
+        })
+    }
 });
+

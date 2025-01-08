@@ -40,6 +40,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/devices/export', [DeviceController::class, 'export'])->name('devices.export');
 
     Route::post('/devices/bulk-delete', [DeviceController::class, 'bulkDelete'])->name('devices.bulkDelete');
+    Route::post('/devices/bulk-restore', [DeviceController::class, 'bulkRestore'])->name('devices.bulkRestore');
     Route::delete('/devices/{device}/force-destroy', [DeviceController::class, 'forceDestroy'])->name('devices.forceDestroy');
     Route::put('/devices/{device}/restore', [DeviceController::class, 'restore'])->name('devices.restore');
     Route::get('/devices/orphans', [DeviceController::class, 'orphans']);

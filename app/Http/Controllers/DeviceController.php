@@ -66,7 +66,7 @@ class DeviceController extends Controller
             'link2' => 'working',
             'link3' => 'storage',
         ];
-        
+
         return view('devices.index', compact('devices', 'columns', 'infobox'));
 
     }
@@ -158,11 +158,32 @@ class DeviceController extends Controller
         if (empty($deviceIds)) {
             return redirect()->back()->with('error', 'Hiçbir cihaz seçilmedi.');
         }
-        $devices = Device::whereIn('id', $deviceIds)->get();
+        $devices = Device::withTrashed()->whereIn('id', $deviceIds)->get();
+
         foreach ($devices as $device) {
-            $device->delete(); // Bu çağrı model olaylarını tetikler
+            if ($device->trashed()) {
+                $device->deviceInfos()->forceDelete();
+                $device->forceDelete();
+            }else{
+                $device->delete();
+            }
+
+
         }
         return new SuccessResponse('Toplam ' . count($deviceIds) . ' adet cihaz silindi.');
+    }
+    public function bulkRestore(Request $request)
+    {
+        $deviceIds = $request->input('selectedDevices', []);
+        if (empty($deviceIds)) {
+            return redirect()->back()->with('error', 'Hiçbir cihaz seçilmedi.');
+        }
+        $devices = Device::onlyTrashed()->whereIn('id', $deviceIds)->get();
+        foreach ($devices as $device) {
+            $device->latestDeviceInfo()->restore();
+            $device->restore();
+        }
+        return new SuccessResponse('Toplam ' . count($deviceIds) . ' adet cihaz geri döndürüldü.');
     }
 
     public function forceDestroy($deviceId)

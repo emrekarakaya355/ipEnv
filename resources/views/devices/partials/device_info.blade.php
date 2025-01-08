@@ -100,7 +100,7 @@
                     @foreach ($locations->unique('building') as $location)
                         <option
                             value="{{ $location->building }}" {{  $location->building ==  $device->building   ? 'selected' : '' }}>
-                            {{ mb_strtolower( $location->building,'UTF-8') }}
+                            {{  $location->building}}
                         </option>
                     @endforeach
                 </select>

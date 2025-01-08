@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('device_type_id')->constrained('device_types');
             $table->string('type');
             $table->string('device_name')->nullable();
-            $table->string('serial_number')->unique();
+            $table->string('serial_number');
             $table->string('registry_number')->nullable();
             $table->string('mac_address')->unique();
             $table->enum('status', array_keys(DeviceStatus::toArray()))->default(DeviceStatus::STORAGE->name);

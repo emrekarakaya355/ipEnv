@@ -26,15 +26,20 @@
                     </button>
                 </form>
             @endif
-                @if(request()->routeIs('devices.deletedDevices'))
-
-                    <form id="bulkDeleteForm" action="{{ route('devices.bulkDelete') }}" method="POST" onsubmit="return confirm('Seçilen cihazları silmek istediğinizden emin misiniz?');">
+            @if(request()->routeIs('devices.deletedDevices'))
+                    <form id="bulkRestoreForm" class="bulk-form" action="{{ route('devices.bulkRestore') }}" method="POST" onsubmit="return confirm('Seçilen cihazları geri getirmek istediğinizden emin misiniz?');">
                         @csrf
-                        <button type="submit" class="bg-red-500 text-white rounded px-2 py-2">
-                            <i class="fas fa-trash"></i>
+                        <button type="submit" class="bg-green-500 text-white rounded px-2 py-2">
+                            <i class="fas fa-trash-restore"></i>
                         </button>
                     </form>
-                @endif
+                <form id="bulkDeleteForm" class="bulk-form" action="{{ route('devices.bulkDelete') }}" method="POST" onsubmit="return confirm('Seçilen cihazları Kalıcı silmek istediğinizden emin misiniz?');">
+                    @csrf
+                    <button type="submit" class="bg-red-500 text-white rounded px-2 py-2">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </form>
+            @endif
         @endisset
     </div>
 </div>

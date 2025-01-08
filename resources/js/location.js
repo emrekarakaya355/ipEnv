@@ -10,8 +10,8 @@ window.editLocation = function editLocation(locationId) {
     fetch(`/locations/${locationId}`)
         .then(response => response.json())
         .then(data => {
-            document.getElementById('building').value = data.building.toLocaleLowerCase('tr');
-            document.getElementById('unit').value =data.unit.toLocaleLowerCase('tr');
+            document.getElementById('building').value = data.building;
+            document.getElementById('unit').value =data.unit;
             document.getElementById('addUnitButton').classList.add('hidden');
             document.getElementById('locationModal').classList.remove('hidden');
             document.getElementById('method').value = "PUT";

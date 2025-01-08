@@ -101,7 +101,6 @@ class Device extends Model implements Auditable
                 $model->latestDeviceInfo->delete();
                 $model->save();
             }
-
         });
 
         static::restoring(function ($model) {

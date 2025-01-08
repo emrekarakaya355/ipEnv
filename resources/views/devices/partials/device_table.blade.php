@@ -82,16 +82,6 @@
                                 class="bg-blue-500 text-white rounded">
                             <i class="fa-solid fa-arrow-right px-4 py-2"></i>
                         </button>
-                        @if(false)
-                            <form action="{{ route('devices.destroy', $row->id) }}" method="POST"
-                                  onsubmit="return confirm('Bu cihazı geçici olarak silmek istediğinizden emin misiniz?');">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="bg-red-500 text-white rounded">
-                                    <i class="fa-solid fa-trash px-4 py-2"></i>
-                                </button>
-                            </form>
-                        @endif
                     </td>
                 @endif
 

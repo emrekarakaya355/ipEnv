@@ -71,10 +71,8 @@ class DeviceInfo extends Model implements Auditable
         static::restoring(function ($model) {
             $model->deleted_by = null;
             $model->isDeleted = false;
-            $model->updated_by = auth()->id();
 
         });
-
 
         static::saving(function ($model) {
             // Aynı IP adresine sahip silinmemiş (soft deleted olmayan) bir kayıt olup olmadığını kontrol et
