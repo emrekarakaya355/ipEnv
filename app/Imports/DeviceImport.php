@@ -111,7 +111,7 @@ class DeviceImport extends  BaseImport
             'mac_address' => [
                 'required',
                 'string',
-                'regex:/^([0-9A-Fa-f]{2}([-:])?){5}[0-9A-Fa-f]{2}$/', // Ensures MAC address format
+                'regex:/^\s*([0-9A-Fa-f]{2}([-:])?){5}[0-9A-Fa-f]{2}\s*$/', // Ensures MAC address format
                 'unique:devices,mac_address', // Optional: check for uniqueness if needed
             ],
             'device_name' => [
