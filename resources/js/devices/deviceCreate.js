@@ -56,8 +56,10 @@ document.getElementById('ip_address').addEventListener('input', function (e) {
     let value = e.target.value;
 
     // Sadece sayıları ve noktayı kabul et
-    value = value.replace(/[^0-9]/g, '');
+    value = value.replace(/[^0-9.]/g, '.');
 
+    value = value.replace(/\.{2,}/g, '.');
+/*
     // 3 hanelik gruplara ayırmak için bir dizi oluştur
     const segments = [];
     for (let i = 0; i < value.length; i += 3) {
@@ -66,7 +68,7 @@ document.getElementById('ip_address').addEventListener('input', function (e) {
     // Her grup arasına nokta ekleyin
     value = segments.join('.');
 
-
+*/
     if (value.length > 15) {
         value = value.slice(0, 15);  // Maksimum 15 karakteri geçmesin
     }
