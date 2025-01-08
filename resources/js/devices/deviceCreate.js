@@ -59,16 +59,17 @@ document.getElementById('ip_address').addEventListener('input', function (e) {
     value = value.replace(/[^0-9.]/g, '.');
 
     value = value.replace(/\.{2,}/g, '.');
-/*
-    // 3 hanelik gruplara ayırmak için bir dizi oluştur
-    const segments = [];
-    for (let i = 0; i < value.length; i += 3) {
-        segments.push(value.slice(i, i + 3));
-    }
-    // Her grup arasına nokta ekleyin
-    value = segments.join('.');
+    value = value.replace(/(\d{3})(?=\d)/g, '$1.');
+    /*
+        // 3 hanelik gruplara ayırmak için bir dizi oluştur
+        const segments = [];
+        for (let i = 0; i < value.length; i += 3) {
+            segments.push(value.slice(i, i + 3));
+        }
+        // Her grup arasına nokta ekleyin
+        value = segments.join('.');
 
-*/
+    */
     if (value.length > 15) {
         value = value.slice(0, 15);  // Maksimum 15 karakteri geçmesin
     }
