@@ -60,16 +60,15 @@ document.getElementById('ip_address').addEventListener('input', function (e) {
 
     value = value.replace(/\.{2,}/g, '.');
     value = value.replace(/(\d{3})(?=\d)/g, '$1.');
-    /*
-        // 3 hanelik gruplara ayırmak için bir dizi oluştur
-        const segments = [];
-        for (let i = 0; i < value.length; i += 3) {
-            segments.push(value.slice(i, i + 3));
-        }
-        // Her grup arasına nokta ekleyin
-        value = segments.join('.');
+    const dotCount = (value.match(/\./g) || []).length;
 
-    */
+    // Eğer toplamda 4 noktadan fazla varsa, noktaları kaldır
+    if (dotCount > 3) {
+        // Son eklenen noktayı silmek için noktaları geçici olarak kaldırıyoruz
+        let lastDotIndex = value.lastIndexOf('.');
+        value = value.slice(0, lastDotIndex);
+    }
+
     if (value.length > 15) {
         value = value.slice(0, 15);  // Maksimum 15 karakteri geçmesin
     }
