@@ -1,7 +1,12 @@
 <div class="flex justify-between items-center ">
-    <div> </div>
+    <div class="fa-pull-right">
+        @if(request()->routeIs('devices.index'))
+            <a href="devices/refresh" class="bg-blue-500 text-white px-4 py-2 rounded" role="menuitem">
+                <i class="fas fa-arrows-rotate" ></i>
+            </a>
+        @endif
+    </div>
     <div class="flex space-x-2 items-center p-2 mt-2">
-
         <x-button-group
             route="{{$route}}"
             :addOnClick="$addOnClick"

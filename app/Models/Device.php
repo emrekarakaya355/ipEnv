@@ -228,13 +228,31 @@ class Device extends Model implements Auditable
     {
         try {
             if ($value instanceof DeviceStatus) {
-
                 $this->attributes['status'] = $value->value;
             } elseif (is_string($value)) {
                 $this->attributes['status'] = DeviceStatus::fromName($value)->name;
             }
         } catch (Exception $exception) {
             throw new CustomInternalException("Invalid status value.");
+        }
+    }
+
+    /**
+     * IP'ye ping atarak cihazın durumunu günceller
+     * @param string $ipAddress
+     * @return void
+     */
+    public function updateStatusByPing(string $ipAddress): void
+    {
+        if (filter_var($ipAddress, FILTER_VALIDATE_IP)) {
+            exec("ping -n 1 {$ipAddress} 2>&1", $output, $returnVar);
+            if ($returnVar === 0) {
+                $this->setStatusAttribute('WORKING');
+            } else {
+                if($this->status == DeviceStatus::WORKING){
+                    $this->setStatusAttribute('STORAGE');
+                }
+            }
         }
     }
 

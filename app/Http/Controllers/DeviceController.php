@@ -9,6 +9,7 @@ use App\Http\Responses\ErrorResponse;
 use App\Http\Responses\SuccessResponse;
 use App\Imports\DeviceImport;
 use App\Imports\DeviceParentImport;
+use App\Jobs\UpdateDeviceStatus;
 use App\Models\AccessPoint;
 use App\Models\Device;
 use App\Models\Location;
@@ -48,11 +49,13 @@ class DeviceController extends Controller
                 ->withQueryString();
             return view('devices.partials.device_table', compact('devices', 'columns'))->render();
         }
+
         $devices = $query
             ->sorted(request('sort', 'created_at'), request('direction', 'desc'))
             ->with('latestDeviceInfo')
             ->paginate($perPage)
             ->withQueryString();  // Tüm parametreleri URL'e ekle
+
         $total = Device::query()->count();
         $active = Device::where('status', 'working')->count();
         $passive = Device::where('status', 'storage')->count();
@@ -92,6 +95,14 @@ class DeviceController extends Controller
         $query = Device::query();
         $query->onlyTrashed();
         return ($this->applyFiltersAndSorting($request, $query));
+    }
+    public function refresh(Request $request)
+    {
+            $devices = Device::query()->get();
+            foreach ($devices as $device) {
+                UpdateDeviceStatus::dispatch($device);
+            }
+            return new SuccessResponse('Sonuçların Yenilenmesi Biraz Zaman Alabilir.');
     }
 
     public function create()

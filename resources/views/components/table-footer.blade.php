@@ -25,6 +25,7 @@
                 <option value="10" {{ request('perPage') == 10 ? 'selected' : '' }}>10</option>
                 <option value="20" {{ request('perPage') == 20 ? 'selected' : '' }}>20</option>
                 <option value="100" {{ request('perPage') == 100 ? 'selected' : '' }}>100</option>
+                <option value="500" {{ request('perPage') == 500 ? 'selected' : '' }}>500</option>
             </select>
         </form>
         <span class="text-md">kayıt</span>

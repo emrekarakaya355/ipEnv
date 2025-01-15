@@ -45,6 +45,7 @@ Route::middleware('auth')->group(function () {
     Route::put('/devices/{device}/restore', [DeviceController::class, 'restore'])->name('devices.restore');
     Route::get('/devices/orphans', [DeviceController::class, 'orphans']);
     Route::get('/devices/deleted-devices', [DeviceController::class, 'deletedDevices'])->name('devices.deletedDevices');
+    Route::get('/devices/refresh', [DeviceController::class, 'refresh'])->name('devices.refresh');
 
     Route::resource('devices', DeviceController::class);
     Route::get('/devices/type/{type}', [DeviceController::class, 'index'])->name('devices.index.type');
