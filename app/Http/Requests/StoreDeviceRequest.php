@@ -39,7 +39,6 @@ class StoreDeviceRequest extends FormRequest
                 'required',
                 'string',
                 'max:255',
-                Rule::unique('devices', 'serial_number')->ignore($this->route('device')->id ?? null),
             ],
 
             'registry_number' => [

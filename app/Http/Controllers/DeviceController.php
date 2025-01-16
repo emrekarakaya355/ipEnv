@@ -306,5 +306,21 @@ class DeviceController extends Controller
         return \Maatwebsite\Excel\Facades\Excel::download(new DeviceTemplateExport(), 'device_import_template.xlsx');
     }
 
+    public function openCmdAndRunSsh($ipAddress)
+    {
+        $username = env('SSH_USERNAME');
+        $password = env('SSH_PASSWORD');
+
+
+        // SSH komutunu hazırlamak (Windows'ta cmd komutunu kullanarak başlatıyoruz)
+        $sshCommand = "ssh -o StrictHostKeyChecking=no $username@$ipAddress";
+        // shell_exec ile komut çalıştırma
+        $output = shell_exec("start cmd /k $sshCommand");
+        /*
+        $sshCommand = "ssh $username@$ipAddress";
+        $output = shell_exec("powershell -Command \"$sshCommand\"");*/
+        return new successResponse();
+    }
+
 
 }

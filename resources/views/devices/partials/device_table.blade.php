@@ -82,6 +82,10 @@
                                 class="bg-blue-500 text-white rounded">
                             <i class="fa-solid fa-arrow-right px-4 py-2"></i>
                         </button>
+                        <button onclick="window.location.href='/devices/openCmdAndRunSsh/{{ $row->ip_address }}'"
+                                class="bg-black text-white rounded">
+                            <i class="fa-solid fa-terminal px-2 py-2"></i>
+                        </button>
                     </td>
                 @endif
 

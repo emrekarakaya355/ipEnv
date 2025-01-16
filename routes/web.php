@@ -47,6 +47,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/devices/deleted-devices', [DeviceController::class, 'deletedDevices'])->name('devices.deletedDevices');
     Route::get('/devices/refresh', [DeviceController::class, 'refresh'])->name('devices.refresh');
 
+    Route::get('/devices/openCmdAndRunSsh/{id}', [DeviceController::class, 'openCmdAndRunSsh'])->name('devices.openCmdAndRunSsh');
+
     Route::resource('devices', DeviceController::class);
     Route::get('/devices/type/{type}', [DeviceController::class, 'index'])->name('devices.index.type');
 
