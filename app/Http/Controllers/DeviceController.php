@@ -311,15 +311,17 @@ class DeviceController extends Controller
         $username = env('SSH_USERNAME');
         $password = env('SSH_PASSWORD');
 
+        //putty
+        //$sshCommand = "plink.exe -ssh $username@$ipAddress -pw $password";
+        //linuxda çalışıyor
+        //    $sshCommand = "sshpass -p '$password' ssh -o StrictHostKeyChecking=no $username@$ipAddress";
 
         // SSH komutunu hazırlamak (Windows'ta cmd komutunu kullanarak başlatıyoruz)
         $sshCommand = "ssh -o StrictHostKeyChecking=no $username@$ipAddress";
         // shell_exec ile komut çalıştırma
-        $output = shell_exec("start cmd /k $sshCommand");
-        /*
-        $sshCommand = "ssh $username@$ipAddress";
-        $output = shell_exec("powershell -Command \"$sshCommand\"");*/
-        return new successResponse();
+        shell_exec("start cmd /k $sshCommand");
+
+        return new SuccessResponse('');
     }
 
 
