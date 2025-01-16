@@ -102,7 +102,8 @@ class DeviceController extends Controller
             foreach ($devices as $device) {
                 UpdateDeviceStatus::dispatch($device);
             }
-            return new SuccessResponse('Sonuçların Yenilenmesi Biraz Zaman Alabilir.');
+
+        return new SuccessResponse('Sonuçların Yenilendi.');
     }
 
     public function create()
