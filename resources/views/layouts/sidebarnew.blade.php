@@ -66,6 +66,14 @@
             <span class="mx-3">Yetkiler</span>
         </a>
         @endcan
+            @can('view script')
+        <a class="flex items-center px-6 py-2 mt-4 text-gray-500 hover:bg-gray-700 hover:bg-opacity-25 hover:text-gray-100"
+           href="/scripts">
+            <i class="fa-solid fa-lock w-6 h-6 text-gray-500"></i>
+            <span class="mx-3">Scriptler</span>
+        </a>
+        @endcan
+
 
     </nav>
 </div>
@@ -163,6 +171,11 @@
                     @can('view permission')
                     <a href="/permissions"
                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-600 hover:text-white">Yetkiler</a>
+
+                    @endcan
+                    @can('view script')
+                    <a href="/scripts"
+                       class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-600 hover:text-white">Scriptler</a>
 
                     @endcan
 
