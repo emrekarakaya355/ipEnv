@@ -143,8 +143,15 @@
 
             @endcan
         </div>
-        <div class="mt-4">
+        <div class="mt-4 flex justify-between">
+            <div>
+            @can('terminal device')
+                <button type="button" id="terminal-btn" class="bg-black text-white px-4 py-2 rounded "     onclick="window.location.href='{{ route('devices.terminal', ['id' => $device->id]) }}'">>Terminal</button>
+            @endcan
+            </div>
+            <div>
             @can('update device')
+
             <button type="button" id="edit-btn" class="bg-blue-500 text-white px-4 py-2 rounded mr-2">Update</button>
             <button type="submit" id="save-btn" class="bg-green-500 text-white px-4 py-2 rounded mr-2 hidden">Save
             </button>
@@ -154,6 +161,7 @@
             @can('delete device')
             <button type="button" id="delete-btn" class="bg-red-500 text-white px-4 py-2 rounded" onclick="handleDelete(`/devices/{{$device->id}}`,redirectUrl='/devices')">Delete</button>
             @endcan
+            </div>
         </div>
         <input type="hidden" name="parent_device_id" id="parent_device_id"
                value="{{ $device->parentDevice->id ?? '' }}">

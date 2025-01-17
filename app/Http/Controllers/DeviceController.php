@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\ConflictException;
 use App\Exports\DeviceExport;
 use App\Exports\DeviceTemplateExport;
 use App\Http\Requests\StoreDeviceRequest;
@@ -15,6 +16,7 @@ use App\Models\Device;
 use App\Models\Location;
 use App\Models\NetworkSwitch;
 use App\Services\DeviceService;
+use App\Services\SSHService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
@@ -22,11 +24,11 @@ use Maatwebsite\Excel\Facades\Excel;
 class DeviceController extends Controller
 {
     protected DeviceService $deviceService;
-
-    public function __construct(DeviceService $deviceService)
+    private $sshService;
+    public function __construct(DeviceService $deviceService,SSHService $sshService)
     {
         $this->deviceService = $deviceService;
-
+        $this->sshService =  $sshService;
         $this->middleware('permission:view device', ['only' => ['index']]);
         $this->middleware('permission:view deviceInfo', ['only' => ['orphans']]);
         $this->middleware('permission:create device', ['only' => ['create', 'store']]);
@@ -103,7 +105,7 @@ class DeviceController extends Controller
                 UpdateDeviceStatus::dispatch($device);
             }
 
-        return new SuccessResponse('Sonuçların Yenilendi.');
+        return new SuccessResponse('Sonuçların Biraz bekleyiniz.');
     }
 
     public function create()
@@ -307,22 +309,58 @@ class DeviceController extends Controller
         return \Maatwebsite\Excel\Facades\Excel::download(new DeviceTemplateExport(), 'device_import_template.xlsx');
     }
 
+
     public function openCmdAndRunSsh($ipAddress)
     {
         $username = env('SSH_USERNAME');
         $password = env('SSH_PASSWORD');
+        //$sshCommand = "ssh -o StrictHostKeyChecking=no $username@$ipAddress";
 
         //putty
-        //$sshCommand = "plink.exe -ssh $username@$ipAddress -pw $password";
+        $sshCommand = "plink.exe -ssh $username@$ipAddress -pw $password";
         //linuxda çalışıyor
         //    $sshCommand = "sshpass -p '$password' ssh -o StrictHostKeyChecking=no $username@$ipAddress";
+        // Komut satırını çalıştırmak için proc_open kullanımı
+        $descriptorspec = [
+            0 => ["pipe", "r"],  // Standart girdi (yazma)
+            1 => ["pipe", "w"],  // Standart çıktı (okuma)
+            2 => ["pipe", "w"]   // Standart hata (okuma)
+        ];
+
+        // Komutu başlat
+        $process = proc_open("start cmd /k \"$sshCommand\"", $descriptorspec, $pipes);
+
 
         // SSH komutunu hazırlamak (Windows'ta cmd komutunu kullanarak başlatıyoruz)
-        $sshCommand = "ssh -o StrictHostKeyChecking=no $username@$ipAddress";
         // shell_exec ile komut çalıştırma
-        shell_exec("start cmd /k $sshCommand");
+        //shell_exec("start cmd /k $sshCommand");
 
         return new SuccessResponse('');
+    }
+
+    public function terminal($id)
+    {
+        $device = Device::with('deviceType','deviceType.scripts')->findOrFail($id);
+        $username = env('SSH_USERNAME');
+        $password = env('SSH_PASSWORD');
+
+        try {
+            $this->sshService->connect($device->ip_address, $username, $password);
+        } catch (\Exception $e) {
+            //return new ErrorResponse($e,$e->getMessage());
+        }
+        return view('devices.partials.terminal', compact('id','device'));
+    }
+
+    public function executeCommand(Request $request)
+    {
+        $command = $request->input('command');
+        try {
+            $output = $this->sshService->execute($command);
+            return new SuccessResponse($output);
+        } catch (\Exception $e) {
+            return new ErrorResponse($e,$e->getMessage());
+        }
     }
 
 

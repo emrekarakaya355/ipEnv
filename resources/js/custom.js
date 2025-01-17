@@ -1,6 +1,5 @@
 window.handleTypeChange = function handleTypeChange(type, container) {
     let brandSelect = container.querySelector('[data-brand-select]');
-
     fetch(`/get-brands/${type}`)
         .then(response => response.json())
         .then(data => {

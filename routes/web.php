@@ -5,6 +5,7 @@ use App\Http\Controllers\DeviceController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\ProfileController;
 use \App\Http\Controllers\DeviceTypeController;
+use \App\Http\Controllers\SshController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -20,7 +21,7 @@ Route::middleware('auth')->group(function () {
 });
 
 // Cihaz ve diğer resource route'ları oturum açmış kullanıcılar için
-Route::middleware('auth')->group(function () {
+Route::middleware('auth')->group(callback: function () {
 
     //Route::get('/', function () { return view('welcome'); });
     Route::get('/get-brands/{type}', [DeviceTypeController::class, 'getBrandsByType']);
@@ -46,6 +47,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/devices/orphans', [DeviceController::class, 'orphans']);
     Route::get('/devices/deleted-devices', [DeviceController::class, 'deletedDevices'])->name('devices.deletedDevices');
     Route::get('/devices/refresh', [DeviceController::class, 'refresh'])->name('devices.refresh');
+
+    Route::get('/devices/terminal/{id}', [DeviceController::class, 'terminal'])->name('devices.terminal');
+    Route::post('/devices/executeCommand', [DeviceController::class, 'executeCommand'])->name('devices.executeCommand');
 
     Route::get('/devices/openCmdAndRunSsh/{id}', [DeviceController::class, 'openCmdAndRunSsh'])->name('devices.openCmdAndRunSsh');
 
@@ -74,6 +78,11 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/search-results', [App\Http\Controllers\SearchController::class, 'searchResults']);
 
+    Route::resource('scripts', App\Http\Controllers\ScriptController::class);
+    Route::get('scripts/{scriptsId}/delete', [App\Http\Controllers\ScriptController::class, 'destroy']);
+    Route::get('scripts/{scriptsId}/assign', [App\Http\Controllers\ScriptController::class, 'assign']);
+    Route::post('script/{scriptsId}/assign', [App\Http\Controllers\ScriptController::class, 'assignStore']);
+    Route::get('script/{scriptsId}/detach/{deviceTypeId}', [App\Http\Controllers\ScriptController::class, 'detach']);
 
 });
 

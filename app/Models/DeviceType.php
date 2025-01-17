@@ -49,6 +49,13 @@ class DeviceType extends Model  implements Auditable
     {
         return $this->hasMany(Device::class);
     }
+    public function scripts()
+    {
+        return $this->belongsToMany(Script::class, 'script_device_type', 'device_type_id', 'script_id');
+    }
+
+
+
     public static function getBrandsByType($type)
     {
 
