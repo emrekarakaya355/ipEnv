@@ -312,6 +312,9 @@ class DeviceController extends Controller
 
     public function openCmdAndRunSsh($ipAddress)
     {
+        if(!$ipAddress){
+            return new ErrorResponse(null,'İp adresi gerekiyor');
+        }
         $username = env('SSH_USERNAME');
         $password = env('SSH_PASSWORD');
         //$sshCommand = "ssh -o StrictHostKeyChecking=no $username@$ipAddress";
