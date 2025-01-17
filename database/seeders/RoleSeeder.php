@@ -52,6 +52,9 @@ class RoleSeeder extends Seeder
         Permission::create(['name' => 'delete deviceType']);
         Permission::create(['name' => 'view deleted devices']);
 
+        Permission::create(['name' => 'view script']);
+        Permission::create(['name' => 'terminal device']);
+
 
         Permission::create(['name' => 'view-device_movement']);
         Permission::create(['name' => 'view-device_family']);
