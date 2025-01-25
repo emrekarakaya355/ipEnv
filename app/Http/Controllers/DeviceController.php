@@ -24,11 +24,9 @@ use Maatwebsite\Excel\Facades\Excel;
 class DeviceController extends Controller
 {
     protected DeviceService $deviceService;
-    private $sshService;
-    public function __construct(DeviceService $deviceService,SSHService $sshService)
+    public function __construct(DeviceService $deviceService,protected SSHService $sshService)
     {
         $this->deviceService = $deviceService;
-        $this->sshService =  $sshService;
         $this->middleware('permission:view device', ['only' => ['index']]);
         $this->middleware('permission:view deviceInfo', ['only' => ['orphans']]);
         $this->middleware('permission:create device', ['only' => ['create', 'store']]);
@@ -320,7 +318,7 @@ class DeviceController extends Controller
         //$sshCommand = "ssh -o StrictHostKeyChecking=no $username@$ipAddress";
 
         //putty
-        $sshCommand = "plink.exe -ssh $username@$ipAddress -pw $password";
+        $sshCommand = "plink.exe -ssh $username@sdf.org -pw $password";
         //linuxda çalışıyor
         //    $sshCommand = "sshpass -p '$password' ssh -o StrictHostKeyChecking=no $username@$ipAddress";
         // Komut satırını çalıştırmak için proc_open kullanımı
@@ -343,20 +341,31 @@ class DeviceController extends Controller
 
     public function terminal($id)
     {
+
         $device = Device::with('deviceType','deviceType.scripts')->findOrFail($id);
+        return view('devices.partials.terminal', compact('id','device'));
+
+        if(!$device || !$device->ipAddress){
+            return new ErrorResponse(null,'İp adresi gerekiyor');
+        }
         $username = env('SSH_USERNAME');
         $password = env('SSH_PASSWORD');
-
         try {
-            $this->sshService->connect($device->ip_address, $username, $password);
+            $this->sshService->connect('sdf.org', $username, $password);
+            echo  $this->sshService->q;
+            app(SSHService::class);
+            echo  $this->sshService->q;
+
         } catch (\Exception $e) {
-            //return new ErrorResponse($e,$e->getMessage());
+            return new ErrorResponse($e,$e->getMessage());
         }
         return view('devices.partials.terminal', compact('id','device'));
     }
 
     public function executeCommand(Request $request)
     {
+        echo spl_object_hash($this->sshService);
+        dd($this->sshService);
         $command = $request->input('command');
         try {
             $output = $this->sshService->execute($command);

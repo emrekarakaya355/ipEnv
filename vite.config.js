@@ -24,6 +24,9 @@ export default defineConfig({
                 'resources/js/button-group.js',
                 'resources/js/tableHeader.js',
                 'resources/js/mainSearch.js',
+                'resources/js/client.js',
+
+
             ],
             refresh: true,
         }),
