@@ -252,7 +252,6 @@
     document.addEventListener('DOMContentLoaded', function () {
         const editButton = document.getElementById('edit-btn');
         const cancelButton = document.getElementById('cancel-btn');
-        const deleteButton = document.getElementById('delete-btn');
         const parentEditButton = document.getElementById('parent-edit-btn');
         const parentDeleteButton = document.getElementById('parent-delete-btn');
         const infoElements = document.querySelectorAll('#device-info-form p[contenteditable="false"]');
@@ -284,7 +283,6 @@
                 element.addEventListener('change', handleInputChange);
             });
 
-            // Disable select elements with data-dis attribute
             dataDisSelects.forEach(select => {
                 select.setAttribute('disabled', 'disabled');
             });
@@ -323,7 +321,6 @@
         function isIpAddressChanged() {
             const ipAddressElement = document.getElementById('device-ip-address');
 
-            // Eğer IP address elementi bulunamazsa (görünmüyorsa), değişiklik olmadığını varsay.
             if (ipAddressElement === null) {
                 return false;
             }
@@ -333,7 +330,7 @@
 
 
         saveButton.addEventListener('click', async function (event) {
-            event.preventDefault(); // Formun varsayılan gönderimini engelle
+            event.preventDefault();
 
 
             infoElements.forEach(element => {
@@ -356,7 +353,6 @@
                 document.getElementById('device-info-form').appendChild(input);
             });
 
-            // Kullanıcı onay vermezse form gönderimini iptal et
             if (isIpAddressChanged()) {
                 event.preventDefault();
                 toastr.info(
@@ -367,7 +363,6 @@
                         allowHtml: true,
                         onShown: function (toast) {
                             $("#confirmationButtonYes").click(function () {
-                                // Kullanıcı "Evet"e tıkladı, formu gönder
                                 document.getElementById('device-info-form').submit();
                             });
 
@@ -375,13 +370,12 @@
                                 toastr.clear(toast, {force: true});
                             });
                         },
-                        timeOut: 0, // Toastr mesajı kaybolmasın
-                        extendedTimeOut: 0 // Fare üzerinde olduğunda da kaybolmasın
+                        timeOut: 0,
+                        extendedTimeOut: 0
                     }
                 );
 
             }
-            // Kullanıcıdan değişiklik yapma sebebini alın
             const changeReason = prompt('Değişiklik yapma sebebini girin:');
 
             if (!changeReason) {

@@ -32,15 +32,15 @@ export default defineConfig({
         }),
     ],
     build: {
-        minify: 'terser', // Terser kullanarak minify işlemi
+        minify: 'terser',
         terserOptions: {
             compress: {
-                drop_console: true, // Konsol çıktısını kaldırır
-                drop_debugger: true, // Debugger ifadelerini kaldırır
+                drop_console: true,
+                drop_debugger: true,
             },
-            mangle: true, // Koddaki değişken isimlerini karmaşıklaştırır
+            mangle: true,
             format: {
-                comments: false, // Yorumları kaldırır
+                comments: false,
             },
         },
     },

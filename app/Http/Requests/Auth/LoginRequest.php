@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Exceptions\ModelNotFoundException;
+use App\Models\User;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
@@ -40,10 +42,29 @@ class LoginRequest extends FormRequest
     public function authenticate(): void
     {
         $this->ensureIsNotRateLimited();
+        $loginInput = $this->input('login');
+        $loginType = filter_var($loginInput, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
 
-        $loginType = filter_var($this->input('login'), FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+        if($loginType == 'username') {
+            $loginInput .= '@nevsehir.edu.tr';
+        }
 
+        if($this->LdapLogin($loginInput, $this->password)) {
 
+            $bilgiler = User::where('email','=',$loginInput)->first();
+            if(!$bilgiler){
+                throw new ModelNotFoundException('Yetkiniz Yok');
+            }
+            Auth::loginUsingId($bilgiler->id);
+            RateLimiter::clear($this->throttleKey());
+        }else{
+            RateLimiter::hit($this->throttleKey());
+            throw ValidationException::withMessages([
+                'form.email' =>  'E-posta adresiniz veya şifreniz yanlış. Lütfen tekrar kontrol edin ve yeniden deneyin.',
+            ]);
+        }
+
+        /*
         if (! Auth::attempt([$loginType => $this->input('login'), 'password' => $this->input('password')], $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
 
@@ -51,7 +72,7 @@ class LoginRequest extends FormRequest
                 'email' => trans('auth.failed'),
             ]);
         }
-
+*/
         RateLimiter::clear($this->throttleKey());
     }
 
@@ -84,5 +105,27 @@ class LoginRequest extends FormRequest
     public function throttleKey(): string
     {
         return Str::transliterate(Str::lower($this->string('email')).'|'.$this->ip());
+    }
+
+    private function LdapLogin($email,$password)
+    {
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL))
+            return false;
+
+        $fp = fsockopen ( "79.123.186.104" , 110 );
+        if (!$fp) {
+            return false;
+        }
+        $trash = fgets ( $fp, 128 );
+        fwrite ( $fp, "USER ".$email."\r\n" );
+
+        $trash = fgets ( $fp, 128 );
+        fwrite ( $fp, "PASS ".$password."\r\n" );
+        $result = fgets ( $fp, 128 );
+
+        if(str_starts_with($result, '+OK'))
+            return true;
+        else
+            return false;
     }
 }
